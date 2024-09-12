@@ -3416,6 +3416,8 @@ i.icon-circle {
 
 .unique-info {
   background-color: #ffc107;
+  width: 50%;
+  color: white;
   padding: 8px 12px;
   border-radius: 4px;
   margin-bottom: 20px;
@@ -3433,6 +3435,18 @@ i.icon-circle {
 input[type="checkbox"] {
   margin-right: 8px;
 }
+
+.radio-group {
+  display: flex;
+  gap: 0.5rem;
+}
+.unique-radio {
+  margin-right: 0.5rem;
+}
+.unique-radio-label {
+  margin-right: 2rem;
+}
+
 
 .unique-button {
   background-color: #00c6ff;
@@ -3608,3 +3622,4 @@ h1 {
       justify-content: center;
   }
 }
+

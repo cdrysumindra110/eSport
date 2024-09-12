@@ -232,3 +232,4 @@ document.addEventListener('DOMContentLoaded', function () {
   // Initialize with the first tab active
   switchTab('latest'); // Set 'latest' as the initial tab
 });
+
