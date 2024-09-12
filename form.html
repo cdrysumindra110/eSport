@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.tour_create-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #212529;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  border-radius: 10px;
+}
+
+.tour_create-container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
+}
+
+.tour_create-container .form-group {
+  margin-bottom: 20px;
+}
+
+.tour_create-container label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background-color: #343a40;
+  color: #fff;
+  font-size: 16px;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus {
+  border-color: #6c5ce7;
+  outline: none;
+}
+
+button {
+  display: block;
+  width: 100%;
+  background-color: #28a745;
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+.help-link {
+  display: inline-block;
+  margin-top: 15px;
+  text-align: right;
+  color: #007bff;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.help-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .tour_create-container {
+    padding: 20px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="tour_create-container">
+  <form action="" method="post">
+    <h1>REQUIRED FIELDS</h1>
+
+    <div class="form-group">
+      <label for="selected-game">SELECTED GAME</label>
+      <input type="text" id="selected-game" value="PUBG Mobile" readonly>
+    </div>
+  
+    <div class="form-group">
+      <label for="tournament-name">TOURNAMENT NAME</label>
+      <input type="text" id="tournament-name" placeholder="Enter tournament name">
+    </div>
+  
+    <div class="form-group">
+      <label for="start-date">START DATE (DD/MM/YYYY)</label>
+      <input type="date" id="start-date" value="2024-09-06">
+      <p style="font-size: smaller; color: #888;">Date displayed in +0545</p>
+    </div>
+  
+    <div class="form-group">
+      <label for="start-time">START TIME</label>
+      <input type="time" id="start-time" value="19:00">
+      <p style="font-size: smaller; color: #888;">Time displayed in +0545</p>
+    </div>
+  
+    <button type="button" value="submit" id="submit">Submit</button>
+    <a href="#" class="help-link">Help</a>
+  </form>
+</div>
+</body>
+</html>

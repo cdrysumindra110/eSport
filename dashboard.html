@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Esports Website</title>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/responsee.css">
+    <link rel="stylesheet" href="owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="owl-carousel/owl.theme.css">
+    <!-- CUSTOM STYLE -->      
+    <link rel="stylesheet" href="css/template-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
+
+  </head>
+
+  <body class="size-1280 primary-color-red">
+    <!-- HEADER -->
+    <header role="banner" class="position-absolute">
+      <!-- Top Bar -->
+      <div class="top-bar full-width hide-s hide-m">
+        <div class="right">
+            <a href="tel:080055544444444" class="text-white text-primary-hover">Phone : +977 8888888888 </a> 
+            <span class="sep text-white">|</span> <a href="mailto:info@InfiKnight.com" class="text-white text-primary-hover"><i ></i>Email : info@InfiKnight.com</a>
+        </div>  
+      </div>    
+      <!-- Top Navigation -->
+      <nav class="background-transparent background-transparent-hightlight full-width sticky">
+        <div class="s-12 l-2">
+          <a href="index.html" class="logo">
+            <!-- Logo White Version -->
+            <img class="logo-white" src="img/logo.png" alt="">
+            <!-- Logo Dark Version -->
+            <img class="logo-dark" src="img/logo.png" alt="">
+          </a>
+        </div>
+        <div class="top-nav s-12 l-10">
+          <ul class="right chevron">
+            <li><a href="index.html">Home</a></li>
+           <li><a href="#">Tournaments</a>
+              <ul>
+                <li><a href="#">Upcoming Tournaments</a>
+                  <ul class="game_container">
+                    <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
+                    <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
+                    <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
+                    <a href="tour_reg.html" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
+                  </ul>
+              </li>
+                <li><a>Ongoing Tournaments</a></li>
+                </ul>
+            </li>
+            <li><a href="games.html">Games</a></li>
+            <li><a href="our-services.html">Our Services</a></li>
+            <!-- <li><a href="our-history.html">Our History</a></li> -->
+            <!-- <li><a href="contact.html">Contact</a></li> -->
+             
+            <li><a href="organize.html">Organize</a></li>
+            <li><a href="about-us.html">About</a></li>
+            <li><a href="#"><i class="fas fa-user"></i></a>
+              <ul>
+                <li><a href="signin.html">Signin</a></li>
+                <li><a href="signup.html">Signup</a></li>
+                <li><a href="index.html">Logout</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#">
+              <label class="plane-switch">
+              <input type="checkbox">
+              <div>
+                  <div>
+                      <svg viewBox="0 0 13 13">
+                          <path d="M1.55989957,5.41666667 L5.51582215,5.41666667 L4.47015462,0.108333333 L4.47015462,0.108333333 C4.47015462,0.0634601974 4.49708054,0.0249592654 4.5354546,0.00851337035 L4.57707145,0 L5.36229752,0 C5.43359776,0 5.50087375,0.028779451 5.55026392,0.0782711996 L5.59317877,0.134368264 L7.13659662,2.81558333 L8.29565964,2.81666667 C8.53185377,2.81666667 8.72332694,3.01067661 8.72332694,3.25 C8.72332694,3.48932339 8.53185377,3.68333333 8.29565964,3.68333333 L7.63589819,3.68225 L8.63450135,5.41666667 L11.9308317,5.41666667 C12.5213171,5.41666667 13,5.90169152 13,6.5 C13,7.09830848 12.5213171,7.58333333 11.9308317,7.58333333 L8.63450135,7.58333333 L7.63589819,9.31666667 L8.29565964,9.31666667 C8.53185377,9.31666667 8.72332694,9.51067661 8.72332694,9.75 C8.72332694,9.98932339 8.53185377,10.1833333 8.29565964,10.1833333 L7.13659662,10.1833333 L5.59317877,12.8656317 C5.55725264,12.9280353 5.49882018,12.9724157 5.43174295,12.9907056 L5.36229752,13 L4.57707145,13 L4.55610333,12.9978962 C4.51267695,12.9890959 4.48069792,12.9547924 4.47230803,12.9134397 L4.47223088,12.8704208 L5.51582215,7.58333333 L1.55989957,7.58333333 L0.891288881,8.55114605 C0.853775374,8.60544678 0.798421006,8.64327676 0.73629202,8.65879796 L0.672314689,8.66666667 L0.106844414,8.66666667 L0.0715243949,8.66058466 L0.0715243949,8.66058466 C0.0297243066,8.6457608 0.00275502199,8.60729104 0,8.5651586 L0.00593007386,8.52254537 L0.580855011,6.85813984 C0.64492547,6.67265611 0.6577034,6.47392717 0.619193545,6.28316421 L0.580694768,6.14191703 L0.00601851064,4.48064746 C0.00203480725,4.4691314 0,4.45701613 0,4.44481314 C0,4.39994001 0.0269259152,4.36143908 0.0652999725,4.34499318 L0.106916826,4.33647981 L0.672546853,4.33647981 C0.737865848,4.33647981 0.80011301,4.36066329 0.848265401,4.40322477 L0.89131128,4.45169723 L1.55989957,5.41666667 Z" fill="currentColor"></path>
+                      </svg>
+                  </div>
+                  <span class="street-middle"></span>
+                  <span class="cloud"></span>
+                  <span class="cloud two"></span>
+              </div>
+              </label>
+             </a>
+          </li>
+          </li>
+        </div>
+      </nav>
+    </header>
+    
+
+    <!-- MAIN -->
+    <main role="main">    
+      <article>
+        <!-- Header -->
+        <!-- Header -->
+        <header class="section-head background-image" style="background-image:url(img/full_bg.jpg)">
+          <div class="line">
+  
+            <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
+              User Profile
+            </h1>
+          
+          </div>
+   
+        </header>
+  
+    
+              <!-- Dashboard Container  -->
+                <!-- Dashboard Container -->
+            <div class="profile-container">
+              <!-- Cover Photo and Profile Picture Section -->
+              <div class="cover-photo-container">
+                <div class="cover-photo">
+                  <input id="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
+                  <label for="coverPhotoFile" class="cover-photo-label">
+                    <span class="icon-wrapper">
+                      <i class="fas fa-camera"></i>
+                    </span>
+                    <span>Change Cover</span>
+                  </label>
+                  <img id="coverPhoto" src="img/neon.png" alt="Cover Photo" class="cover-photo-img" />
+                  <div class="cover-overlay"></div>
+                </div>
+              </div>
+              <div class="profile-pic">
+                <input id="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
+                <label class="-label" for="profilePicFile">
+                  <span class="glyphicon glyphicon-camera"></span>
+                  <span>Change Profile</span>
+                </label>
+                <img src="img/team-02.jpg" id="profilePic" class="profile-pic-img" />
+              </div>
+            </div>
+
+            
+            <!-- Account Settings Container  -->
+
+            <div class="unique-container">
+              <form id="profile-form" action="#" method="post">
+              <div class="acc-setting">
+                <h2 class="unique-header">Account Settings</h2>
+            
+                <div class="unique-input-field">
+                  <label for="email" class="unique-label">Change Email:</label>
+                  <div class="unique-input-button-container">
+                    <input type="email" id="email" class="unique-input" placeholder="user@gmail.com">
+                    <button id="change-email" class="unique-button">Change email</button>
+                  </div>
+                </div>
+            
+                <div class="unique-input-field">
+                  <label for="password" class="unique-label">Change Password:</label>
+                  <div class="unique-input-button-container">
+                    <input type="password" id="password" class="unique-input" placeholder="********">
+                    <button id="change-password" class="unique-button">Change password</button>
+                  </div>
+                </div>
+              </div>
+              
+               <!-- Personal Information Container  -->
+              <h2 class="unique-header">Personal Information</h2>
+            
+              <div class="unique-input-field">
+                <label for="uname" class="unique-label">User Name</label>
+                <input type="text" id="uname" class="unique-input" placeholder="bloodehancxy">
+              </div>
+            
+              <div class="unique-input-field">
+                <label for="email" class="unique-label">Email</label>
+                <input type="email" id="email" class="unique-input" placeholder="user@gmail.com">
+              </div>
+            
+              <div class="unique-input-field">
+                <label for="dob" class="unique-label">Date Of Birth</label>
+                  <div class="dob-row">
+                    <select id="dob-month" class="unique-select">
+                      <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                    <select id="dob-day" class="unique-select">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                      <option value="8">8</option>
+                      <option value="9">9</option>
+                      <option value="10">10</option>
+                      <option value="11">11</option>
+                      <option value="12">12</option>
+                      <option value="13">13</option>
+                      <option value="14">14</option>
+                      <option value="15">15</option>
+                      <option value="16">16</option>
+                      <option value="17">17</option>
+                      <option value="18">18</option>
+                      <option value="19">19</option>
+                      <option value="20">20</option>
+                      <option value="21">21</option>
+                      <option value="22">22</option>
+                      <option value="23">23</option>
+                      <option value="24">24</option>
+                      <option value="25">25</option>
+                      <option value="26">26</option>
+                      <option value="27">27</option>
+                      <option value="28">28</option>
+                      <option value="29">29</option>
+                      <option value="30">30</option>
+                      <option value="31">31</option>
+                  </select>
+                  
+                  <select id="dob-year" class="unique-select">
+                    <option value="1960">1960</option>
+                    <option value="1961">1961</option>
+                    <option value="1962">1962</option>
+                    <option value="1963">1963</option>
+                    <option value="1964">1964</option>
+                    <option value="1965">1965</option>
+                    <option value="1966">1966</option>
+                    <option value="1967">1967</option>
+                    <option value="1968">1968</option>
+                    <option value="1969">1969</option>
+                    <option value="1970">1970</option>
+                    <option value="1971">1971</option>
+                    <option value="1972">1972</option>
+                    <option value="1973">1973</option>
+                    <option value="1974">1974</option>
+                    <option value="1975">1975</option>
+                    <option value="1976">1976</option>
+                    <option value="1977">1977</option>
+                    <option value="1978">1978</option>
+                    <option value="1979">1979</option>
+                    <option value="1980">1980</option>
+                    <option value="1981">1981</option>
+                    <option value="1982">1982</option>
+                    <option value="1983">1983</option>
+                    <option value="1984">1984</option>
+                    <option value="1985">1985</option>
+                    <option value="1986">1986</option>
+                    <option value="1987">1987</option>
+                    <option value="1988">1988</option>
+                    <option value="1989">1989</option>
+                    <option value="1990">1990</option>
+                    <option value="1991">1991</option>
+                    <option value="1992">1992</option>
+                    <option value="1993">1993</option>
+                    <option value="1994">1994</option>
+                    <option value="1995">1995</option>
+                    <option value="1996">1996</option>
+                    <option value="1997">1997</option>
+                    <option value="1998">1998</option>
+                    <option value="1999">1999</option>
+                    <option value="2000">2000</option>
+                    <option value="2001">2001</option>
+                    <option value="2002">2002</option>
+                    <option value="2003">2003</option>
+                    <option value="2004">2004</option>
+                    <option value="2005">2005</option>
+                    <option value="2006">2006</option>
+                    <option value="2007">2007</option>
+                    <option value="2008">2008</option>
+                    <option value="2009">2009</option>
+                    <option value="2010">2010</option>
+                    <option value="2011">2011</option>
+                    <option value="2012">2012</option>
+                    <option value="2013">2013</option>
+                    <option value="2014">2014</option>
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                </select>
+                  </div>
+            
+           </div>
+            
+              <h2 class="unique-header">Location</h2>
+            
+              <div class="unique-input-field">
+                <label for="country" class="unique-label">Country</label>
+                <select id="country" class="unique-select">
+                  <option value="Afghanistan">Afghanistan</option>
+                  <option value="Albania">Albania</option>
+                  <option value="Algeria">Algeria</option>
+                  <option value="Andorra">Andorra</option>
+                  <option value="Angola">Angola</option>
+                  <option value="Antigua and Barbuda">Antigua and Barbuda</option>
+                  <option value="Argentina">Argentina</option>
+                  <option value="Armenia">Armenia</option>
+                  <option value="Australia">Australia</option>
+                  <option value="Austria">Austria</option>
+                  <option value="Azerbaijan">Azerbaijan</option>
+                  <option value="Bahamas">Bahamas</option>
+                  <option value="Bahrain">Bahrain</option>
+                  <option value="Bangladesh">Bangladesh</option>
+                  <option value="Barbados">Barbados</option>
+                  <option value="Belarus">Belarus</option>
+                  <option value="Belgium">Belgium</option>
+                  <option value="Belize">Belize</option>
+                  <option value="Benin">Benin</option>
+                  <option value="Bhutan">Bhutan</option>
+                  <option value="Bolivia">Bolivia</option>
+                  <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                  <option value="Botswana">Botswana</option>
+                  <option value="Brazil">Brazil</option>
+                  <option value="Brunei">Brunei</option>
+                  <option value="Bulgaria">Bulgaria</option>
+                  <option value="Burkina Faso">Burkina Faso</option>
+                  <option value="Burundi">Burundi</option>
+                  <option value="Cabo Verde">Cabo Verde</option>
+                  <option value="Cambodia">Cambodia</option>
+                  <option value="Cameroon">Cameroon</option>
+                  <option value="Canada">Canada</option>
+                  <option value="Central African Republic">Central African Republic</option>
+                  <option value="Chad">Chad</option>
+                  <option value="Chile">Chile</option>
+                  <option value="China">China</option>
+                  <option value="Colombia">Colombia</option>
+                  <option value="Comoros">Comoros</option>
+                  <option value="Congo, Democratic Republic of the">Congo, Democratic Republic of the</option>
+                  <option value="Congo, Republic of the">Congo, Republic of the</option>
+                  <option value="Costa Rica">Costa Rica</option>
+                  <option value="Croatia">Croatia</option>
+                  <option value="Cuba">Cuba</option>
+                  <option value="Cyprus">Cyprus</option>
+                  <option value="Czechia">Czechia</option>
+                  <option value="Denmark">Denmark</option>
+                  <option value="Djibouti">Djibouti</option>
+                  <option value="Dominica">Dominica</option>
+                  <option value="Dominican Republic">Dominican Republic</option>
+                  <option value="Ecuador">Ecuador</option>
+                  <option value="Egypt">Egypt</option>
+                  <option value="El Salvador">El Salvador</option>
+                  <option value="Equatorial Guinea">Equatorial Guinea</option>
+                  <option value="Eritrea">Eritrea</option>
+                  <option value="Estonia">Estonia</option>
+                  <option value="Eswatini">Eswatini</option>
+                  <option value="Ethiopia">Ethiopia</option>
+                  <option value="Fiji">Fiji</option>
+                  <option value="Finland">Finland</option>
+                  <option value="France">France</option>
+                  <option value="Gabon">Gabon</option>
+                  <option value="Gambia">Gambia</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Germany">Germany</option>
+                  <option value="Ghana">Ghana</option>
+                  <option value="Greece">Greece</option>
+                  <option value="Grenada">Grenada</option>
+                  <option value="Guatemala">Guatemala</option>
+                  <option value="Guinea">Guinea</option>
+                  <option value="Guinea-Bissau">Guinea-Bissau</option>
+                  <option value="Guyana">Guyana</option>
+                  <option value="Haiti">Haiti</option>
+                  <option value="Honduras">Honduras</option>
+                  <option value="Hungary">Hungary</option>
+                  <option value="Iceland">Iceland</option>
+                  <option value="India">India</option>
+                  <option value="Indonesia">Indonesia</option>
+                  <option value="Iran">Iran</option>
+                  <option value="Iraq">Iraq</option>
+                  <option value="Ireland">Ireland</option>
+                  <option value="Israel">Israel</option>
+                  <option value="Italy">Italy</option>
+                  <option value="Jamaica">Jamaica</option>
+                  <option value="Japan">Japan</option>
+                  <option value="Jordan">Jordan</option>
+                  <option value="Kazakhstan">Kazakhstan</option>
+                  <option value="Kenya">Kenya</option>
+                  <option value="Kiribati">Kiribati</option>
+                  <option value="Korea, North">Korea, North</option>
+                  <option value="Korea, South">Korea, South</option>
+                  <option value="Kosovo">Kosovo</option>
+                  <option value="Kuwait">Kuwait</option>
+                  <option value="Kyrgyzstan">Kyrgyzstan</option>
+                  <option value="Laos">Laos</option>
+                  <option value="Latvia">Latvia</option>
+                  <option value="Lebanon">Lebanon</option>
+                  <option value="Lesotho">Lesotho</option>
+                  <option value="Liberia">Liberia</option>
+                  <option value="Libya">Libya</option>
+                  <option value="Liechtenstein">Liechtenstein</option>
+                  <option value="Lithuania">Lithuania</option>
+                  <option value="Luxembourg">Luxembourg</option>
+                  <option value="Madagascar">Madagascar</option>
+                  <option value="Malawi">Malawi</option>
+                  <option value="Malaysia">Malaysia</option>
+                  <option value="Maldives">Maldives</option>
+                  <option value="Mali">Mali</option>
+                  <option value="Malta">Malta</option>
+                  <option value="Marshall Islands">Marshall Islands</option>
+                  <option value="Mauritania">Mauritania</option>
+                  <option value="Mauritius">Mauritius</option>
+                  <option value="Mexico">Mexico</option>
+                  <option value="Micronesia">Micronesia</option>
+                  <option value="Moldova">Moldova</option>
+                  <option value="Monaco">Monaco</option>
+                  <option value="Mongolia">Mongolia</option>
+                  <option value="Montenegro">Montenegro</option>
+                  <option value="Morocco">Morocco</option>
+                  <option value="Mozambique">Mozambique</option>
+                  <option value="Myanmar">Myanmar</option>
+                  <option value="Namibia">Namibia</option>
+                  <option value="Nauru">Nauru</option>
+                  <option value="Nepal">Nepal</option>
+                  <option value="Netherlands">Netherlands</option>
+                  <option value="New Zealand">New Zealand</option>
+                  <option value="Nicaragua">Nicaragua</option>
+                  <option value="Niger">Niger</option>
+                  <option value="Nigeria">Nigeria</option>
+                  <option value="North Macedonia">North Macedonia</option>
+                  <option value="Norway">Norway</option>
+                  <option value="Oman">Oman</option>
+                  <option value="Pakistan">Pakistan</option>
+                  <option value="Palau">Palau</option>
+                  <option value="Panama">Panama</option>
+                  <option value="Papua New Guinea">Papua New Guinea</option>
+                  <option value="Paraguay">Paraguay</option>
+                  <option value="Peru">Peru</option>
+                  <option value="Philippines">Philippines</option>
+                  <option value="Poland">Poland</option>
+                  <option value="Portugal">Portugal</option>
+                  <option value="Qatar">Qatar</option>
+                  <option value="Romania">Romania</option>
+                  <option value="Russia">Russia</option>
+                  <option value="Rwanda">Rwanda</option>
+                  <option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+                  <option value="Saint Lucia">Saint Lucia</option>
+                  <option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
+                  <option value="Samoa">Samoa</option>
+                  <option value="San Marino">San Marino</option>
+                  <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                  <option value="Saudi Arabia">Saudi Arabia</option>
+                  <option value="Senegal">Senegal</option>
+                  <option value="Serbia">Serbia</option>
+                  <option value="Seychelles">Seychelles</option>
+                  <option value="Sierra Leone">Sierra Leone</option>
+                  <option value="Singapore">Singapore</option>
+                  <option value="Slovakia">Slovakia</option>
+                  <option value="Slovenia">Slovenia</option>
+                  <option value="Solomon Islands">Solomon Islands</option>
+                  <option value="Somalia">Somalia</option>
+                  <option value="South Africa">South Africa</option>
+                  <option value="South Sudan">South Sudan</option>
+                  <option value="Spain">Spain</option>
+                  <option value="Sri Lanka">Sri Lanka</option>
+                  <option value="Sudan">Sudan</option>
+                  <option value="Suriname">Suriname</option>
+                  <option value="Sweden">Sweden</option>
+                  <option value="Switzerland">Switzerland</option>
+                  <option value="Syria">Syria</option>
+                  <option value="Taiwan">Taiwan</option>
+                  <option value="Tajikistan">Tajikistan</option>
+                  <option value="Tanzania">Tanzania</option>
+                  <option value="Thailand">Thailand</option>
+                  <option value="Timor-Leste">Timor-Leste</option>
+                  <option value="Togo">Togo</option>
+                  <option value="Tonga">Tonga</option>
+                  <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+                  <option value="Tunisia">Tunisia</option>
+                  <option value="Turkey">Turkey</option>
+                  <option value="Turkmenistan">Turkmenistan</option>
+                  <option value="Tuvalu">Tuvalu</option>
+                  <option value="Uganda">Uganda</option>
+                  <option value="Ukraine">Ukraine</option>
+                  <option value="United Arab Emirates">United Arab Emirates</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="United States">United States</option>
+                  <option value="Uruguay">Uruguay</option>
+                  <option value="Uzbekistan">Uzbekistan</option>
+                  <option value="Vanuatu">Vanuatu</option>
+                  <option value="Vatican City">Vatican City</option>
+                  <option value="Venezuela">Venezuela</option>
+                  <option value="Vietnam">Vietnam</option>
+                  <option value="Yemen">Yemen</option>
+                  <option value="Zambia">Zambia</option>
+                  <option value="Zimbabwe">Zimbabwe</option>
+              </select>
+              
+              </div>
+            
+              <div class="unique-info">
+                <i class="unique-info-icon"></i> You can change your country once every 6 months.
+              </div>
+            
+              <div class="unique-input-field">
+                <label for="city" class="unique-label">City</label>
+                <input type="text" id="city" class="unique-input" placeholder="City">
+              </div>
+            
+              <div class="unique-checkbox">
+                <input type="checkbox" id="hide-country">
+                <label for="hide-country">Don't show my country on my profile</label>
+              </div>
+            
+              <button type="button" class="unique-button">CANCEL</button>
+              <button type="button" class="unique-button">SAVE CHANGES</button>
+          </form>
+        </div>
+            
+        
+    <!-- Section 9 -->
+    <section class="section background-white">
+      <!-- red full width arrow object -->
+      <img class="arrow-object" src="img/object-red.svg" alt="">
+    </section>
+    <!-- FOOTER -->
+    <footer>
+      <!-- Social -->
+      <div class="background-primary padding text-center">
+        <a href="/"><i class="icon-facebook_circle text-size-30 text-white"></i></a> 
+        <a href="/"><i class="icon-twitter_circle text-size-30 text-white"></i></a>
+        <a href="/"><i class="icon-google_plus_circle text-size-30 text-white"></i></a>
+        <a href="/"><i class="icon-instagram_circle text-size-30 text-white"></i></a> 
+        <a href="/"><i class="icon-linked_in_circle text-size-30 text-white"></i></a>                                                                       
+      </div>
+    <!-- Animated Logos -->
+      <div class="container-animated sticky" id="logo-container">
+        <div class="scrollable-container">
+          <button class="animated-btn left-button">&nbsp;&nbsp;&nbsp;&nbsp;We are Trusted By:&nbsp;&nbsp;&nbsp;&nbsp;</button>
+            <div class="logos">
+                <img src="../assets/img/ESports.jpg" alt="Esports" class="image">
+                <img src="../assets/img/amd.jpg" alt="AMD" class="image">
+                <img src="../assets/img/redbull.jpg" alt="Red Bull" class="image">
+                <img src="../assets/img/unicef.jpg" alt="UNICEF" class="image">
+                <img src="../assets/img/tencent.jpg" alt="Tencent" class="image">
+                <img src="../assets/img/KoHire.png" alt="KoHire" class="image">
+                <img src="../assets/img/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
+                <img src="../assets/img/Empyre.png" alt="Empyre" class="image">
+            </div>
+            <button class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
+        </div>
+    </div>
+      <section class="section background-dark">
+      <!-- Main Footer -->
+        <div class="line"> 
+          <div class="margin2x">
+            <div class="hide-s hide-m hide-l xl-2">
+               <img src="img/logo_red.png" alt="">
+            </div>
+            <div class="s-12 m-6 l-3 xl-3">
+               <h4 class="text-white text-strong">Our Mission</h4>
+               <p>
+                To create a thriving esports ecosystem where players can showcase their skills, 
+                teams can compete at the highest level, and fans can experience the excitement 
+                of world-class gaming events.
+               </p>
+            </div>
+            <div class="s-12 m-6 l-3 xl-2">
+               <h4 class="text-white text-strong margin-m-top-30">Useful Links</h4>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.html">FAQ</a><br>      
+               <a class="text-primary-hover" href="contact-1.html">Contact Us</a><br>
+               <a class="text-primary-hover" href="blog.html">Blog</a>
+            </div>
+            <div class="s-12 m-6 l-3 xl-2">
+               <h4 class="text-white text-strong margin-m-top-30">Term of Use</h4>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Terms and Conditions</a><br>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Refund Policy</a><br>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Disclaimer</a>
+            </div>
+            <div class="s-12 m-6 l-3 xl-3">
+               <h4 class="text-white text-strong margin-m-top-30">Contact Us</h4>
+                <a class="text-primary-hover" href="tel:+977 8888888888"><i class="icon-sli-screen-smartphone text-primary"></i> +977 8888888888</a><br>
+                <a class="text-primary-hover" href="mailto:contact@InfiKnight.com"><i class="fa-solid fa-envelope text-primary"></i> contact@InfiKnight.com</a><br>
+                <a class="text-primary-hover" href="https://maps.app.goo.gl/QGesNa3t51KtP1Vt7"><i class="fa-solid fa-map-marker-alt text-primary"></i> Pradarshani Marg, Kathmandu 44600</a>
+            </div>
+          </div>  
+        </div>    
+      </section>
+      <div class="background-dark">
+        <hr class="break margin-top-bottom-0" style="border-color: #777;">
+      </div>
+      <!-- Bottom Footer -->
+      <section class="padding-2x background-dark full-width">
+        <div class="full-width">
+          <div class="s-12 l-6">
+            <p class="text-size-12 margin-bottom-0">Copyright 2024, &Sigma;Indra65 - BCA 2k22</p>
+            <p class="text-size-12 margin-bottom-0">Copyright 2024, MK38 - BCA 2k22</p>
+            <p class="text-size-12">© 2024 InfiKnight Esports. All Rights Reserved.</p>
+          </div>
+          <div class="s-12 l-6">
+            <a class="right text-size-12 text-primary-hover" href="#" title="Esports Website">Design and coded by <br> Team &infin; </a>
+          </div>
+        </div>  
+      </section>
+    </footer>
+    <script type="text/javascript" src="js/responsee.js"></script>
+    <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
+    <script type="text/javascript" src="js/template-scripts.js"></script> 
+
+    <!-- Popup page Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    myModal.show();
+  });
+
+  function loadCoverPhoto(event) {
+  const coverPhoto = document.getElementById('coverPhoto');
+  coverPhoto.src = URL.createObjectURL(event.target.files[0]);
+}
+
+function loadProfilePic(event) {
+  const profilePic = document.getElementById('profilePic');
+  profilePic.src = URL.createObjectURL(event.target.files[0]);
+}
+
+</script>
+
+  </body>
+</html>
+
+
+<!-- <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $email = $_POST['email'];
+
+  // Connect to the database
+  $conn = new mysqli('hostname', 'username', 'password', 'database');
+
+  if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+  }
+
+  $sql = "UPDATE users SET email = ? WHERE id = ?"; // Adjust query as needed
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param('si', $email, $userId); // Assuming you have a user ID to identify the record
+  $stmt->execute();
+
+  if ($stmt->affected_rows > 0) {
+    echo 'Email updated successfully.';
+  } else {
+    echo 'Error updating email.';
+  }
+
+  $stmt->close();
+  $conn->close();
+}
+?> -->

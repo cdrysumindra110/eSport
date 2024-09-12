@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SignIn Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,800">
+  <link rel="stylesheet" href="css/signin.css">
+</head>
+<body>
+  <div class="container" id="container">
+    <div class="form-container sign-in-container">
+      <form action="#">
+        <h1>Sign in</h1>
+        <div class="social-container">
+          <a class="social-icon" id="google-signin" title="Sign with Google" class="social"><i class="fab fa-google"></i></a>
+          <a class="social-icon" id="facebook-signin" title="Sign with Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a class="social-icon" id="twitch-signin" title="Sign with Twitch"><i class="fab fa-twitch"></i></a>
+          <a class="social-icon" id="discord-signin" title="Sign with Discord"><i class="fab fa-discord"></i></a>
+        </div>
+        <span>| or |</span>
+        <input type="email" placeholder="Email" />
+        <input type="password" placeholder="Password" />
+        <a href="#">Forgot your password?</a>
+        <button>Sign In</button>
+      </form>
+    </div>
+    <div class="overlay-container">
+      <div class="overlay">
+        <div class="overlay-panel overlay-right">
+          <div class="logo-container">
+            <a href="../index.html"><img src="img/logo.png" alt="Logo"></a>
+          </div>
+          <h1>Welcome !</h1>
+                <P>Don't have an account ?</P>
+          <button class="ghost" id="signUp">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function toggleContainerAndRedirect() {
+  const container = document.getElementById('container');
+  container.classList.add('hidden'); 
+
+  setTimeout(function() {
+    window.location.href = 'signup.html';
+  }, 300); 
+}
+
+document.getElementById('signUp').addEventListener('click', toggleContainerAndRedirect);
+  </script>
+</body>
+</html>

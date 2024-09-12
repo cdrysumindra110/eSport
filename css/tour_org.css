@@ -1,0 +1,1004 @@
+.game-tournament {
+  font-family: 'Arial', sans-serif;
+  margin: 10px;
+  padding: 10px;
+}
+.games-container {
+    margin-top: 20px; /* Use a single margin-top value */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+}
+.section-heading {
+  text-align: center;
+  font-size: 50px;
+  font-weight: 800;
+  color: #000000; 
+}
+/*==================== Search CSS======================== */
+#search {
+	display: grid;
+	grid-area: search;
+	grid-template:
+		"search" 45px
+		/ 300px;
+	justify-content: center;
+	align-content: center;
+	justify-items: stretch;
+	align-items: stretch;
+	background: hsl(0, 0%, 99%);
+}
+
+#search input {
+	display: block;
+	grid-area: search;
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 100%;
+	background: none;
+	padding: 0 30px 0 60px;
+	border: none;
+	border-radius: 100px;
+	font: 18px/1 system-ui, sans-serif;
+	outline-offset: -8px;
+}
+
+
+#search svg {
+	grid-area: search;
+	overflow: visible;
+	color: hsl(341, 100%, 49%);
+	fill: none;
+	stroke: currentColor;
+}
+
+.spark {
+	fill: currentColor;
+	stroke: none;
+	r: 15;
+}
+
+.spark:nth-child(1) {
+	animation:
+		spark-radius 2.03s 1s both,
+		spark-one-motion 2s 1s both;
+}
+
+@keyframes spark-radius {
+	0% { r: 0; animation-timing-function: cubic-bezier(0, 0.3, 0, 1.57) }
+	30% { r: 15; animation-timing-function: cubic-bezier(1, -0.39, 0.68, 1.04) }
+	95% { r: 8 }
+	99% { r: 10 }
+	99.99% { r: 7 }
+	100% { r: 0 }
+}
+
+@keyframes spark-one-motion {
+	0% { transform: translate(-20%, 50%); animation-timing-function: cubic-bezier(0.63, 0.88, 0, 1.25) }
+	20% { transform: rotate(-0deg) translate(0%, -50%); animation-timing-function: ease-in }
+	80% { transform: rotate(-230deg) translateX(-20%) rotate(-100deg) translateX(15%); animation-timing-function: linear }
+	100% { transform: rotate(-360deg) translate(30px, 100%); animation-timing-function: cubic-bezier(.64,.66,0,.51) }
+}
+
+.spark:nth-child(2) {
+	animation:
+		spark-radius 2.03s 1s both,
+		spark-two-motion 2.03s 1s both;
+}
+
+@keyframes spark-two-motion {
+	0% { transform: translate(120%, 50%) rotate(-70deg) translateY(0%); animation-timing-function: cubic-bezier(0.36, 0.18, 0.94, 0.55) }
+	20% { transform: translate(90%, -80%) rotate(60deg) translateY(-80%); animation-timing-function: cubic-bezier(0.16, 0.77, 1, 0.4) }
+	40% { transform: translate(110%, -50%) rotate(-30deg) translateY(-120%); animation-timing-function: linear }
+	70% { transform: translate(100%, -50%) rotate(120deg) translateY(-100%); animation-timing-function: linear }
+	80% { transform: translate(95%, 50%) rotate(80deg) translateY(-150%); animation-timing-function: cubic-bezier(.64,.66,0,.51) }
+	100% { transform: translate(100%, 50%) rotate(120deg) translateY(0%) }
+}
+
+.spark:nth-child(3) {
+	animation:
+		spark-radius 2.05s 1s both,
+		spark-three-motion 2.03s 1s both;
+}
+
+@keyframes spark-three-motion {
+	0% { transform: translate(50%, 100%) rotate(-40deg) translateX(0%); animation-timing-function: cubic-bezier(0.62, 0.56, 1, 0.54) }
+	30% { transform: translate(40%, 70%) rotate(20deg) translateX(20%); animation-timing-function: cubic-bezier(0, 0.21, 0.88, 0.46) }
+	40% { transform: translate(65%, 20%) rotate(-50deg) translateX(15%); animation-timing-function: cubic-bezier(0, 0.24, 1, 0.62) }
+	60% { transform: translate(60%, -40%) rotate(-50deg) translateX(20%); animation-timing-function: cubic-bezier(0, 0.24, 1, 0.62) }
+	70% { transform: translate(70%, -0%) rotate(-180deg) translateX(20%); animation-timing-function: cubic-bezier(0.15, 0.48, 0.76, 0.26) }
+	100% { transform: translate(70%, -0%) rotate(-360deg) translateX(0%) rotate(180deg) translateX(20%); }
+}
+
+
+
+
+.burst {
+	stroke-width: 3;
+}
+
+.burst :nth-child(2n) { color: #ff783e }
+.burst :nth-child(3n) { color: #ffab00 }
+.burst :nth-child(4n) { color: #55e214 }
+.burst :nth-child(5n) { color: #82d9f5 }
+
+.circle {
+	r: 6;
+}
+
+.rect {
+	width: 10px;
+	height: 10px;
+}
+
+.triangle {
+	d: path("M0,-6 L7,6 L-7,6 Z");
+	stroke-linejoin: round;
+}
+
+.plus {
+	d: path("M0,-5 L0,5 M-5,0L 5,0");
+	stroke-linecap: round;
+}
+
+
+
+
+.burst:nth-child(4) {
+	transform: translate(30px, 100%) rotate(150deg);
+}
+
+.burst:nth-child(5) {
+	transform: translate(50%, 0%) rotate(-20deg);
+}
+
+.burst:nth-child(6) {
+	transform: translate(100%, 50%) rotate(75deg);
+}
+
+.burst * {}
+
+@keyframes particle-fade {
+	0%, 100% { opacity: 0 }
+	5%, 80% { opacity: 1 }
+}
+
+.burst :nth-child(1) { animation: particle-fade 600ms 2.95s both, particle-one-move 600ms 2.95s both; }
+.burst :nth-child(2) { animation: particle-fade 600ms 2.95s both, particle-two-move 600ms 2.95s both; }
+.burst :nth-child(3) { animation: particle-fade 600ms 2.95s both, particle-three-move 600ms 2.95s both; }
+.burst :nth-child(4) { animation: particle-fade 600ms 2.95s both, particle-four-move 600ms 2.95s both; }
+.burst :nth-child(5) { animation: particle-fade 600ms 2.95s both, particle-five-move 600ms 2.95s both; }
+.burst :nth-child(6) { animation: particle-fade 600ms 2.95s both, particle-six-move 600ms 2.95s both; }
+
+@keyframes particle-one-move { 0% { transform: rotate(0deg) translate(-5%) scale(0.0001, 0.0001) } 100% { transform: rotate(-20deg) translateX(8%) scale(0.5, 0.5) } }
+@keyframes particle-two-move { 0% { transform: rotate(0deg) translate(-5%) scale(0.0001, 0.0001) } 100% { transform: rotate(0deg) translateX(8%) scale(0.5, 0.5) } }
+@keyframes particle-three-move { 0% { transform: rotate(0deg) translate(-5%) scale(0.0001, 0.0001) } 100% { transform: rotate(20deg) translateX(8%) scale(0.5, 0.5) } }
+@keyframes particle-four-move { 0% { transform: rotate(0deg) translate(-5%) scale(0.0001, 0.0001) } 100% { transform: rotate(-35deg) translateX(12%) } }
+@keyframes particle-five-move { 0% { transform: rotate(0deg) translate(-5%) scale(0.0001, 0.0001) } 100% { transform: rotate(0deg) translateX(12%) } }
+@keyframes particle-six-move { 0% { transform: rotate(0deg) translate(-5%) scale(0.0001, 0.0001) } 100% { transform: rotate(35deg) translateX(12%) } }
+
+
+
+.bar {
+	width: 100%;
+	height: 100%;
+	ry: 50%;
+	stroke-width: 10;
+	animation: bar-in 900ms 3s both;
+}
+
+@keyframes bar-in {
+	0% { stroke-dasharray: 0 180 0 226 0 405 0 0 }
+	100% { stroke-dasharray: 0 0 181 0 227 0 405 0 }
+}
+
+.magnifier {
+	animation: magnifier-in 600ms 3.6s both;
+	transform-box: fill-box;
+}
+
+@keyframes magnifier-in {
+	0% { transform: translate(20px, 8px) rotate(-45deg) scale(0.01, 0.01); }
+	50% { transform: translate(-4px, 8px) rotate(-45deg); }
+	100% { transform: translate(0px, 0px) rotate(0deg); }
+}
+
+.magnifier .glass {
+	cx: 27;
+	cy: 27;
+	r: 8;
+	stroke-width: 3;
+}
+.magnifier .handle {
+	x1: 32;
+	y1: 32;
+	x2: 44;
+	y2: 44;
+	stroke-width: 3;
+}
+
+#results {
+	grid-area: results;
+	background: hsl(0, 0%, 95%);
+}
+.game-card {
+    position: relative;
+    width: 400px;
+    border: 2px solid black;
+    text-align: center;
+    background-color: #484848;
+    overflow: hidden; /* Ensures content stays within the card */
+}
+.game-card:hover{
+  border: 4px solid rgb(0, 145, 255);
+} 
+.game-card img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+    z-index: 1; /* Keeps the image behind the text */
+}
+
+.game-card h3 {
+    padding: 5px 0;
+    font-size: 1.5em;
+    border-top: 0.5px solid whitesmoke;
+    color: #fff;
+    background-color: #484848; /* Ensure background behind the text */
+    z-index: 2; /* Places the text on top of the image */
+    position: relative;
+}
+
+.game-card img:hover {
+    transform: scale(1.05); /* Image will scale but remain inside the container */
+}
+
+.game-card.featured {
+    cursor: not-allowed;
+}
+
+.game-card.featured img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+    z-index: 1; /* Keeps the image behind the text */
+}
+
+.game-card.featured:hover img {
+    filter: grayscale(1) blur(1px) brightness(0.5);
+}
+
+.game-card .overlay {
+    display: none; /* Hidden by default */
+    position: absolute;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3; /* Ensures overlay appears above the image */
+}
+
+.game-card.featured:hover .overlay {
+    display: flex; /* Show overlay only when hovering over featured games */
+    background-color: rgba(255, 0, 0, 0.419); /* Red background with slight transparency */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: #fff;
+}
+
+.game-card.available img {
+    filter: none;
+    cursor: pointer;
+}
+
+.featured-tag {
+  position: absolute; 
+  bottom: 48px; 
+  right: 0; 
+  background-color: #f00; 
+  color: #fff; 
+  padding: 5px 10px;
+  font-weight: bold;
+}
+@media (max-width: 480px) {
+  .section-heading {
+    font-size: 30px;
+  }
+
+  #search {
+    grid-template:
+      "search" 45px
+      / 100%;
+  }
+
+  .game-card {
+    max-width: 100%; /* Full width on smaller screens */
+  }
+
+  .game-card h3 {
+    font-size: 1em;
+  }
+}
+
+/* ++++++++++++++++++++++++++++++++  Create------Tournament  +++++++++++++++++++++++++++++++++++++ */
+
+.tournament_form {
+  width: 100%;
+  margin: 0 auto;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0;
+  background-color: transparent; /* Ensure background is transparent */
+}
+
+
+#heading{
+    text-transform: uppercase;
+    color: #673AB7;
+    font-weight: normal;
+    font-size: 3rem;
+}
+
+#msform{
+  width: 100%;
+    text-align: center;
+    position: relative;
+    margin-top: 20px;
+}
+
+#msform fieldset{
+    background: white;
+    border: 0 none;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.form-card{
+    text-align: left;
+}
+
+#msform fieldset:not(:first-of-type){
+    display: none;
+}
+
+#msform input, #msform textarea{
+    padding: 8px 15px 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 0px;
+    margin-bottom: 25px;
+    margin-top: 2px;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: #000000;
+    background-color: #ECEFF1;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+#msform input:focus, #msform textarea:focus{
+    -moz-box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    border: px solid #673AB7;
+    outline-width: 0;
+}
+
+#msform .action-button{
+    width: 100px;
+    background: #673AB7;
+    font-weight: bold;
+    color: white;
+    border: 0 none;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 10px 5px;
+    margin: 10px 0px 10px 5px;
+    float: right;
+}
+#msform .action-button:hover,
+#msform .action-button:focus {
+    background-color: #311B92
+}
+
+#msform .action-button-previous {
+    width: 100px;
+    background: #616161;
+    font-weight: bold;
+    color: white;
+    border: 0 none;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 10px 5px;
+    margin: 10px 5px 10px 0px;
+    float: right
+}
+
+#msform .action-button-previous:hover,
+#msform .action-button-previous:focus {
+    background-color: #000000
+}
+
+.card {
+    z-index: 0;
+    border: none;
+    position: relative;
+    width: 100%;
+}
+
+.fs-title {
+    font-size: 28px;
+    color: #673AB7;
+    margin-bottom: 15px;
+    font-weight: normal;
+    text-align: left
+}
+.fs-titleh3{
+  font-size: 20px;
+  color: #673AB7;
+  margin-bottom: 15px;
+  font-weight: normal;
+  text-align: left
+}
+.purple-text {
+    color: #673AB7;
+    font-weight: normal
+}
+
+.steps {
+  display: none;
+    font-size: 25px;
+    color: gray;
+    margin-bottom: 10px;
+    font-weight: normal;
+    text-align: right
+}
+
+.fieldlabels {
+    color: gray;
+    text-align: left
+}
+
+#progressbar {
+    margin-bottom: 30px;
+    overflow: hidden;
+    color: lightgrey
+}
+
+#progressbar .active {
+    color: #ff5f1f
+}
+
+#progressbar li {
+    list-style-type: none;
+    font-size: 15px;
+    width: 25%;
+    float: left;
+    position: relative;
+    font-weight: 400
+}
+
+#progressbar #setup:before {
+    font-family: FontAwesome;
+    content: "\f091"; /* Clipboard icon for Tournament Info */
+}
+
+#progressbar #brackets:before {
+    font-family: FontAwesome;
+    content: "\f0e8"; /* List icon for Rules and Brackets */
+}
+
+#progressbar #stream:before {
+    font-family: FontAwesome;
+    content: "\f03d"; /* Video camera icon for Streams */
+}
+
+#progressbar #publish:before {
+    font-family: FontAwesome;
+    content: "\f1b3"; /* Bullhorn icon for Publish */
+}
+
+
+#progressbar li:before {
+    width: 50px;
+    height: 50px;
+    line-height: 45px;
+    display: block;
+    font-size: 20px;
+    color: #ffffff;
+    background: lightgray;
+    border-radius: 50%;
+    margin: 0 auto 10px auto;
+    padding: 2px;
+}
+
+#progressbar li:after {
+    content: '';
+    width: 100%;
+    height: 2px;
+    background: lightgray;
+    position: absolute;
+    left: 0;
+    top: 25px;
+    z-index: -1
+}
+
+#progressbar li.active:before,
+#progressbar li.active:after {
+    background: #ff5f1f;
+    border: 3px solid greenyellow;
+}
+
+.progress {
+    height: 20px
+}
+
+.progress-bar {
+    background-color: #ff5f1f;
+    border: 3px solid greenyellow;
+}
+
+.fit-image {
+    width: 100%;
+    object-fit: cover
+}
+
+.back-arrow-container {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+#back-arrow {
+    border: none;
+    background: transparent;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+/* Text Field */
+.textfield-cnt {
+    width: 100%;
+    margin: 20px auto;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    position: relative; /* Ensure the tooltip is positioned relative to the toolbar */
+}
+
+.toolbar button {
+    position: relative;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+.toolbar button:hover {
+    background-color: #5c7fe7; /* Dark Light Blue */
+    color: white;
+}
+
+.toolbar button:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.toolbar i {
+    font-size: 16px;
+}
+
+.textarea {
+    width: 100%;
+    height: 200px;
+    resize: vertical;
+    padding: 10px;
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 3px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.textarea:focus {
+    outline: none;
+}
+
+/* ----------------------------------------------------------Accordian CSS +++++++++++++++++++++++++++++++++++++ */
+/* Accordian css */
+.accordion {
+  max-width: 100%;
+  margin: 0 auto;
+}
+.accordion dd {
+  display: none;
+  padding: 30px;
+  border: 1px solid goldenrod;
+}
+.accordion dd:first-of-type {
+  display: block;
+}
+
+.accordion dt {
+  position: relative;
+  background-color: aliceblue;
+  box-shadow: 0 1px 4px 0 gray;
+  margin-top: 10px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 18px;
+}
+.accordion dt:hover,
+.accordion dt.expand {
+  background-color: darkcyan;
+  color: #fff;
+}
+.accordion dt::before,
+.accordion dt::after {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 3px;
+  background-color: #000000;
+
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translate(0, -50%);
+  transition: 0.3s;
+}
+.accordion dt::after {
+  width: 4px;
+  height: 16px;
+  right: 16px;
+}
+.accordion dt.expand::after {
+  right: 10px;
+  width: 16px;
+  height: 3px;
+}
+.accordion dt.expand::before,
+.accordion dt.expand::after {
+  background-color: white;
+}
+/* Ensures game cards stack on mobile */
+@media (max-width: 768px) {
+    .game-card {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .game-card img {
+        width: 100%; /* Ensures image is responsive */
+        height: auto;
+    }
+
+    .game-card h3 {
+        font-size: 1.2rem; /* Adjusts font size for smaller screens */
+    }
+}
+
+/* COntact with you text field */
+
+.fieldlabels {
+  margin-bottom: 5px;
+}
+
+.social-media-row {
+  display: flex;
+  align-items: center; /* Center items vertically */
+  gap: 10px; /* Space between select and input */
+}
+
+.unique-select, .dynamic-input input {
+  flex: 1 0 auto; /* Allow elements to grow but not shrink */
+  min-width: 30%; /* Minimum width for select */
+  padding: 10px;
+  border: none;
+  gap: 20px;
+  border-radius: 4px;
+  background-color: #383838; /* Same background color */
+  color: #fff; /* Same text color */
+  height: 40px; /* Same height for alignment */
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.dynamic-input {
+  display: none; /* Hidden by default */
+}
+
+/* --------------------------------------------------Add Stream +++++++++++++++++++++++++++++++++++++++++++++++  */
+.new-stream-form {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 10px; /* Space between elements */
+  margin-top: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: row; /* Stack input fields vertically */
+  gap: 10px; /* Space between elements within the form-group */
+}
+
+.stream-input {
+  flex: 1; /* Allow elements to grow */
+  margin-bottom: 10px; /* Space below each input */
+}
+
+.stream-input select,
+.stream-input input {
+  width: 100%; /* Full width of container */
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #383838; /* Same background color */
+  color: #fff; /* Same text color */
+  height: 40px; /* Consistent height */
+}
+
+.form-buttons {
+  display: flex;
+  flex-direction: row; /* Keep buttons in a row */
+  gap: 10px; /* Space between buttons */
+  margin-top: -25px;
+}
+.form-buttons {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px; /* Space between buttons */
+}
+
+.save-btn{
+  cursor: pointer;
+  padding: 10px 20px;
+  background-color: #6c5ce7cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  height: 40px; /* Consistent height */
+  display: flex;
+  align-items: center; /* Vertically center align text */
+  justify-content: center; /* Center align text within the button */
+  border: 2px solid rgba(74, 74, 74, 0.81);
+}
+.save-btn:hover {
+  background-color: #6c5ce7; /* Darker shade on hover */
+  border-color: #383838; /* Change border color on hover */
+}
+.remove-btn{
+  cursor: pointer;
+  padding: 10px 20px;
+  background-color: #ff0000c2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  height: 40px; /* Consistent height */
+  display: flex;
+  align-items: center; /* Vertically center align text */
+  justify-content: center; /* Center align text within the button */
+  border: 2px solid rgba(74, 74, 74, 0.81);
+}
+.remove-btn:hover {
+  background-color: #ff0000; /* Darker shade on hover */
+  border-color: #383838; /* Change border color on hover */
+}
+
+.add-btn{
+  cursor: pointer;
+  padding: 10px 20px;
+  background-color: #383838f1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  height: 40px; /* Consistent height */
+  display: flex;
+  align-items: center; /* Vertically center align text */
+  justify-content: center; /* Horizontally center align text */
+  border: 2px solid #a8a8a8bd;
+}
+.add-btn:hover{
+  background-color: #383838;
+  border-color: 1px solid rgba(0, 0, 0, 0.716);
+}
+.input-wrapper {
+  position: relative; /* Relative positioning for the label */
+  margin-bottom: 20px; /* Space below each input */
+}
+
+
+.input-wrapper input {
+  width: 100%; /* Full width of container */
+  padding: 10px;
+  border: none; /* Remove default border */
+  border-bottom: 2px solid #383838; /* Border only at the bottom */
+  border-radius: 0; /* No rounded corners */
+  background-color: #383838; /* Background color */
+  color: #fff; /* Text color */
+  height: 40px; /* Consistent height */
+  font-size: 16px;
+  box-sizing: border-box; /* Include padding in element's total width and height */
+  outline: none; /* Remove default outline */
+}
+
+.input-wrapper label {
+  position: absolute;
+  top: 10px; /* Position inside the input */
+  left: 10px; /* Align with input padding */
+  color: #aaa; /* Color of the label */
+  font-size: 14px;
+  pointer-events: none; /* Prevent interaction with the label */
+  transition: 0.2s ease-in-out; /* Smooth transition for the floating effect */
+  transform-origin: left bottom; /* Anchor transformation to the bottom-left corner */
+}
+
+/* Style when input is focused or has value */
+.input-wrapper input:focus + label,
+.input-wrapper input:not(:placeholder-shown) + label {
+  top: -20px; /* Move label up */
+  left: 0; /* Align label to the left */
+  font-size: 16px; /* Smaller font size for the label */
+  color: #000000; /* Color change for label on focus */
+}
+
+/* Popup container */
+.popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #f44336; /* Light red background */
+  color: white; /* White text */
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Hidden state */
+.hidden {
+  display: none;
+}
+
+/* Close button */
+.close-btn {
+  margin-left: 15px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Font Awesome icon in the popup */
+#popup-message i {
+  color: white; /* Set the icon color to white */
+}
+
+
+.button-custom {
+  text-decoration: none;
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  color: white; /* Text color */
+  background-color: #66ff66; /* Light green background */
+  border: none;
+  border-radius: 5px; /* Optional: rounded corners */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.button-custom:hover {
+  background-color: #00ff00; /* Dark green background on hover */
+}
+
+
+/* --------------------------------------------------------Bracket details CSS++++++++++++++++++++++++++++++++++++++++ */
+/* General Styling for Containers */
+.match-details-container {
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fs-titleh3 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  color: #000000;
+}
+
+/* Bracket Selection and Match Selection */
+.bracket-selection,
+.match-selection {
+  margin-bottom: 20px;
+}
+
+.brac-label {
+  display: block;
+  font-size: 1em;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.brac-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.brac-input:focus {
+  border-color: var(--main-color);
+  outline: none;
+}
+
+/* Match Containers */
+.match-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+
+textarea.brac-input {
+  resize: vertical;
+}
+
+/* Disabled Options */
+.bracket-select option[disabled],
+.match-select option[disabled] {
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .brac-input {
+    font-size: 0.9em;
+  }
+
+  .fs-titleh3{
+    font-size: 1.2em;
+  }
+}

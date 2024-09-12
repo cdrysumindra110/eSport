@@ -1,0 +1,105 @@
+<div class="news-container">
+    <header class="news-header">
+        <h1>Latest News</h1>
+        <div class="search-container">
+            <input type="search" placeholder="Search" class="search-input" />
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+            </svg>
+        </div>
+    </header>
+
+    <div class="tab-menu">
+        <button class="tab-button active" data-tab="latest">Latest</button>
+        <button class="tab-button" data-tab="changelogs">Changelogs</button>
+        <button class="tab-button" data-tab="web3">Web3</button>
+        <button class="tab-button" data-tab="esports">Esports</button>
+        <button class="tab-button" data-tab="features">Features</button>
+        <button class="tab-button" data-tab="community">Community</button>
+    </div>
+
+    <div class="tab-content">
+        <!-- Latest News Tab -->
+        <div class="tab latest active" data-tab="latest">
+            <div class="news-card">
+                <img src="/placeholder.svg" alt="POL" class="news-image" />
+                <div class="news-details">
+                    <p>by Community Gaming in <a href="#" class="category-link">Web3</a> · 2024-09-04</p>
+                    <h2>More on the MATIC - POL migration for CG users</h2>
+                    <p>Polygon is migrating MATIC token to the new POL token on September 4th. Here's more information for CG users!</p>
+                    <a href="#" class="read-more-link">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Changelogs Tab -->
+        <div class="tab changelogs" data-tab="changelogs">
+            <div class="news-card">
+                <img src="/placeholder.svg" alt="Change" class="news-image" />
+                <div class="news-details">
+                    <p>by Dev Team in <a href="#" class="category-link">Changelogs</a> · 2024-09-05</p>
+                    <h2>New Feature Release: Version 2.0</h2>
+                    <p>We have just released version 2.0 with exciting new features and improvements.</p>
+                    <a href="#" class="read-more-link">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Web3 Tab -->
+        <div class="tab web3" data-tab="web3">
+            <div class="news-card">
+                <img src="/placeholder.svg" alt="Web3" class="news-image" />
+                <div class="news-details">
+                    <p>by Web3 Insights in <a href="#" class="category-link">Web3</a> · 2024-09-06</p>
+                    <h2>Understanding Web3: A Comprehensive Guide</h2>
+                    <p>Explore the latest trends and developments in the Web3 space with our detailed guide.</p>
+                    <a href="#" class="read-more-link">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Tabs (Esports, Features, Community) go here, structured the same way -->
+        <!-- Esports Tab -->
+              <div class="tab esports">
+                  <div class="news-card">
+                      <img src="/placeholder.svg" alt="Esports" class="news-image" />
+                      <div class="news-details">
+                          <p>by Esports Daily in <a href="#" class="category-link">Esports</a> · 2024-09-07</p>
+                          <h2>Upcoming Esports Tournaments in 2024</h2>
+                          <p>Get ready for the most anticipated esports tournaments of 2024 with our full schedule.</p>
+                          <a href="#" class="read-more-link">Read More</a>
+                      </div>
+                  </div>
+                  <!-- Add more news cards here -->
+              </div>
+      
+              <!-- Features Tab -->
+              <div class="tab features">
+                  <div class="news-card">
+                      <img src="/placeholder.svg" alt="Feature" class="news-image" />
+                      <div class="news-details">
+                          <p>by Feature Highlights in <a href="#" class="category-link">Features</a> · 2024-09-08</p>
+                          <h2>Feature Spotlight: Enhanced UI</h2>
+                          <p>Check out the new UI enhancements that make your experience smoother and more intuitive.</p>
+                          <a href="#" class="read-more-link">Read More</a>
+                      </div>
+                  </div>
+                  <!-- Add more news cards here -->
+              </div>
+      
+              <!-- Community Tab -->
+              <div class="tab community">
+                  <div class="news-card">
+                      <img src="/placeholder.svg" alt="Community" class="news-image" />
+                      <div class="news-details">
+                          <p>by Community News in <a href="#" class="category-link">Community</a> · 2024-09-09</p>
+                          <h2>Community Events and Meetups</h2>
+                          <p>Join our upcoming community events and meetups to connect with other enthusiasts.</p>
+                          <a href="#" class="read-more-link">Read More</a>
+                      </div>
+                  </div>
+                  <!-- Add more news cards here -->
+              </div>
+    </div>
+</div>
