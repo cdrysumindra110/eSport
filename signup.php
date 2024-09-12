@@ -1,10 +1,10 @@
-<?php
+<?php 
 // Database configuration
 include_once('config.php');
 
 // Initialize messages
 $error_message = '';
-$success_message = '';
+$success_signup = '';  // Changed here
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -36,15 +36,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error_message = "Email already exists.";
         } else {
             // Hash the password
-            $hashed_password = md5($password);
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
             // Insert new user into database
             $sql = "INSERT INTO users (full_name, email, password) VALUES ('$full_name', '$email', '$hashed_password')";
             if ($conn->query($sql) === TRUE) {
-                $success_message = "Account created successfully!";
-                // Redirect to sign-in page or another page
-                echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".$success_message."', 'success'); }</script>";
-                header("Location: signin.php");
+                $success_signup = "Account created successfully!";  // Changed here
+                header("Location: signin.php?success_signup=" . urlencode($success_signup));  // Changed here
                 exit();
             } else {
                 $error_message = "Error: " . $conn->error;
@@ -56,6 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -136,15 +136,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Example usage for PHP error and success messages
-    <?php if (!empty($error_message) || !empty($success_message)): ?>
+    <?php if (!empty($error_message) || !empty($success_signup)): ?>  // Changed here
       document.addEventListener('DOMContentLoaded', function() {
-        <?php if (!empty($success_message)): ?>
-          showPopupMessage("<?php echo $success_message; ?>", 'success');
+        <?php if (!empty($success_signup)): ?>  // Changed here
+          showPopupMessage("<?php echo $success_signup; ?>", 'success');  // Changed here
         <?php elseif (!empty($error_message)): ?>
           showPopupMessage("<?php echo $error_message; ?>", 'error');
         <?php endif; ?>
       });
     <?php endif; ?>
+
 
     function toggleContainerAndRedirect() {
       const container = document.getElementById('container');

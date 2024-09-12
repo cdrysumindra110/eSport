@@ -3186,11 +3186,11 @@ i.icon-circle {
   }
 
 
-  /* Profile container styling */
+/* Profile container styling */
 /* Profile container styling */
 .profile-container {
   width: 100%;
-  margin: 50px auto;
+  margin: 0 auto;
   overflow: hidden;
   position: relative;
 }
@@ -3241,6 +3241,7 @@ i.icon-circle {
   height: 100%;
   object-fit: cover;
   transition: opacity 0.3s ease;
+  border-top: 0.5px solid lightgray;
 }
 
 /* Overlay styling */
@@ -3299,7 +3300,8 @@ i.icon-circle {
   height: var(--circle-size);
   box-shadow: var(--shadow);
   border-radius: var(--radius);
-  z-index: 0;
+  z-index: 1;
+  border: 0.5px solid lightskyblue;
 }
 
 .profile-pic .-label {
@@ -3326,7 +3328,7 @@ i.icon-circle {
   height: 2em;
 }
 
-/* =================================================Account Setting===================================== */
+/* Account Settings */
 .acc-setting .unique-input-field {
   display: flex;
   flex-direction: column;
@@ -3356,22 +3358,27 @@ i.icon-circle {
   height: 36px;
 }
 
-
+/* Unique Container */
+/* Unique Container */
 .unique-container {
   background-color: #282828;
   text-align: left;
-  align-items: center;
-  border-radius: 8px;
   padding: 20px;
-  width: 85%;
-  margin: 50px auto;
+  width: 80%;
+  position: relative; /* Add this */
+  margin: auto 290px;
+  right: 0; /* Aligns the container to the right */
+  border-top: 0.5px solid lightgray;
 }
 
+
+/* Unique Header */
 .unique-header {
   color: #00c6ff;
   margin-bottom: 10px;
 }
 
+/* Unique Input Field */
 .unique-input-field {
   margin-bottom: 20px;
 }
@@ -3390,12 +3397,14 @@ i.icon-circle {
   background-color: #383838;
   color: #fff;
 }
+
 .dob-row {
   display: flex;
   justify-content: space-between;
   gap: 10px; /* Add space between the selects */
 }
 
+/* Unique Select */
 .unique-select {
   flex: 1;
   padding: 10px;
@@ -3404,8 +3413,6 @@ i.icon-circle {
   background-color: #383838;
   color: #fff;
   max-width: 35%; /* Optional: Limit the width of each select */
-}
-.unique-select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -3414,6 +3421,7 @@ i.icon-circle {
   background-position: right 10px center;
 }
 
+/* Unique Info */
 .unique-info {
   background-color: #ffc107;
   width: 50%;
@@ -3428,6 +3436,7 @@ i.icon-circle {
   margin-right: 8px;
 }
 
+/* Unique Checkbox */
 .unique-checkbox {
   margin-bottom: 20px;
 }
@@ -3436,18 +3445,21 @@ input[type="checkbox"] {
   margin-right: 8px;
 }
 
+/* Radio Group */
 .radio-group {
   display: flex;
   gap: 0.5rem;
 }
+
 .unique-radio {
   margin-right: 0.5rem;
 }
+
 .unique-radio-label {
   margin-right: 2rem;
 }
 
-
+/* Unique Button */
 .unique-button {
   background-color: #00c6ff;
   color: #fff;
@@ -3463,6 +3475,7 @@ input[type="checkbox"] {
 .unique-button:hover {
   background-color: #00a2ff;
 }
+
 
 /* ===================================News container====================================  */
 :root {

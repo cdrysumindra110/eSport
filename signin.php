@@ -4,32 +4,43 @@ include_once('config.php');
 
 // Initialize messages
 $error_message = '';
-$success_message = '';
+$success_message = '';  // For redirect success messages
 
 // Check if a success message is set in the URL
-$success_message = isset($_GET['success_message']) ? $_GET['success_message'] : '';
+if (isset($_GET['success_signup'])) {
+    $success_message = htmlspecialchars($_GET['success_signup']);  // Sanitize output
+    echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
+}
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get the email and password from the form
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
     // Sanitize inputs
     $email = $conn->real_escape_string($email);
     $password = $conn->real_escape_string($password);
 
     // Query to check if user exists
-    $sql = "SELECT * FROM users WHERE email = '$email' AND password = '".md5($password)."'"; // Use appropriate hashing method for passwords
+    $sql = "SELECT * FROM users WHERE email = '$email'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
-        // User exists, set success message and redirect
-        $success_message = "Successfully logged in!";
-        header("Location: dashboard.php?success_message=" . urlencode($success_message));
-        exit();
+        $user = $result->fetch_assoc();
+
+        // Verify password
+        if (password_verify($password, $user['password'])) {
+            // User exists and password is correct, set success message and redirect
+            $success_message = "Successfully logged in!";
+            header("Location: update_profile.php?success_signin=" . urlencode($success_message));
+            exit();
+        } else {
+            // Invalid password
+            $error_message = "Invalid email or password. Please try again.";
+        }
     } else {
-        // User does not exist, set error message
+        // User does not exist
         $error_message = "Invalid email or password. Please try again.";
     }
 }
@@ -37,6 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Close the connection
 $conn->close();
 ?>
+
+
+
 
 
 <!DOCTYPE html>
@@ -75,7 +89,7 @@ $conn->close();
       <form action="signin.php" method="post">
         <h1>Sign in</h1>
         <div class="social-container">
-          <a class="social-icon" id="google-signin" title="Sign with Google" class="social"><i class="fab fa-google"></i></a>
+          <a class="social-icon" id="google-signin" title="Sign with Google"><i class="fab fa-google"></i></a>
           <a class="social-icon" id="facebook-signin" title="Sign with Facebook"><i class="fab fa-facebook-f"></i></a>
           <a class="social-icon" id="twitch-signin" title="Sign with Twitch"><i class="fab fa-twitch"></i></a>
           <a class="social-icon" id="discord-signin" title="Sign with Discord"><i class="fab fa-discord"></i></a>
@@ -101,43 +115,41 @@ $conn->close();
     </div>
   </div>
   <script>
-    // Function to show the popup message
-    function showPopupMessage(message, type) {
-      const popup = document.getElementById('popup-message');
-      popup.textContent = message;
-      popup.className = 'popup-message'; // Reset to default
-      if (type === 'success') {
-        popup.classList.add('success');
-      } else if (type === 'error') {
-        popup.classList.add('error');
-      }
-      popup.style.display = 'block';
-      setTimeout(() => {
-        popup.style.display = 'none';
-      }, 3000); // Hide after 3 seconds
-    }
+// Function to show the popup message
+function showPopupMessage(message, type) {
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
+  }
+  popup.style.display = 'block';
+  setTimeout(() => {
+    popup.style.display = 'none';
+  }, 3000); // Hide after 3 seconds
+}
 
-    // Example usage for PHP error and success messages
-    <?php if (!empty($error_message) || !empty($success_message)): ?>
-      document.addEventListener('DOMContentLoaded', function() {
-        <?php if (!empty($success_message)): ?>
-          showPopupMessage("<?php echo $success_message; ?>", 'success');
-        <?php elseif (!empty($error_message)): ?>
-          showPopupMessage("<?php echo $error_message; ?>", 'error');
-        <?php endif; ?>
-      });
-    <?php endif; ?>
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage(<?php echo json_encode($success_message); ?>, 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage(<?php echo json_encode($error_message); ?>, 'error');
+  <?php endif; ?>
+});
 
-    function toggleContainerAndRedirect() {
-      const container = document.getElementById('container');
-      container.classList.add('hidden'); 
+function toggleContainerAndRedirect() {
+  const container = document.getElementById('container');
+  container.classList.add('hidden'); 
 
-      setTimeout(function() {
-        window.location.href = 'signup.php';
-      }, 300); 
-    }
+  setTimeout(function() {
+    window.location.href = 'signup.php';
+  }, 300); 
+}
 
-    document.getElementById('signUp').addEventListener('click', toggleContainerAndRedirect);
+document.getElementById('signUp').addEventListener('click', toggleContainerAndRedirect);
   </script>
 </body>
 </html>
