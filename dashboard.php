@@ -1,5 +1,6 @@
-<?php
-// Include the config file
+
+<?php 
+// Include the config file for database connection
 require_once 'config.php';
 
 // Start the session
@@ -9,10 +10,25 @@ session_start();
 $error_message = '';
 $success_message = '';
 
-// Check for success message from query parameter
+$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
+
+
+// Check if a success signin message exists in the URL
+$success_message = '';
 if (isset($_GET['success_signin'])) {
     $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
 }
+
+
+// Check if a success message exists in the URL
+if (isset($_GET['success_message'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
+}
+//Error Message
+if (isset($_GET['error_message'])) {
+  $error_message = htmlspecialchars(urldecode($_GET['error_message']));
+}
+
 
 // Check if the user is logged in
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
@@ -21,13 +37,18 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
 }
 
 // Get the logged-in user ID
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User ID not set in session.");
+}
+
 $user_id = $_SESSION['user_id'];
 
 // Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
+    
     // Handle the update profile form
     if (isset($_POST['update_profile'])) {
+        // Collect the form data
         $role = $_POST['role'];
         $uname = $_POST['uname'];
         $dob_month = $_POST['dob-month'];
@@ -36,40 +57,62 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $country = $_POST['country'];
         $city = $_POST['city'];
 
-        // Validate and update the profile data in the database
-        $dob = "$dob_year-$dob_month-$dob_day";  // Using Year-Month-Day format
-        $stmt = $conn->prepare("UPDATE users SET role = ?, uname = ?, dob = ?, country = ?, city = ? WHERE id = ?");
-        $stmt->bind_param('sssssi', $role, $uname, $dob, $country, $city, $user_id);
+        // Validate data
+        if (empty($uname) || empty($country) || empty($city) || empty($dob_month) || empty($dob_day) || empty($dob_year)) {
+          $error_message = 'Please fill in all required fields.';
+      } elseif (!checkdate($dob_month, $dob_day, $dob_year)) {
+          $error_message = 'Invalid date provided.';
+      } else {
+          // Prepare the date of birth in YYYY-MM-DD format
+          $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
 
-        if ($stmt->execute()) {
-            $success_message = 'Profile updated successfully.';
-        } else {
-            $error_message = 'Error updating profile: ' . $stmt->error;
+          // Prepare the SQL query
+          $stmt = $conn->prepare("UPDATE users SET role = ?, uname = ?, dob = ?, country = ?, city = ? WHERE id = ?");
+          if (!$stmt) {
+              die('Prepare failed: ' . $conn->error);
+          }
+
+          // Bind the parameters to the SQL query
+          $stmt->bind_param('sssssi', $role, $uname, $dob, $country, $city, $user_id);
+
+          // Execute the query and check for errors
+          if ($stmt->execute()) {
+              $success_message = 'Profile updated successfully.';
+          } else {
+              $error_message = 'Error updating profile: ' . $stmt->error;
+          }
+
+          // Close the statement
+          $stmt->close();
+      }
+
+        // Prepare query string for redirect with success or error messages
+        $query_string = '';
+        if (!empty($success_message)) {
+            $query_string .= 'success_message=' . urlencode($success_message);
         }
-        $stmt->close();
-    }
+        if (!empty($error_message)) {
+            if (!empty($query_string)) {
+                $query_string .= '&';
+            }
+            $query_string .= 'error_message=' . urlencode($error_message);
+        }
 
-    // Prepare query string for redirect
-    $query_string = '';
-    if (!empty($success_message)) {
-        $query_string .= 'success_message=' . urlencode($success_message);
+        // Redirect to the dashboard with messages
+        header('Location: dashboard.php?' . $query_string);
+        exit;
     }
-    if (!empty($error_message)) {
-        if (!empty($query_string)) $query_string .= '&';
-        $query_string .= 'error_message=' . urlencode($error_message);
-    }
-
-    // Redirect the user back to the dashboard with messages
-    header('Location: dashboard.php?' . $query_string);
-    exit;
 }
 ?>
 
 
 
+
+
+
 <!DOCTYPE html>
 <html lang="en-US">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Esports Website</title>
@@ -79,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="owl-carousel/owl.carousel.css">
     <link rel="stylesheet" href="owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
-    <link rel="stylesheet" href="css/template-style.css">
+    <link rel="stylesheet" href="./css/template-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -87,8 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
+
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
-    
+
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -104,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <!-- Top Navigation -->
       <nav class="background-transparent background-transparent-hightlight full-width sticky">
         <div class="s-12 l-2">
-          <a href="index.html" class="logo">
+          <a href="index.php" class="logo">
             <!-- Logo White Version -->
             <img class="logo-white" src="img/logo.png" alt="">
             <!-- Logo Dark Version -->
@@ -113,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div class="top-nav s-12 l-10">
           <ul class="right chevron">
-            <li><a href="index.html">Home</a></li>
+            <li><a href="index.php">Home</a></li>
            <li><a href="#">Tournaments</a>
               <ul>
                 <li><a href="#">Upcoming Tournaments</a>
@@ -121,29 +165,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
-                    <a href="tour_reg.html" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
+                    <a href="tour_reg.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
                   </ul>
               </li>
                 <li><a>Ongoing Tournaments</a></li>
                 </ul>
             </li>
-            <li><a href="games.html">Games</a></li>
-            <li><a href="our-services.html">Our Services</a></li>
+            <li><a href="news.php">News</a></li>
+            <li><a href="our-services.php">Our Services</a></li>
              
-            <li><a href="organize.html">Organize</a></li>
-            <li><a href="about-us.html">About</a></li>
-            <li>
-              <a href="dashboard.php"><i class="fas fa-user"></i></a>
-              <ul>
-                <?php if (isset($_SESSION['isSignin']) && $_SESSION['isSignin'] === true): ?>
-                  <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
-                <?php else: ?>
-                  <li><a href="signin.php">Signin</a></li>
-                  <li><a href="signup.php">Signup</a></li>
-                <?php endif; ?>
-              </ul>
+            <li><a href="organize.php">Organize</a></li>
+            <li><a href="about-us.php">About</a></li>
+            <li><a href="#"><i class="fas fa-user"></i></a>
+                <ul>
+                    <?php if ($isSignin): ?>
+                        <li><a href="logout.php">Signout</a></li>
+                    <?php else: ?>
+                        <li><a href="signin.php">Signin</a></li>
+                        <li><a href="signup.php">Signup</a></li>
+                    <?php endif; ?>
+                </ul>
             </li>
-            <li>
+
+            <!-- <li>
               <a href="#">
               <label class="plane-switch">
               <input type="checkbox">
@@ -159,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               </div>
               </label>
              </a>
-          </li>
+          </li> -->
           </li>
         </div>
       </nav>
@@ -232,9 +276,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="unique-input-field">
                         <label for="dob" class="unique-label">Date Of Birth</label>
                         <div class="dob-row">
+                            <select id="dob-year" name="dob-year" class="unique-select" required></select>
                             <select id="dob-month" name="dob-month" class="unique-select" required></select>
                             <select id="dob-day" name="dob-day" class="unique-select" required></select>
-                            <select id="dob-year" name="dob-year" class="unique-select" required></select>
                         </div>
                     </div>
 
@@ -255,45 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </form>
         </div>
-
-        <!-- Change Email Section -->
-        <div id="changeEmailSection" class="profile-section" style="display:none;">
-            <form id="update_email" action="dashboard.php" method="post">
-                <div class="unique-container">
-                    <h2 class="unique-header">Change Email</h2>
-                    <div class="unique-input-field">
-                        <label for="newEmail" class="unique-label">New Email:</label>
-                        <input type="email" id="newEmail" name="newEmail" class="unique-input" placeholder="newuser@gmail.com" required>
-                    </div>
-                    <div class="unique-actions">
-                        <button type="button" class="unique-button" onclick="showSection('changeEmailSection')">CANCEL</button>
-                        <button type="submit" name="update_email" value="submit" class="unique-button">UPDATE EMAIL</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Change Password Section -->
-        <div id="changePasswordSection" class="profile-section" style="display:none;">
-            <form id="update_password" action="dashboard.php" method="post">
-                <div class="unique-container">
-                    <h2 class="unique-header">Change Password</h2>
-                    <div class="unique-input-field">
-                        <label for="currentPassword" class="unique-label">Current Password:</label>
-                        <input type="password" id="currentPassword" name="currentPassword" class="unique-input" placeholder="Current Password" required>
-                    </div>
-                    <div class="unique-input-field">
-                        <label for="newPassword" class="unique-label">New Password:</label>
-                        <input type="password" id="newPassword" name="newPassword" class="unique-input" placeholder="New Password" required>
-                    </div>
-                    <div class="unique-actions">
-                        <button type="button" class="unique-button" onclick="showSection('changePasswordSection')">CANCEL</button>
-                        <button type="submit" name="update_password" value="submit" class="unique-button">UPDATE PASSWORD</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-</div>
+    </div>
 
             
 
@@ -372,7 +378,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <p class="text-size-12">© 2024 InfiKnight Esports. All Rights Reserved.</p>
           </div>
           <div class="s-12 l-6">
-            <a class="right text-size-12 text-primary-hover" href="#" title="Esports Website">Design and coded by <br> Team &infin; </a>
+            <a class="right text-size-12 text-primary-hover" href="#" title="Esports Website">Developed by Team <span style="font-size: 25px;">&infin;</span>
+            </a>
           </div>
         </div>  
       </section>
@@ -446,8 +453,18 @@ function loadProfilePic(event) {
 // ----------------------Dob Javascript ----------------------------
 document.addEventListener('DOMContentLoaded', function() {
     const months = [
-        "January", "February", "March", "April", "May", "June", "July",
-        "August", "September", "October", "November", "December"
+        { name: "January", value: 1 },
+        { name: "February", value: 2 },
+        { name: "March", value: 3 },
+        { name: "April", value: 4 },
+        { name: "May", value: 5 },
+        { name: "June", value: 6 },
+        { name: "July", value: 7 },
+        { name: "August", value: 8 },
+        { name: "September", value: 9 },
+        { name: "October", value: 10 },
+        { name: "November", value: 11 },
+        { name: "December", value: 12 }
     ];
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
     const currentYear = new Date().getFullYear();
@@ -460,8 +477,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Populate months
     months.forEach(month => {
         const option = document.createElement('option');
-        option.value = month;
-        option.textContent = month;
+        option.value = month.value; // Use numerical value
+        option.textContent = month.name;
         monthSelect.appendChild(option);
     });
 
@@ -527,37 +544,32 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-  // Function to show the popup message
-  function showPopupMessage(message, type) {
-    const popup = document.getElementById('popup-message');
-    popup.textContent = message;
-    popup.className = 'popup-message'; // Reset to default
-    if (type === 'success') {
-      popup.classList.add('success');
-    } else if (type === 'error') {
-      popup.classList.add('error');
-    }
-    popup.style.display = 'block';
-    setTimeout(() => {
-      popup.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
+// Function to show the popup message
+function showPopupMessage(message, type) {
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
   }
+  popup.style.display = 'block'; // Show the popup
+  setTimeout(() => {
+    popup.style.display = 'none'; // Hide after 3 seconds
+  }, 3000);
+}
 
-  // Example usage for PHP error and success messages
-  document.addEventListener('DOMContentLoaded', function() {
-    <?php if (!empty($success_message)): ?>
-      showPopupMessage("<?php echo $success_message; ?>", 'success');
-    <?php elseif (!empty($error_message)): ?>
-      showPopupMessage("<?php echo $error_message; ?>", 'error');
-    <?php endif; ?>
-  });
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
+});
 
-    // Check if there's a success message and display it
-    <?php if (!empty($success_message)): ?>
-      document.addEventListener('DOMContentLoaded', function() {
-        showPopupMessage("<?php echo $success_message; ?>", 'success');
-      });
-    <?php endif; ?>
+
 </script>
 
   </body>

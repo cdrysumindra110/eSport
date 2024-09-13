@@ -1,5 +1,5 @@
 <?php
-// Include the config file
+// Include the config file for database connection
 require_once 'config.php';
 
 // Start the session
@@ -15,55 +15,86 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     exit();
 }
 
+// Check if a success & error message exists in the URL
+if (isset($_GET['success_message'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
+}
+
+if (isset($_GET['error_message'])) {
+  $error_message = htmlspecialchars(urldecode($_GET['error_message']));
+}
+
 // Get the logged-in user ID
-$user_id = $_SESSION['user_id'];
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+if (!$user_id) {
+    die('Error: User ID not set in session.');
+}
+
+// Fetch current email from the database
+$currentEmail = '';
+$stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
+if ($stmt === false) {
+    die('Prepare failed: ' . $conn->error);
+}
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+$stmt->bind_result($currentEmail);
+$stmt->fetch();
+$stmt->close();
 
 // Check if the form has been submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-// Handle the update email form
-if (isset($_POST['update_email'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
     $newEmail = filter_var($_POST['newEmail'], FILTER_SANITIZE_EMAIL);
 
     // Validate the new email
     if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-        // Prepare and execute the update
-        $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
-        $stmt->bind_param('si', $newEmail, $user_id);
-
-        if ($stmt->execute()) {
-            $success_message = 'Email updated successfully.';
+        // Check if the new email is different from the current email
+        if ($newEmail === $currentEmail) {
+            $error_message = 'Cannot update same email address.';
         } else {
-            $error_message = 'Error updating email: ' . $stmt->error;
+            // Prepare and execute the update
+            $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
+            if ($stmt === false) {
+                die('Prepare failed: ' . $conn->error);
+            }
+            $stmt->bind_param('si', $newEmail, $user_id);
+
+            if ($stmt->execute()) {
+                $success_message = 'Email updated successfully.';
+            } else {
+                $error_message = 'Error updating email: ' . $stmt->error;
+            }
+            $stmt->close();
         }
-        $stmt->close();
     } else {
         $error_message = 'Invalid email format.';
     }
-}
 
-// Prepare query string for redirect
-$query_string = '';
-if (!empty($success_message)) {
-    $query_string .= 'success_message=' . urlencode($success_message);
-}
-if (!empty($error_message)) {
-    if (!empty($query_string)) $query_string .= '&';
-    $query_string .= 'error_message=' . urlencode($error_message);
-}
+    // Prepare query string for redirect
+    $query_string = '';
+    if (!empty($success_message)) {
+        $query_string .= 'success_message=' . urlencode($success_message);
+    }
+    if (!empty($error_message)) {
+        if (!empty($query_string)) $query_string .= '&';
+        $query_string .= 'error_message=' . urlencode($error_message);
+    }
 
-// Redirect the user back to the change email page with messages
-header('Location: change_email.php?' . $query_string);
-exit;
+    // Redirect the user back to the change email page with messages
+    header('Location: change_email.php?' . $query_string);
+    exit;
 }
 ?>
 
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="en-US">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Esports Website</title>
@@ -73,7 +104,7 @@ exit;
     <link rel="stylesheet" href="owl-carousel/owl.carousel.css">
     <link rel="stylesheet" href="owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
-    <link rel="stylesheet" href="css/template-style.css">
+    <link rel="stylesheet" href="./css/template-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -81,8 +112,9 @@ exit;
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
+
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
-    
+
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -98,7 +130,7 @@ exit;
       <!-- Top Navigation -->
       <nav class="background-transparent background-transparent-hightlight full-width sticky">
         <div class="s-12 l-2">
-          <a href="index.html" class="logo">
+          <a href="index.php" class="logo">
             <!-- Logo White Version -->
             <img class="logo-white" src="img/logo.png" alt="">
             <!-- Logo Dark Version -->
@@ -107,7 +139,7 @@ exit;
         </div>
         <div class="top-nav s-12 l-10">
           <ul class="right chevron">
-            <li><a href="index.html">Home</a></li>
+            <li><a href="index.php">Home</a></li>
            <li><a href="#">Tournaments</a>
               <ul>
                 <li><a href="#">Upcoming Tournaments</a>
@@ -115,41 +147,27 @@ exit;
                     <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
-                    <a href="tour_reg.html" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
+                    <a href="tour_reg.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
                   </ul>
               </li>
                 <li><a>Ongoing Tournaments</a></li>
                 </ul>
             </li>
-            <li><a href="games.html">Games</a></li>
-            <li><a href="our-services.html">Our Services</a></li>
+            <li><a href="news.php">News</a></li>
+            <li><a href="our-services.php">Our Services</a></li>
              
-            <li><a href="organize.html">Organize</a></li>
-            <li><a href="about-us.html">About</a></li>
+            <li><a href="organize.php">Organize</a></li>
+            <li><a href="about-us.php">About</a></li>
             <li><a href="#"><i class="fas fa-user"></i></a>
-              <ul>
-                <li><a href="signin.html">Signin</a></li>
-                <li><a href="signup.html">Signup</a></li>
-                <li><a href="index.html">Logout</a></li>
-              </ul>
+                <ul>
+                    <?php if ($isSignin): ?>
+                        <li><a href="logout.php">Signout</a></li>
+                    <?php else: ?>
+                        <li><a href="signin.php">Signin</a></li>
+                        <li><a href="signup.php">Signup</a></li>
+                    <?php endif; ?>
+                </ul>
             </li>
-            <li>
-              <a href="#">
-              <label class="plane-switch">
-              <input type="checkbox">
-              <div>
-                  <div>
-                      <svg viewBox="0 0 13 13">
-                          <path d="M1.55989957,5.41666667 L5.51582215,5.41666667 L4.47015462,0.108333333 L4.47015462,0.108333333 C4.47015462,0.0634601974 4.49708054,0.0249592654 4.5354546,0.00851337035 L4.57707145,0 L5.36229752,0 C5.43359776,0 5.50087375,0.028779451 5.55026392,0.0782711996 L5.59317877,0.134368264 L7.13659662,2.81558333 L8.29565964,2.81666667 C8.53185377,2.81666667 8.72332694,3.01067661 8.72332694,3.25 C8.72332694,3.48932339 8.53185377,3.68333333 8.29565964,3.68333333 L7.63589819,3.68225 L8.63450135,5.41666667 L11.9308317,5.41666667 C12.5213171,5.41666667 13,5.90169152 13,6.5 C13,7.09830848 12.5213171,7.58333333 11.9308317,7.58333333 L8.63450135,7.58333333 L7.63589819,9.31666667 L8.29565964,9.31666667 C8.53185377,9.31666667 8.72332694,9.51067661 8.72332694,9.75 C8.72332694,9.98932339 8.53185377,10.1833333 8.29565964,10.1833333 L7.13659662,10.1833333 L5.59317877,12.8656317 C5.55725264,12.9280353 5.49882018,12.9724157 5.43174295,12.9907056 L5.36229752,13 L4.57707145,13 L4.55610333,12.9978962 C4.51267695,12.9890959 4.48069792,12.9547924 4.47230803,12.9134397 L4.47223088,12.8704208 L5.51582215,7.58333333 L1.55989957,7.58333333 L0.891288881,8.55114605 C0.853775374,8.60544678 0.798421006,8.64327676 0.73629202,8.65879796 L0.672314689,8.66666667 L0.106844414,8.66666667 L0.0715243949,8.66058466 L0.0715243949,8.66058466 C0.0297243066,8.6457608 0.00275502199,8.60729104 0,8.5651586 L0.00593007386,8.52254537 L0.580855011,6.85813984 C0.64492547,6.67265611 0.6577034,6.47392717 0.619193545,6.28316421 L0.580694768,6.14191703 L0.00601851064,4.48064746 C0.00203480725,4.4691314 0,4.45701613 0,4.44481314 C0,4.39994001 0.0269259152,4.36143908 0.0652999725,4.34499318 L0.106916826,4.33647981 L0.672546853,4.33647981 C0.737865848,4.33647981 0.80011301,4.36066329 0.848265401,4.40322477 L0.89131128,4.45169723 L1.55989957,5.41666667 Z" fill="currentColor"></path>
-                      </svg>
-                  </div>
-                  <span class="street-middle"></span>
-                  <span class="cloud"></span>
-                  <span class="cloud two"></span>
-              </div>
-              </label>
-             </a>
-          </li>
           </li>
         </div>
       </nav>
@@ -203,6 +221,10 @@ exit;
             <form id="update_email" action="change_email.php" method="post">
                 <div class="unique-container">
                     <h2 class="unique-header">Change Email</h2>
+                    <div class="unique-input-field">
+                        <label for="currentEmail" class="unique-label">Current Email:</label>
+                        <input type="email" style="color: #ff0000;cursor: not-allowed;" id="currentEmail" name="currentEmail" class="unique-input" value="<?php echo htmlspecialchars($currentEmail); ?>" readonly>
+                    </div>
                     <div class="unique-input-field">
                         <label for="newEmail" class="unique-label">New Email:</label>
                         <input type="email" id="newEmail" name="newEmail" class="unique-input" placeholder="newuser@gmail.com" required>
@@ -293,7 +315,8 @@ exit;
             <p class="text-size-12">© 2024 InfiKnight Esports. All Rights Reserved.</p>
           </div>
           <div class="s-12 l-6">
-            <a class="right text-size-12 text-primary-hover" href="#" title="Esports Website">Design and coded by <br> Team &infin; </a>
+            <a class="right text-size-12 text-primary-hover" href="#" title="Esports Website">Developed by Team <span style="font-size: 25px;">&infin;</span>
+            </a>
           </div>
         </div>  
       </section>
@@ -364,36 +387,30 @@ function loadProfilePic(event) {
 
 
   // Function to show the popup message
-  function showPopupMessage(message, type) {
-    const popup = document.getElementById('popup-message');
-    popup.textContent = message;
-    popup.className = 'popup-message'; // Reset to default
-    if (type === 'success') {
-      popup.classList.add('success');
-    } else if (type === 'error') {
-      popup.classList.add('error');
-    }
-    popup.style.display = 'block';
-    setTimeout(() => {
-      popup.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
+function showPopupMessage(message, type) {
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
   }
+  popup.style.display = 'block'; // Show the popup
+  setTimeout(() => {
+    popup.style.display = 'none'; // Hide after 3 seconds
+  }, 3000);
+}
 
-  // Example usage for PHP error and success messages
-  document.addEventListener('DOMContentLoaded', function() {
-    <?php if (!empty($success_message)): ?>
-      showPopupMessage("<?php echo $success_message; ?>", 'success');
-    <?php elseif (!empty($error_message)): ?>
-      showPopupMessage("<?php echo $error_message; ?>", 'error');
-    <?php endif; ?>
-  });
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
+});
 
-    // Check if there's a success message and display it
-    <?php if (!empty($success_message)): ?>
-      document.addEventListener('DOMContentLoaded', function() {
-        showPopupMessage("<?php echo $success_message; ?>", 'success');
-      });
-    <?php endif; ?>
 </script>
 
   </body>
