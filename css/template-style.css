@@ -3190,7 +3190,6 @@ i.icon-circle {
 /* Profile container styling */
 .profile-container {
   width: 100%;
-  margin: 0 auto;
   overflow: hidden;
   position: relative;
 }
@@ -3361,7 +3360,7 @@ i.icon-circle {
 /* Unique Container */
 .unique-container {
   background-color: #282828;
-  text-align: center;
+  text-align: left;
   padding: 20px;
   width: 80%;
   position: relative; /* Add this */
