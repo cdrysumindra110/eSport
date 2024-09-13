@@ -1,5 +1,4 @@
 
-
 document.addEventListener('DOMContentLoaded', () => {
   // Game cards
   const gameCards = document.querySelectorAll('.game-card.available');
@@ -12,14 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
           // Store the selected game in localStorage
           localStorage.setItem('selectedGame', selectedGame);
 
-          // Redirect to the create_tour.html page
-          window.location.href = 'create_tour.html';
+          // Redirect to the create_tour.php page
+          window.location.href = 'create_tour.php';
       });
   });
 });
 
 document.getElementById('back-arrow').addEventListener('click', function() {
-  window.location.href = 'organize.html';
+  window.location.href = 'organize.php';
 });
 
 
@@ -33,8 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Store the game name in localStorage
       localStorage.setItem('selectedGame', gameName);
       
-      // Redirect to the create_tour.html page
-      window.location.href = 'create_tour.html';
+      // Redirect to the create_tour.php page
+      window.location.href = 'create_tour.php';
     });
   });
 });
@@ -259,14 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Bracket Setting ++++++++++++++++++++++++++++
-// const select = document.getElementById('squad');
-//     for (let i = 1; i <= 20; i++) {
-//         const option = document.createElement('option');
-//         option.value = i;
-//         option.textContent = i;
-//         select.appendChild(option);
-//     }
 
 document.addEventListener('DOMContentLoaded', function() {
   const matchTypeSelect = document.getElementById('match-type');
