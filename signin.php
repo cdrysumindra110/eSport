@@ -1,14 +1,17 @@
-<?php 
-// Database configuration
-include_once('config.php');
+<?php
+// Include the config file
+require_once 'config.php';
+
+// Start the session
+session_start();
 
 // Initialize messages
 $error_message = '';
-$success_message = '';  // For redirect success messages
+$success_message = '';
 
 // Check if a success message is set in the URL
 if (isset($_GET['success_signup'])) {
-    $success_message = htmlspecialchars($_GET['success_signup']);  // Sanitize output
+    $success_message = htmlspecialchars($_GET['success_signup']);
     echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
 }
 
@@ -31,9 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Verify password
         if (password_verify($password, $user['password'])) {
-            // User exists and password is correct, set success message and redirect
-            $success_message = "Successfully logged in!";
-            header("Location: update_profile.php?success_signin=" . urlencode($success_message));
+            // User exists and password is correct, set session variables
+            $_SESSION['isSignin'] = true;
+            $_SESSION['user_id'] = $user['id'];
+
+            // Redirect to dashboard with a success message
+            header("Location: dashboard.php?success_signin=" . urlencode("Successfully logged in!"));
             exit();
         } else {
             // Invalid password

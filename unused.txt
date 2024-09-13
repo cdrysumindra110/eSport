@@ -103,3 +103,14 @@
               </div>
     </div>
 </div>
+
+
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+// Check for success message from query parameter
+if (isset($_GET['success_signin'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
+}

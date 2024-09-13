@@ -3359,10 +3359,9 @@ i.icon-circle {
 }
 
 /* Unique Container */
-/* Unique Container */
 .unique-container {
   background-color: #282828;
-  text-align: left;
+  text-align: center;
   padding: 20px;
   width: 80%;
   position: relative; /* Add this */

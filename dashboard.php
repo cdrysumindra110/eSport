@@ -1,113 +1,121 @@
 <?php
+// Include the config file
+require_once 'config.php';
+
+// Start the session
 session_start();
-include 'config.php'; // Make sure to include your database connection file
 
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+// Check for success message from query parameter
+if (isset($_GET['success_signin'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
+    header('Location: signin.php');
+    exit();
+}
+
+// Get the logged-in user ID
+$user_id = $_SESSION['user_id'];
+
+// Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['update_profile'])) {
-        // Handle profile update
-        $uname = $_POST['uname'];
-        $dobMonth = $_POST['dob-month'];
-        $dobDay = $_POST['dob-day'];
-        $dobYear = $_POST['dob-year'];
-        $country = $_POST['country'];
-        $city = $_POST['city'];
-        $role = $_POST['role'];
+    // Handle file uploads if files are uploaded
+    if (isset($_FILES['coverPhotoFile']) && isset($_FILES['profilePicFile'])) {
+        $coverPhotoFile = $_FILES['coverPhotoFile'];
+        $profilePicFile = $_FILES['profilePicFile'];
 
-        // Handle file uploads
-        $coverPhotoPath = '';
-        $profilePicPath = '';
-
-        if (!empty($_FILES['coverPhotoFile']['name'])) {
-            $coverPhoto = $_FILES['coverPhotoFile'];
-            if ($coverPhoto['error'] == UPLOAD_ERR_OK) {
-                $coverPhotoPath = 'uploads/' . basename($coverPhoto['name']);
-                move_uploaded_file($coverPhoto['tmp_name'], $coverPhotoPath);
-            }
-        }
-
-        if (!empty($_FILES['profilePicFile']['name'])) {
-            $profilePic = $_FILES['profilePicFile'];
-            if ($profilePic['error'] == UPLOAD_ERR_OK) {
-                $profilePicPath = 'uploads/' . basename($profilePic['name']);
-                move_uploaded_file($profilePic['tmp_name'], $profilePicPath);
-            }
-        }
-
-        // Update profile in the database
-        $sql = "UPDATE users SET username = ?, dob_month = ?, dob_day = ?, dob_year = ?, country = ?, city = ?, role = ?, cover_photo = ?, profile_pic = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssssi", $uname, $dobMonth, $dobDay, $dobYear, $country, $city, $role, $coverPhotoPath, $profilePicPath, $_SESSION['user_id']);
-
-        if ($stmt->execute()) {
-            echo "Profile updated successfully!";
+        // Validate and store the uploaded files
+        $coverPhotoPath = 'uploads/' . basename($coverPhotoFile['name']);
+        $profilePicPath = 'uploads/' . basename($profilePicFile['name']);
+        
+        if (move_uploaded_file($coverPhotoFile['tmp_name'], $coverPhotoPath) &&
+            move_uploaded_file($profilePicFile['tmp_name'], $profilePicPath)) {
+            $success_message = 'Files uploaded successfully.';
         } else {
-            echo "Error updating profile: " . $conn->error;
-        }
-
-        $stmt->close();
-    } elseif (isset($_POST['change_email'])) {
-        // Handle email change
-        $newEmail = $_POST['newEmail'];
-
-        // Validate email
-        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-            echo "Invalid email format.";
-            exit;
-        }
-
-        // Update email in the database
-        $sql = "UPDATE users SET email = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("si", $newEmail, $_SESSION['user_id']);
-
-        if ($stmt->execute()) {
-            echo "Email updated successfully!";
-        } else {
-            echo "Error updating email: " . $conn->error;
-        }
-
-        $stmt->close();
-    } elseif (isset($_POST['change_password'])) {
-        // Handle password change
-        $currentPassword = $_POST['currentPassword'];
-        $newPassword = $_POST['newPassword'];
-
-        // Validate password
-        if (strlen($newPassword) < 6) {
-            echo "Password must be at least 6 characters long.";
-            exit;
-        }
-
-        // Check current password and update to new password
-        $sql = "SELECT password FROM users WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $_SESSION['user_id']);
-        $stmt->execute();
-        $stmt->bind_result($hashedPassword);
-        $stmt->fetch();
-        $stmt->close();
-
-        if (password_verify($currentPassword, $hashedPassword)) {
-            $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            $sql = "UPDATE users SET password = ? WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $newHashedPassword, $_SESSION['user_id']);
-
-            if ($stmt->execute()) {
-                echo "Password updated successfully!";
-            } else {
-                echo "Error updating password: " . $conn->error;
-            }
-
-            $stmt->close();
-        } else {
-            echo "Current password is incorrect.";
+            $error_message = 'Failed to upload files.';
         }
     }
 
-    $conn->close();
+    // Handle the update profile form
+    if (isset($_POST['update_profile'])) {
+        $role = $_POST['role'];
+        $uname = $_POST['uname'];
+        $dob_month = $_POST['dob-month'];
+        $dob_day = $_POST['dob-day'];
+        $dob_year = $_POST['dob-year'];
+        $country = $_POST['country'];
+        $city = $_POST['city'];
+
+        // Validate and update the profile data in the database
+        $dob = "$dob_month-$dob_day-$dob_year";
+        $stmt = $conn->prepare("UPDATE users SET role = ?, uname = ?, dob = ?, country = ?, city = ? WHERE id = ?");
+        $stmt->bind_param('sssssi', $role, $uname, $dob, $country, $city, $user_id);
+
+        if ($stmt->execute()) {
+            $success_message = 'Profile updated successfully.';
+        } else {
+            $error_message = 'Error updating profile: ' . $stmt->error;
+        }
+        $stmt->close();
+    }
+
+    // Handle the update email form
+    if (isset($_POST['update_email'])) {
+        $newEmail = $_POST['newEmail'];
+
+        // Validate and update the email in the database
+        $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
+        $stmt->bind_param('si', $newEmail, $user_id);
+
+        if ($stmt->execute()) {
+            $success_message = 'Email updated successfully.';
+        } else {
+            $error_message = 'Error updating email: ' . $stmt->error;
+        }
+        $stmt->close();
+    }
+
+    // Handle the update password form
+    if (isset($_POST['update_password'])) {
+        $currentPassword = $_POST['currentPassword'];
+        $newPassword = $_POST['newPassword'];
+
+        // Validate and update the password in the database
+        $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ? AND password = ?");
+        $stmt->bind_param('sis', $newPassword, $user_id, $currentPassword);
+
+        if ($stmt->execute()) {
+            $success_message = 'Password updated successfully.';
+        } else {
+            $error_message = 'Error updating password: ' . $stmt->error;
+        }
+        $stmt->close();
+    }
+
+    // Prepare query string for redirect
+    $query_string = '';
+    if ($success_message) {
+        $query_string .= 'success_message=' . urlencode($success_message);
+    }
+    if ($error_message) {
+        if ($query_string) $query_string .= '&';
+        $query_string .= 'error_message=' . urlencode($error_message);
+    }
+
+    // Redirect the user back to the dashboard with messages
+    header('Location: dashboard.php?' . $query_string);
+    exit;
 }
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en-US">
@@ -129,29 +137,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
     <style>
-      .popup-message {
-      display: none;
-      padding: 15px;
-      margin: 20px;
-      border-radius: 5px;
-      color: white;
-      position: fixed;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-    }
-    .popup-message.success {
-      background-color: #4CAF50; /* Green */
-    }
-    .popup-message.error {
-      background-color: #f44336; /* Red */
-    }
+.popup-message {
+  display: none;
+  padding: 15px;
+  margin: 20px;
+  border-radius: 5px;
+  width: 20%;
+  color: white;
+  background-color: #4CAF50; /* Example background color */
+  position: fixed;
+  top: 65px;
+  right: 0px;
+  z-index: 1000;
+  text-align: center;
+}
+
+.popup-message.success {
+  background-color: #4CAF50; /* Green */
+}
+.popup-message.error {
+  background-color: #f44336; /* Red */
+}
 
   .btn-container {
   background-color: #282828;
-  width: 19%;
-  height: 400px;
+  width: 18%;
+  height: 300px;
   display: flex;
   flex-direction: column;
   border: 0.5px solid lightgray;
@@ -164,20 +175,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 /* Optional: Add media queries to make it responsive */
 @media (max-width: 768px) {
-  .button-container {
-    width: 100%;
-    height: auto;
-    top: auto;
-    left: auto;
-    bottom: 0;
-    right: 0;
-  }
+.button-container {
+  width: 100%;
+  height: auto;
+  top: auto;
+  left: auto;
+  bottom: 0;
+  right: 0;
+}
 }
 
 .btn-cnt {
   background-color: #282828; /* Adjust as needed */
   color: #fff;
-  border: none;
+  border-top: 0.5px solid lightgray;
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
@@ -203,6 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
     </style>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+    
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -278,63 +290,64 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </header>
     
 
-    <!-- MAIN -->
-    <main role="main">    
-      <article>
-        <!-- Header -->
-        <!-- Header -->
-        <header class="section-head background-image" style="background-image:url(img/full_bg.jpg); margin-bottom : 10px">
-          <div class="line">
+  <!-- MAIN -->
+  <main role="main">    
+    <article>
+      <!-- Header -->
+      <!-- Header -->
+      <header class="section-head background-image" style="background-image:url(img/full_bg.jpg); margin-bottom : 10px">
+        <div class="line">
+
+          <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
+            User Profile
+          </h1>
+        
+        </div>
   
-            <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-              User Profile
-            </h1>
-          
-          </div>
-   
-        </header>
+      </header>
   
      
     <!-- Popup Message -->
     <div class="popup-message" id="popup-message"></div>
 
-<div class="profile-cont">
+    <div class="profile-cont">
     <div class="btn-container">
-        <button id="manageProfileBtn" class="btn-cnt"><i class='fa fa-money'></i>Wallet</button>
-        <button id="manageProfileBtn" class="btn-cnt"><i class='fas fa-user-edit'></i>Manage Profile</button>
+        <button id="walletBtn" class="btn-cnt"><i class='fa fa-money'></i>Wallet</button>
+        <button id="updateProfileBtn" class="btn-cnt"><i class='fas fa-user-edit'></i>Profile</button>
         <button id="changeEmailBtn" class="btn-cnt"><i class='fa fa-envelope'></i>Change Email</button>
         <button id="changePasswordBtn" class="btn-cnt"><i class='fa fa-key'></i>Change Password</button>
-        <button id="changePasswordBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
-
+        <button id="signoutBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
     </div>
 
-    <!-- Manage Profile -->
-    <div id="profileManageSection" class="profile-section">
-        <form id="profile-form" action="update_profile.php" method="post" enctype="multipart/form-data">
-            <div class="profile-container">
-                <div class="cover-photo-container">
-                    <div class="cover-photo">
-                        <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
-                        <label for="coverPhotoFile" class="cover-photo-label">
-                            <span class="icon-wrapper">
-                                <i class="fas fa-camera"></i>
-                            </span>
-                            <span>Change Cover</span>
-                        </label>
-                        <img id="coverPhoto" name="coverPhoto" src="./img/neon.png" alt="Cover Photo" class="cover-photo-img" />
-                        <div class="cover-overlay"></div>
-                    </div>
-                </div>
-                <div class="profile-pic">
-                    <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
-                    <label class="-label" for="profilePicFile">
-                        <span class="glyphicon glyphicon-camera"></span>
-                        <span>Change Profile</span>
+    <form id="update_images" action="upload.php" method="post" enctype="multipart/form-data">
+        <div class="profile-container">
+            <div class="cover-photo-container">
+                <div class="cover-photo">
+                    <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
+                    <label for="coverPhotoFile" class="cover-photo-label">
+                        <span class="icon-wrapper">
+                            <i class="fas fa-camera"></i>
+                        </span>
+                        <span>Change Cover</span>
                     </label>
-                    <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
+                    <img id="coverPhoto" name="coverPhoto" src="./img/neon.png" alt="Cover Photo" class="cover-photo-img" />
+                    <div class="cover-overlay"></div>
                 </div>
             </div>
-            
+            <div class="profile-pic">
+                <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
+                <label for="profilePicFile" class="profile-pic-label">
+                    <span class="glyphicon glyphicon-camera"></span>
+                    <span>Change Profile</span>
+                </label>
+                <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
+            </div>
+        </div>
+    </form>
+
+    <!-- Update Profile -->
+    <div id="profileUpdateSection" class="profile-section">
+        <form id="update_profile" action="dashboard.php" method="post" enctype="multipart/form-data">
             <div class="unique-container">
                 <h2 class="unique-header">Role Selection</h2>
                 <div class="unique-input-field">
@@ -373,97 +386,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <label for="city" class="unique-label">City</label>
                     <input type="text" id="city" name="city" class="unique-input" placeholder="City" required>
                 </div>
-                <button type="button" class="unique-button">CANCEL</button>
-                <button type="submit" class="unique-button">SAVE CHANGES</button>
+                <button type="button" class="unique-button" onclick="showSection('profileUpdateSection')">CANCEL</button>
+                <button type="submit" name="update_profile" value="submit" class="unique-button">SAVE CHANGES</button>
             </div>
         </form>
     </div>
 
-
-<!-- Change Email Section -->
-<div id="changeEmailSection" class="profile-section" style="display:none;">
-    <form id="changeEmailForm" action="change_email.php" method="post">
-              <div class="profile-container">
-                <div class="cover-photo-container">
-                    <div class="cover-photo">
-                        <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
-                        <label for="coverPhotoFile" class="cover-photo-label">
-                            <span class="icon-wrapper">
-                                <i class="fas fa-camera"></i>
-                            </span>
-                            <span>Change Cover</span>
-                        </label>
-                        <img id="coverPhoto" name="coverPhoto" src="./img/neon.png" alt="Cover Photo" class="cover-photo-img" />
-                        <div class="cover-overlay"></div>
-                    </div>
+    <!-- Change Email Section -->
+    <div id="changeEmailSection" class="profile-section" style="display:none;">
+        <form id="update_email" action="dashboard.php" method="post">
+            <div class="unique-container">
+                <h2 class="unique-header">Change Email</h2>
+                <div class="unique-input-field">
+                    <label for="newEmail" class="unique-label">New Email:</label>
+                    <input type="email" id="newEmail" name="newEmail" class="unique-input" placeholder="newuser@gmail.com" required>
                 </div>
-                <div class="profile-pic">
-                    <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
-                    <label class="-label" for="profilePicFile">
-                        <span class="glyphicon glyphicon-camera"></span>
-                        <span>Change Profile</span>
-                    </label>
-                    <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
+                <div class="unique-actions">
+                    <button type="button" class="unique-button" onclick="showSection('changeEmailSection')">CANCEL</button>
+                    <button type="submit" name="update_email" value="submit" class="unique-button">UPDATE EMAIL</button>
                 </div>
             </div>
-    <div class="unique-container">
-        <h2 class="unique-header">Change Email</h2>
-        <div class="unique-input-field">
-            <label for="newEmail" class="unique-label">New Email:</label>
-            <input type="email" id="newEmail" name="newEmail" class="unique-input" placeholder="newuser@gmail.com" required>
-        </div>
-        <div class="unique-actions">
-            <button type="button" class="unique-button" onclick="window.location.reload();">CANCEL</button>
-            <button type="submit" class="unique-button">UPDATE EMAIL</button>
-        </div>
-      </div>
-    </form>
+        </form>
+    </div>
+
+    <!-- Change Password Section -->
+    <div id="changePasswordSection" class="profile-section" style="display:none;">
+        <form id="update_password" action="dashboard.php" method="post">
+            <div class="unique-container">
+                <h2 class="unique-header">Change Password</h2>
+                <div class="unique-input-field">
+                    <label for="currentPassword" class="unique-label">Current Password:</label>
+                    <input type="password" id="currentPassword" name="currentPassword" class="unique-input" placeholder="Current Password" required>
+                </div>
+                <div class="unique-input-field">
+                    <label for="newPassword" class="unique-label">New Password:</label>
+                    <input type="password" id="newPassword" name="newPassword" class="unique-input" placeholder="New Password" required>
+                </div>
+                <div class="unique-actions">
+                    <button type="button" class="unique-button" onclick="showSection('changePasswordSection')">CANCEL</button>
+                    <button type="submit" name="update_password" value="submit" class="unique-button">UPDATE PASSWORD</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
-<!-- Change Password Section -->
-<div id="changePasswordSection" class="profile-section" style="display:none;">
-    <form id="changePasswordForm" action="change_password.php" method="post">
-             <div class="profile-container">
-                <div class="cover-photo-container">
-                    <div class="cover-photo">
-                        <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
-                        <label for="coverPhotoFile" class="cover-photo-label">
-                            <span class="icon-wrapper">
-                                <i class="fas fa-camera"></i>
-                            </span>
-                            <span>Change Cover</span>
-                        </label>
-                        <img id="coverPhoto" name="coverPhoto" src="./img/neon.png" alt="Cover Photo" class="cover-photo-img" />
-                        <div class="cover-overlay"></div>
-                    </div>
-                </div>
-                <div class="profile-pic">
-                    <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
-                    <label class="-label" for="profilePicFile">
-                        <span class="glyphicon glyphicon-camera"></span>
-                        <span>Change Profile</span>
-                    </label>
-                    <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
-                </div>
-             </div>
-    <div class="unique-container">
-        <h2 class="unique-header">Change Password</h2>
-        <div class="unique-input-field">
-            <label for="currentPassword" class="unique-label">Current Password:</label>
-            <input type="password" id="currentPassword" name="currentPassword" class="unique-input" placeholder="Current Password" required>
-        </div>
-        <div class="unique-input-field">
-            <label for="newPassword" class="unique-label">New Password:</label>
-            <input type="password" id="newPassword" name="newPassword" class="unique-input" placeholder="New Password" required>
-        </div>
-        <div class="unique-actions">
-            <button type="button" class="unique-button" onclick="window.location.reload();">CANCEL</button>
-            <button type="submit" class="unique-button">UPDATE PASSWORD</button>
-        </div>
-      </div>
-    </form>
-</div>
-</div>
             
         
     <!-- Section 9 -->
@@ -562,45 +529,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     myModal.show();
   });
 
-  // Profile Section
   document.addEventListener('DOMContentLoaded', function() {
-    const manageProfileBtn = document.getElementById('manageProfileBtn');
-    const changeEmailBtn = document.getElementById('changeEmailBtn');
-    const changePasswordBtn = document.getElementById('changePasswordBtn');
+    const buttons = {
+        updateProfile: document.getElementById('updateProfileBtn'),
+        changeEmail: document.getElementById('changeEmailBtn'),
+        changePassword: document.getElementById('changePasswordBtn')
+    };
 
-    const profileManageSection = document.getElementById('profileManageSection');
-    const changeEmailSection = document.getElementById('changeEmailSection');
-    const changePasswordSection = document.getElementById('changePasswordSection');
+    const sections = {
+        profileUpdate: document.getElementById('profileUpdateSection'),
+        changeEmail: document.getElementById('changeEmailSection'),
+        changePassword: document.getElementById('changePasswordSection')
+    };
 
-    manageProfileBtn.addEventListener('click', function() {
-        profileManageSection.style.display = 'block';
-        changeEmailSection.style.display = 'none';
-        changePasswordSection.style.display = 'none';
-    });
+    function showSection(sectionToShow) {
+        Object.keys(sections).forEach(key => {
+            sections[key].style.display = (sectionToShow === key) ? 'block' : 'none';
+        });
+    }
 
-
-    changeEmailBtn.addEventListener('click', function() {
-      profileManageSection.style.display = 'none';
-        changeEmailSection.style.display = 'block';
-        changePasswordSection.style.display = 'none';
-    });
-
-    changePasswordBtn.addEventListener('click', function() {
-      profileManageSection.style.display = 'none';
-        changeEmailSection.style.display = 'none';
-        changePasswordSection.style.display = 'block';
-    });
+    buttons.updateProfile.addEventListener('click', () => showSection('profileUpdate'));
+    buttons.changeEmail.addEventListener('click', () => showSection('changeEmail'));
+    buttons.changePassword.addEventListener('click', () => showSection('changePassword'));
 });
 
-
-  function loadCoverPhoto(event) {
-  const coverPhoto = document.getElementById('coverPhoto');
-  coverPhoto.src = URL.createObjectURL(event.target.files[0]);
+function loadCoverPhoto(event) {
+    const coverPhoto = document.getElementById('coverPhoto');
+    coverPhoto.src = URL.createObjectURL(event.target.files[0]);
 }
 
 function loadProfilePic(event) {
-  const profilePic = document.getElementById('profilePic');
-  profilePic.src = URL.createObjectURL(event.target.files[0]);
+    const profilePic = document.getElementById('profilePic');
+    profilePic.src = URL.createObjectURL(event.target.files[0]);
 }
 
 // ----------------------Dob Javascript ----------------------------
