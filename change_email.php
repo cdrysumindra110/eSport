@@ -1,3 +1,66 @@
+<?php
+// Include the config file
+require_once 'config.php';
+
+// Start the session
+session_start();
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+// Check if the user is logged in
+if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
+    header('Location: signin.php');
+    exit();
+}
+
+// Get the logged-in user ID
+$user_id = $_SESSION['user_id'];
+
+// Check if the form has been submitted
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+// Handle the update email form
+if (isset($_POST['update_email'])) {
+    $newEmail = filter_var($_POST['newEmail'], FILTER_SANITIZE_EMAIL);
+
+    // Validate the new email
+    if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+        // Prepare and execute the update
+        $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
+        $stmt->bind_param('si', $newEmail, $user_id);
+
+        if ($stmt->execute()) {
+            $success_message = 'Email updated successfully.';
+        } else {
+            $error_message = 'Error updating email: ' . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        $error_message = 'Invalid email format.';
+    }
+}
+
+// Prepare query string for redirect
+$query_string = '';
+if (!empty($success_message)) {
+    $query_string .= 'success_message=' . urlencode($success_message);
+}
+if (!empty($error_message)) {
+    if (!empty($query_string)) $query_string .= '&';
+    $query_string .= 'error_message=' . urlencode($error_message);
+}
+
+// Redirect the user back to the change email page with messages
+header('Location: change_email.php?' . $query_string);
+exit;
+}
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
@@ -11,7 +74,6 @@
     <link rel="stylesheet" href="owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
     <link rel="stylesheet" href="css/template-style.css">
-    <link rel="stylesheet" href="css/tour_org.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,11 +81,8 @@
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
-    <!-- popup -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+    
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -64,8 +123,6 @@
             </li>
             <li><a href="games.html">Games</a></li>
             <li><a href="our-services.html">Our Services</a></li>
-            <!-- <li><a href="our-history.html">Our History</a></li> -->
-            <!-- <li><a href="contact.html">Contact</a></li> -->
              
             <li><a href="organize.html">Organize</a></li>
             <li><a href="about-us.html">About</a></li>
@@ -98,141 +155,92 @@
       </nav>
     </header>
     
-   <!-- MAIN -->
-    <main role="main"> 
-        
-        <!-- Header -->
-        <header class="section-head background-image" style="background-image:url(img/full_bg.jpg)">
-            <div class="line">
-              <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-                Organize Tournament
-              </h1>
+  
+     
+    <!-- Popup Message -->
+    <div class="popup-message" id="popup-message"></div>
+
+    <div class="profile-cont">
+    <div class="btn-container">
+            <button id="walletBtn" class="btn-cnt"><i class='fa fa-money'></i>Wallet</button>
+            <button id="updateProfileBtn" class="btn-cnt"><i class='fas fa-user-edit'></i>Profile</button>
+            <button id="teamProfileBtn" class="btn-cnt"><i class='fa fa-group'></i>Teams</button>
+            <button id="changeEmailBtn" class="btn-cnt"><i class='fa fa-envelope'></i>Change Email</button>
+            <button id="changePasswordBtn" class="btn-cnt"><i class='fa fa-key'></i>Change Password</button>
+            <button id="signoutBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
+        </div>
+
+        <form id="update_images" action="dashboard.php" method="post" enctype="multipart/form-data">
+            <div class="profile-container">
+                <div class="cover-photo-container">
+                    <div class="cover-photo">
+                        <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
+                        <label for="coverPhotoFile" class="cover-photo-label">
+                            <span class="icon-wrapper">
+                                <i class="fas fa-camera"></i>
+                            </span>
+                            <span>Change Cover</span>
+                        </label>
+                        <img id="coverPhoto" name="coverPhoto" src="./img/neon.png" alt="Cover Photo" class="cover-photo-img" />
+                        <div class="cover-overlay"></div>
+                    </div>
+                </div>
+                <div class="profile-pic">
+                    <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
+                    <label for="profilePicFile" class="profile-pic-label">
+                        <span class="icon-wrapper">
+                          <i class="fas fa-camera"></i>
+                        </span>
+                        <span>Change Profile</span>
+                    </label>
+                    <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
+                </div>
             </div>
-          </header>
-    </main>
+        </form>
 
-    <div class="game-tournament">
-      <h2 class="section-heading">Select a Game</h2>
-      <div id="search">
-        <svg viewBox="0 0 420 60" xmlns="http://www.w3.org/2000/svg">
-          <rect class="bar"/>
-          
-          <g class="magnifier">
-            <circle class="glass"/>
-            <line class="handle" x1="32" y1="32" x2="44" y2="44"></line>
-          </g>
-      
-          <g class="sparks">
-            <circle class="spark"/>
-            <circle class="spark"/>
-            <circle class="spark"/>
-          </g>
-      
-          <g class="burst pattern-one">
-            <circle class="particle circle"/>
-            <path class="particle triangle"/>
-            <circle class="particle circle"/>
-            <path class="particle plus"/>
-            <rect class="particle rect"/>
-            <path class="particle triangle"/>
-          </g>
-          <g class="burst pattern-two">
-            <path class="particle plus"/>
-            <circle class="particle circle"/>
-            <path class="particle triangle"/>
-            <rect class="particle rect"/>
-            <circle class="particle circle"/>
-            <path class="particle plus"/>
-          </g>
-          <g class="burst pattern-three">
-            <circle class="particle circle"/>
-            <rect class="particle rect"/>
-            <path class="particle plus"/>
-            <path class="particle triangle"/>
-            <rect class="particle rect"/>
-            <path class="particle plus"/>
-          </g>
-        </svg>
-        <input type=search name=q aria-label="Search for inspiration"/>
-      </div>
-      
-      <div id="results">
-        
-      </div>
-      
-        <div class="games-container">
-          <div class="game-card available" id="game-pubg">
-              <img src="img/game/pubg.png" alt="PUBG">
-              <h3>PUBG</h3>
-          </div>
-          <div class="game-card available" id="game-cod">
-              <img src="img/game/csGo.png" alt="Call of Duty: Mobile">
-              <h3>Call of Duty: Mobile</h3>
-          </div>
-          <div class="game-card available" id="game-freefire">
-              <img src="img/game/ff_game.jpg" alt="Free Fire">
-              <h3>Free Fire</h3>
-          </div>
-      </div>
-      
-      <div class="games-container">
-        <!-- Featured Games -->
-        <div class="game-card featured">
-          <img src="img/game/lol.png" alt="League of Legends">
-          <div class="featured-tag">FEATURED</div>
-          <h3>League of Legends</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/dota.png" alt="Dota 2">
-          <div class="featured-tag">FEATURED</div>
-          <h3>Dota 2</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/valorant.png" alt="VALORANT">
-          <div class="featured-tag">FEATURED</div>
-          <h3>VALORANT</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/overwatch.png" alt="Overwatch">
-          <div class="featured-tag">FEATURED</div>
-          <h3>Overwatch</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/fortnite.png" alt="Fortnite">
-          <div class="featured-tag">FEATURED</div>
-          <h3>Fortnite</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/eFootball.jpg" alt="eFootball">
-          <div class="featured-tag">FEATURED</div>
-          <h3>eFootball</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-        <!-- Add other featured games similarly -->
-    </div>
-    </div>
+        <!-- Change Email Section -->
+        <div id="changeEmailSection" class="profile-section">
+            <form id="update_email" action="change_email.php" method="post">
+                <div class="unique-container">
+                    <h2 class="unique-header">Change Email</h2>
+                    <div class="unique-input-field">
+                        <label for="newEmail" class="unique-label">New Email:</label>
+                        <input type="email" id="newEmail" name="newEmail" class="unique-input" placeholder="newuser@gmail.com" required>
+                    </div>
+                    <div class="unique-actions">
+                        <button type="button" class="unique-button" onclick="showSection('changeEmailSection')">CANCEL</button>
+                        <button type="submit" name="update_email" value="submit" class="unique-button">UPDATE EMAIL</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+</div>
 
-
+            
 
     <!-- FOOTER -->
     <footer>
+      <!-- Social -->
+      <div class="background-primary padding text-center">
+        <a href="/"><i class="icon-facebook_circle text-size-30 text-white"></i></a> 
+        <a href="/"><i class="icon-twitter_circle text-size-30 text-white"></i></a>
+        <a href="/"><i class="icon-google_plus_circle text-size-30 text-white"></i></a>
+        <a href="/"><i class="icon-instagram_circle text-size-30 text-white"></i></a> 
+        <a href="/"><i class="icon-linked_in_circle text-size-30 text-white"></i></a>                                                                       
+      </div>
+    <!-- Animated Logos -->
       <div class="container-animated sticky" id="logo-container">
         <div class="scrollable-container">
           <button class="animated-btn left-button">&nbsp;&nbsp;&nbsp;&nbsp;We are Trusted By:&nbsp;&nbsp;&nbsp;&nbsp;</button>
             <div class="logos">
-                <img src="../assets/img/ESports.jpg" alt="Esports" class="image">
-                <img src="../assets/img/amd.jpg" alt="AMD" class="image">
-                <img src="../assets/img/redbull.jpg" alt="Red Bull" class="image">
-                <img src="../assets/img/unicef.jpg" alt="UNICEF" class="image">
-                <img src="../assets/img/tencent.jpg" alt="Tencent" class="image">
-                <img src="../assets/img/KoHire.png" alt="KoHire" class="image">
-                <img src="../assets/img/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
-                <img src="../assets/img/Empyre.png" alt="Empyre" class="image">
+                <img src="img/logo/ESports.jpg" alt="Esports" class="image">
+                <img src="img/logo/amd.jpg" alt="AMD" class="image">
+                <img src="img/logo/redbull.jpg" alt="Red Bull" class="image">
+                <img src="img/logo/unicef.jpg" alt="UNICEF" class="image">
+                <img src="img/logo/tencent.jpg" alt="Tencent" class="image">
+                <img src="img/logo/KoHire.png" alt="KoHire" class="image">
+                <img src="img/logo/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
+                <img src="img/logo/Empyre.png" alt="Empyre" class="image">
             </div>
             <button class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
         </div>
@@ -293,20 +301,100 @@
     <script type="text/javascript" src="js/responsee.js"></script>
     <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
     <script type="text/javascript" src="js/template-scripts.js"></script> 
-    <script src="js/tour_org.js"></script>
 
-    <!-- Popup page Scripts -->
+
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(function() {
-        var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
-        myModal.show();
-    }, 1000); // 1-second delay before modal appears
-});
+   document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    myModal.show();
+  });
 
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get all buttons in the button container
+    const buttons = document.querySelectorAll('.btn-cnt');
+  
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove 'active' class from all buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+  
+            // Add 'active' class to the clicked button
+            this.classList.add('active');
+  
+            // Determine the URL to redirect based on button ID
+            let redirectUrl = '';
+            switch (this.id) {
+                case 'walletBtn':
+                    redirectUrl = 'wallet.php';
+                    break;
+                case 'updateProfileBtn':
+                    redirectUrl = 'dashboard.php';
+                    break;
+                case 'teamProfileBtn':
+                    redirectUrl = 'teams.php';
+                    break;
+                case 'changeEmailBtn':
+                    redirectUrl = 'change_email.php';
+                    break;
+                case 'changePasswordBtn':
+                    redirectUrl = 'change_password.php';
+                    break;
+                case 'signoutBtn':
+                    redirectUrl = 'logout.php';
+                    break;
+                default:
+                    redirectUrl = 'dashboard.php'; // Default fallback URL
+            }
+  
+            // Redirect to the appropriate page
+            window.location.href = redirectUrl;
+        });
+    });
+  });
+
+function loadCoverPhoto(event) {
+    const coverPhoto = document.getElementById('coverPhoto');
+    coverPhoto.src = URL.createObjectURL(event.target.files[0]);
+}
+
+function loadProfilePic(event) {
+    const profilePic = document.getElementById('profilePic');
+    profilePic.src = URL.createObjectURL(event.target.files[0]);
+}
+
+
+  // Function to show the popup message
+  function showPopupMessage(message, type) {
+    const popup = document.getElementById('popup-message');
+    popup.textContent = message;
+    popup.className = 'popup-message'; // Reset to default
+    if (type === 'success') {
+      popup.classList.add('success');
+    } else if (type === 'error') {
+      popup.classList.add('error');
+    }
+    popup.style.display = 'block';
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 3000); // Hide after 3 seconds
+  }
+
+  // Example usage for PHP error and success messages
+  document.addEventListener('DOMContentLoaded', function() {
+    <?php if (!empty($success_message)): ?>
+      showPopupMessage("<?php echo $success_message; ?>", 'success');
+    <?php elseif (!empty($error_message)): ?>
+      showPopupMessage("<?php echo $error_message; ?>", 'error');
+    <?php endif; ?>
+  });
+
+    // Check if there's a success message and display it
+    <?php if (!empty($success_message)): ?>
+      document.addEventListener('DOMContentLoaded', function() {
+        showPopupMessage("<?php echo $success_message; ?>", 'success');
+      });
+    <?php endif; ?>
 </script>
-<!-- Accordian jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-</body>
+  </body>
 </html>

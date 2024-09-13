@@ -204,6 +204,7 @@ avatarInput.addEventListener('change', function() {
 });
 
 
+
 // ==========================================News Section CSS =====================================================
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -232,4 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Initialize with the first tab active
   switchTab('latest'); // Set 'latest' as the initial tab
 });
+
+
+
 

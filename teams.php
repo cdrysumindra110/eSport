@@ -9,11 +9,6 @@ session_start();
 $error_message = '';
 $success_message = '';
 
-// Check for success message from query parameter
-if (isset($_GET['success_signin'])) {
-    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
-}
-
 // Check if the user is logged in
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     header('Location: signin.php');
@@ -26,44 +21,43 @@ $user_id = $_SESSION['user_id'];
 // Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    // Handle the update profile form
-    if (isset($_POST['update_profile'])) {
-        $role = $_POST['role'];
-        $uname = $_POST['uname'];
-        $dob_month = $_POST['dob-month'];
-        $dob_day = $_POST['dob-day'];
-        $dob_year = $_POST['dob-year'];
-        $country = $_POST['country'];
-        $city = $_POST['city'];
+// Handle the update email form
+if (isset($_POST['update_email'])) {
+    $newEmail = filter_var($_POST['newEmail'], FILTER_SANITIZE_EMAIL);
 
-        // Validate and update the profile data in the database
-        $dob = "$dob_year-$dob_month-$dob_day";  // Using Year-Month-Day format
-        $stmt = $conn->prepare("UPDATE users SET role = ?, uname = ?, dob = ?, country = ?, city = ? WHERE id = ?");
-        $stmt->bind_param('sssssi', $role, $uname, $dob, $country, $city, $user_id);
+    // Validate the new email
+    if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+        // Prepare and execute the update
+        $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
+        $stmt->bind_param('si', $newEmail, $user_id);
 
         if ($stmt->execute()) {
-            $success_message = 'Profile updated successfully.';
+            $success_message = 'Email updated successfully.';
         } else {
-            $error_message = 'Error updating profile: ' . $stmt->error;
+            $error_message = 'Error updating email: ' . $stmt->error;
         }
         $stmt->close();
+    } else {
+        $error_message = 'Invalid email format.';
     }
+}
 
-    // Prepare query string for redirect
-    $query_string = '';
-    if (!empty($success_message)) {
-        $query_string .= 'success_message=' . urlencode($success_message);
-    }
-    if (!empty($error_message)) {
-        if (!empty($query_string)) $query_string .= '&';
-        $query_string .= 'error_message=' . urlencode($error_message);
-    }
+// Prepare query string for redirect
+$query_string = '';
+if (!empty($success_message)) {
+    $query_string .= 'success_message=' . urlencode($success_message);
+}
+if (!empty($error_message)) {
+    if (!empty($query_string)) $query_string .= '&';
+    $query_string .= 'error_message=' . urlencode($error_message);
+}
 
-    // Redirect the user back to the dashboard with messages
-    header('Location: dashboard.php?' . $query_string);
-    exit;
+// Redirect the user back to the change email page with messages
+header('Location: change_email.php?' . $query_string);
+exit;
 }
 ?>
+
 
 
 
@@ -88,7 +82,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
-    
+    <style>
+.team-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: x-large;
+}
+
+.team-title {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.create-team {
+  background-color: darkcyan;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #00b3ff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.create-team:hover {
+  background-color: cyan;
+  color: #ffffff;
+
+}
+
+.team-text {
+  margin-right: 8px;
+}
+    </style>
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -132,15 +162,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
              
             <li><a href="organize.html">Organize</a></li>
             <li><a href="about-us.html">About</a></li>
-            <li>
-              <a href="dashboard.php"><i class="fas fa-user"></i></a>
+            <li><a href="#"><i class="fas fa-user"></i></a>
               <ul>
-                <?php if (isset($_SESSION['isSignin']) && $_SESSION['isSignin'] === true): ?>
-                  <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
-                <?php else: ?>
-                  <li><a href="signin.php">Signin</a></li>
-                  <li><a href="signup.php">Signup</a></li>
-                <?php endif; ?>
+                <li><a href="signin.html">Signin</a></li>
+                <li><a href="signup.html">Signup</a></li>
+                <li><a href="index.html">Logout</a></li>
               </ul>
             </li>
             <li>
@@ -171,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="popup-message" id="popup-message"></div>
 
     <div class="profile-cont">
-        <div class="btn-container">
+    <div class="btn-container">
             <button id="walletBtn" class="btn-cnt"><i class='fa fa-money'></i>Wallet</button>
             <button id="updateProfileBtn" class="btn-cnt"><i class='fas fa-user-edit'></i>Profile</button>
             <button id="teamProfileBtn" class="btn-cnt"><i class='fa fa-group'></i>Teams</button>
@@ -180,8 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button id="signoutBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
         </div>
 
-        <form id="update_images" action="upload.php" method="post" enctype="multipart/form-data">
-            <div class="profile-container">
+        <div class="profile-container">
                 <div class="cover-photo-container">
                     <div class="cover-photo">
                         <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
@@ -206,94 +231,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
                 </div>
             </div>
-        </form>
 
-
-        <!-- Update Profile -->
-        <div id="profileUpdateSection" class="profile-section">
-            <form id="update_profile" action="dashboard.php" method="post" enctype="multipart/form-data">
-                <div class="unique-container">
-                    <h2 class="unique-header">Role Selection</h2>
-                    <div class="unique-input-field">
-                        <label class="unique-label">Select Role:</label>
-                        <div class="radio-group">
-                            <input type="radio" id="role-player" name="role" value="player" class="unique-radio" required>
-                            <label for="role-player" class="unique-radio-label">Player</label>
-                            <input type="radio" id="role-organizer" name="role" value="organizer" class="unique-radio" required>
-                            <label for="role-organizer" class="unique-radio-label">Organizer</label>
-                        </div>
-                    </div>
-
-                    <h2 class="unique-header">Personal Information</h2>
-                    <div class="unique-input-field">
-                        <label for="uname" class="unique-label">User Name</label>
-                        <input type="text" id="uname" name="uname" class="unique-input" placeholder="@BloodeHancxy" required>
-                    </div>
-                    <div class="unique-input-field">
-                        <label for="dob" class="unique-label">Date Of Birth</label>
-                        <div class="dob-row">
-                            <select id="dob-month" name="dob-month" class="unique-select" required></select>
-                            <select id="dob-day" name="dob-day" class="unique-select" required></select>
-                            <select id="dob-year" name="dob-year" class="unique-select" required></select>
-                        </div>
-                    </div>
-
-                    <h2 class="unique-header">Location</h2>
-                    <div class="unique-input-field">
-                        <label for="country" class="unique-label">Country</label>
-                        <select id="country" name="country" class="unique-select" required></select>
-                    </div>
-                    <div class="unique-info">
-                        <i class="unique-info-icon"></i> You can change your country once every 6 months.
-                    </div>
-                    <div class="unique-input-field">
-                        <label for="city" class="unique-label">City</label>
-                        <input type="text" id="city" name="city" class="unique-input" placeholder="City" required>
-                    </div>
-                    <button type="button" class="unique-button" onclick="showSection('profileUpdateSection')">CANCEL</button>
-                    <button type="submit" name="update_profile" value="submit" class="unique-button">SAVE CHANGES</button>
-                </div>
-            </form>
+        <div class="unique-container">
+          <div class="team-container">
+          <h2 class="unique-header">Team</h2>
+            <button class="create-team"><i class='fa fa-plus' style='color:#000000'></i>
+              <span class="team-text">Create Team</span>
+            </button>
+          </div>
         </div>
-
-        <!-- Change Email Section -->
-        <div id="changeEmailSection" class="profile-section" style="display:none;">
-            <form id="update_email" action="dashboard.php" method="post">
-                <div class="unique-container">
-                    <h2 class="unique-header">Change Email</h2>
-                    <div class="unique-input-field">
-                        <label for="newEmail" class="unique-label">New Email:</label>
-                        <input type="email" id="newEmail" name="newEmail" class="unique-input" placeholder="newuser@gmail.com" required>
-                    </div>
-                    <div class="unique-actions">
-                        <button type="button" class="unique-button" onclick="showSection('changeEmailSection')">CANCEL</button>
-                        <button type="submit" name="update_email" value="submit" class="unique-button">UPDATE EMAIL</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Change Password Section -->
-        <div id="changePasswordSection" class="profile-section" style="display:none;">
-            <form id="update_password" action="dashboard.php" method="post">
-                <div class="unique-container">
-                    <h2 class="unique-header">Change Password</h2>
-                    <div class="unique-input-field">
-                        <label for="currentPassword" class="unique-label">Current Password:</label>
-                        <input type="password" id="currentPassword" name="currentPassword" class="unique-input" placeholder="Current Password" required>
-                    </div>
-                    <div class="unique-input-field">
-                        <label for="newPassword" class="unique-label">New Password:</label>
-                        <input type="password" id="newPassword" name="newPassword" class="unique-input" placeholder="New Password" required>
-                    </div>
-                    <div class="unique-actions">
-                        <button type="button" class="unique-button" onclick="showSection('changePasswordSection')">CANCEL</button>
-                        <button type="submit" name="update_password" value="submit" class="unique-button">UPDATE PASSWORD</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-</div>
+    </div>
 
             
 
@@ -383,13 +330,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <!-- Popup page Scripts -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+   document.addEventListener('DOMContentLoaded', function () {
     var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
     myModal.show();
   });
 
-// ========================================== Dahboard Js =====================================================
-document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Get all buttons in the button container
     const buttons = document.querySelectorAll('.btn-cnt');
   
@@ -431,7 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
   });
-  
 
 function loadCoverPhoto(event) {
     const coverPhoto = document.getElementById('coverPhoto');
@@ -443,89 +388,6 @@ function loadProfilePic(event) {
     profilePic.src = URL.createObjectURL(event.target.files[0]);
 }
 
-// ----------------------Dob Javascript ----------------------------
-document.addEventListener('DOMContentLoaded', function() {
-    const months = [
-        "January", "February", "March", "April", "May", "June", "July",
-        "August", "September", "October", "November", "December"
-    ];
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
-
-    const monthSelect = document.getElementById('dob-month');
-    const daySelect = document.getElementById('dob-day');
-    const yearSelect = document.getElementById('dob-year');
-
-    // Populate months
-    months.forEach(month => {
-        const option = document.createElement('option');
-        option.value = month;
-        option.textContent = month;
-        monthSelect.appendChild(option);
-    });
-
-    // Populate days
-    days.forEach(day => {
-        const option = document.createElement('option');
-        option.value = day;
-        option.textContent = day;
-        daySelect.appendChild(option);
-    });
-
-    // Populate years
-    years.forEach(year => {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        yearSelect.appendChild(option);
-    });
-});
-
-// ----------------------------------JS for Countries ----------------------------
-document.addEventListener('DOMContentLoaded', function() {
-    const countries = [
-        "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
-        "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
-        "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
-        "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso",
-        "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic",
-        "Chad", "Chile", "China", "Colombia", "Comoros", "Congo, Democratic Republic of the",
-        "Congo, Republic of the", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark",
-        "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador",
-        "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland",
-        "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada",
-        "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
-        "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica",
-        "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South",
-        "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia",
-        "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia",
-        "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico",
-        "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique",
-        "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua",
-        "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Panama",
-        "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar",
-        "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
-        "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
-        "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore",
-        "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan",
-        "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan",
-        "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
-        "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates",
-        "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
-        "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-    ];
-
-    const countrySelect = document.getElementById('country');
-
-    // Populate countries
-    countries.forEach(country => {
-        const option = document.createElement('option');
-        option.value = country;
-        option.textContent = country;
-        countrySelect.appendChild(option);
-    });
-});
 
   // Function to show the popup message
   function showPopupMessage(message, type) {

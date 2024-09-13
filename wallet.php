@@ -1,3 +1,66 @@
+<?php
+// Include the config file
+require_once 'config.php';
+
+// Start the session
+session_start();
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+// Check if the user is logged in
+if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
+    header('Location: signin.php');
+    exit();
+}
+
+// Get the logged-in user ID
+$user_id = $_SESSION['user_id'];
+
+// Check if the form has been submitted
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+// Handle the update email form
+if (isset($_POST['update_email'])) {
+    $newEmail = filter_var($_POST['newEmail'], FILTER_SANITIZE_EMAIL);
+
+    // Validate the new email
+    if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+        // Prepare and execute the update
+        $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
+        $stmt->bind_param('si', $newEmail, $user_id);
+
+        if ($stmt->execute()) {
+            $success_message = 'Email updated successfully.';
+        } else {
+            $error_message = 'Error updating email: ' . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        $error_message = 'Invalid email format.';
+    }
+}
+
+// Prepare query string for redirect
+$query_string = '';
+if (!empty($success_message)) {
+    $query_string .= 'success_message=' . urlencode($success_message);
+}
+if (!empty($error_message)) {
+    if (!empty($query_string)) $query_string .= '&';
+    $query_string .= 'error_message=' . urlencode($error_message);
+}
+
+// Redirect the user back to the change email page with messages
+header('Location: change_email.php?' . $query_string);
+exit;
+}
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
@@ -18,6 +81,42 @@
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+    <style>
+  .wallet-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: x-large;
+}
+
+.wallet-title {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.link-wallet {
+  background-color: #282c34;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #00b8d4;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.link-icon {
+  margin-right: 8px;
+}
+
+.link-text {
+  margin-right: 8px;
+}
+    </style>
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -58,12 +157,16 @@
             </li>
             <li><a href="games.html">Games</a></li>
             <li><a href="our-services.html">Our Services</a></li>
-            <!-- <li><a href="our-history.html">Our History</a></li> -->
-            <!-- <li><a href="contact.html">Contact</a></li> -->
              
             <li><a href="organize.html">Organize</a></li>
             <li><a href="about-us.html">About</a></li>
-            <li><a href="sig_in.html"><i class="fas fa-user"></i></a></li>
+            <li><a href="#"><i class="fas fa-user"></i></a>
+              <ul>
+                <li><a href="signin.html">Signin</a></li>
+                <li><a href="signup.html">Signup</a></li>
+                <li><a href="index.html">Logout</a></li>
+              </ul>
+            </li>
             <li>
               <a href="#">
               <label class="plane-switch">
@@ -81,123 +184,65 @@
               </label>
              </a>
           </li>
-          </ul>
+          </li>
         </div>
       </nav>
     </header>
     
-    <!-- MAIN -->
-    <main role="main">    
-      <article>
-        <!-- Header -->
-        <header class="section-head background-image" style="background-image:url(img/full_bg.jpg)">
-          <div class="line">
-  
-            <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-              About Us
-            </h1>
-          
-          </div>
-    
-        </header>
-        
-        <!-- Section 1 -->
-        <section class="section-top-padding">      
-          <div class="line">
-            <div class="margin2x">         
-              <div class="m-12 l-6">
-                <h2 class="text-extra-strong text-size-80 text-m-size-40">Why choose us?</h2>
-                
-                <p class="text-dark text-size-20 margin-bottom-30">
-                  Top-Tier Experience
-                </p>
-                <p>Enjoy cutting-edge technology and thrilling gameplay designed for all skill levels.</p>
 
-                <p class="text-dark text-size-20 margin-bottom-30">
-                  24/7 Support
-                </p>
-                <p>Get prompt and professional assistance whenever you need it.</p>
+     
+    <!-- Popup Message -->
+    <div class="popup-message" id="popup-message"></div>
 
-                <p class="text-dark text-size-20 margin-bottom-30">
-                  Competitive Play
-                </p>
-                <p>Compete in exciting tournaments and showcase your skills.</p>
+    <div class="profile-cont">
+    <div class="btn-container">
+            <button id="walletBtn" class="btn-cnt"><i class='fa fa-money'></i>Wallet</button>
+            <button id="updateProfileBtn" class="btn-cnt"><i class='fas fa-user-edit'></i>Profile</button>
+            <button id="teamProfileBtn" class="btn-cnt"><i class='fa fa-group'></i>Teams</button>
+            <button id="changeEmailBtn" class="btn-cnt"><i class='fa fa-envelope'></i>Change Email</button>
+            <button id="changePasswordBtn" class="btn-cnt"><i class='fa fa-key'></i>Change Password</button>
+            <button id="signoutBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
+        </div>
 
-                <p class="text-dark text-size-20 margin-bottom-30">
-                  Active Community
-                </p>
-                <p>Connect with fellow gamers and stay engaged through our vibrant community.</p>
-
-              </div>
-              
-              <div class="m-12 l-6 margin-m-top-30">
-                <!-- Image --> 
-                <img src="img/about.jpeg" alt="">
-              </div> 
-            </div>    
-          </div>      
-        </section>
-        
-        <!-- Section 2 -->
-        <section class="section">      
-          <div class="line">
-            <div class="margin2x">              
-              <div class="m-12 l-6 margin-m-top-30">
-                <!-- Image --> 
-                <img src="img/img-15.jpg" alt="">
-              </div> 
-                       
-              <div class="m-12 l-6">
-                <h2 class="text-extra-strong text-size-80 text-m-size-40">Our Mission</h2>
-                <p>At InfiKnight, we are driven by a passion for competitive gaming. 
-                  Our mission is to create a platform where gamers from all backgrounds can showcase 
-                  their skills, compete at the highest levels, and connect with a global community of 
-                  like-minded individuals. We believe in the power of esports to bring people together, 
-                  inspire greatness, and push the boundaries of what's possible in the gaming world.
-                </p>
-                
-                <h2 class="text-extra-strong text-size-80 text-m-size-40">Join Us</h2>
-                <p class="padding background-orange text-white">
-                  Whether you're a seasoned pro or just starting out, 
-                  InfiKnight welcomes you to be part of our growing community. 
-                  Stay tuned for upcoming events, exclusive content, and opportunities 
-                  to connect with fellow gamers. Let's make history together in the world of esports!
-                </p>
-              </div>
-            </div>    
-          </div>      
-        </section>
-        
-        <!-- Section 3 -->
-        <section class="section text-center background-primary">  
-          <div class="line">
-            <p class="text-white text-handwrite text-size-90 margin-bottom-20 text-line-height-1">Play hard. Win harder.</p>
-            <p class="text-white">
-              Join the next generation of esports champions.<br>
-              Compete, conquer, and elevate your game to the highest level. The arena is waiting for you.
-            </p>
-          </div>
-        </section>
-        
-        <!-- Section 4 -->
-        <section class="section background-image" style="background-image:url(img/parallax-06.jpg)">
-          <div class="line text-center">
-            <h2 class="text-white text-extra-strong text-size-80 text-m-size-40">Do you need help?</h2>
-            <p class="text-white">Welcome to our esports hub!<br> Dive into the latest tournaments, team updates, and gaming news. Join the action and be part of our gaming community. </p>
-          </div>            
-          <div class="line">  
-            <div class="s-12 m-12 l-3 center">
-              <a href="our-services.html" class="s-12 button border-radius background-primary text-size-20 text-white">Contact Us</a>
+        <div class="profile-container">
+                <div class="cover-photo-container">
+                    <div class="cover-photo">
+                        <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
+                        <label for="coverPhotoFile" class="cover-photo-label">
+                            <span class="icon-wrapper">
+                                <i class="fas fa-camera"></i>
+                            </span>
+                            <span>Change Cover</span>
+                        </label>
+                        <img id="coverPhoto" name="coverPhoto" src="./img/neon.png" alt="Cover Photo" class="cover-photo-img" />
+                        <div class="cover-overlay"></div>
+                    </div>
+                </div>
+                <div class="profile-pic">
+                    <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
+                    <label for="profilePicFile" class="profile-pic-label">
+                        <span class="icon-wrapper">
+                          <i class="fas fa-camera"></i>
+                        </span>
+                        <span>Change Profile</span>
+                    </label>
+                    <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
+                </div>
             </div>
-          </div>
-            
-          <!-- red full width arrow object -->
-          <img class="arrow-object" src="img/object-red.svg" alt="">
-        </section>
-      </article>  
 
-    </main>
-    
+        <div class="unique-container">
+          <div class="wallet-container">
+          <h2 class="unique-header">Wallet</h2>
+            <button class="link-wallet">
+              <span class="link-icon">🔗</span>
+              <span class="link-text">Link Wallet</span>
+            </button>
+          </div>
+        </div>
+    </div>
+
+            
+
     <!-- FOOTER -->
     <footer>
       <!-- Social -->
@@ -213,14 +258,14 @@
         <div class="scrollable-container">
           <button class="animated-btn left-button">&nbsp;&nbsp;&nbsp;&nbsp;We are Trusted By:&nbsp;&nbsp;&nbsp;&nbsp;</button>
             <div class="logos">
-                <img src="../assets/img/ESports.jpg" alt="Esports" class="image">
-                <img src="../assets/img/amd.jpg" alt="AMD" class="image">
-                <img src="../assets/img/redbull.jpg" alt="Red Bull" class="image">
-                <img src="../assets/img/unicef.jpg" alt="UNICEF" class="image">
-                <img src="../assets/img/tencent.jpg" alt="Tencent" class="image">
-                <img src="../assets/img/KoHire.png" alt="KoHire" class="image">
-                <img src="../assets/img/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
-                <img src="../assets/img/Empyre.png" alt="Empyre" class="image">
+                <img src="img/logo/ESports.jpg" alt="Esports" class="image">
+                <img src="img/logo/amd.jpg" alt="AMD" class="image">
+                <img src="img/logo/redbull.jpg" alt="Red Bull" class="image">
+                <img src="img/logo/unicef.jpg" alt="UNICEF" class="image">
+                <img src="img/logo/tencent.jpg" alt="Tencent" class="image">
+                <img src="img/logo/KoHire.png" alt="KoHire" class="image">
+                <img src="img/logo/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
+                <img src="img/logo/Empyre.png" alt="Empyre" class="image">
             </div>
             <button class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
         </div>
@@ -230,7 +275,7 @@
         <div class="line"> 
           <div class="margin2x">
             <div class="hide-s hide-m hide-l xl-2">
-               <img src="img/logo.png" alt="">
+               <img src="img/logo_red.png" alt="">
             </div>
             <div class="s-12 m-6 l-3 xl-3">
                <h4 class="text-white text-strong">Our Mission</h4>
@@ -280,7 +325,101 @@
     </footer>
     <script type="text/javascript" src="js/responsee.js"></script>
     <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
-    <script type="text/javascript" src="js/template-scripts.js"></script> 
-    
+    <script type="text/javascript" src="./js/template-scripts.js"></script> 
+
+    <!-- Popup page Scripts -->
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    myModal.show();
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get all buttons in the button container
+    const buttons = document.querySelectorAll('.btn-cnt');
+  
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove 'active' class from all buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+  
+            // Add 'active' class to the clicked button
+            this.classList.add('active');
+  
+            // Determine the URL to redirect based on button ID
+            let redirectUrl = '';
+            switch (this.id) {
+                case 'walletBtn':
+                    redirectUrl = 'wallet.php';
+                    break;
+                case 'updateProfileBtn':
+                    redirectUrl = 'dashboard.php';
+                    break;
+                case 'teamProfileBtn':
+                    redirectUrl = 'teams.php';
+                    break;
+                case 'changeEmailBtn':
+                    redirectUrl = 'change_email.php';
+                    break;
+                case 'changePasswordBtn':
+                    redirectUrl = 'change_password.php';
+                    break;
+                case 'signoutBtn':
+                    redirectUrl = 'logout.php';
+                    break;
+                default:
+                    redirectUrl = 'dashboard.php'; // Default fallback URL
+            }
+  
+            // Redirect to the appropriate page
+            window.location.href = redirectUrl;
+        });
+    });
+  });
+
+function loadCoverPhoto(event) {
+    const coverPhoto = document.getElementById('coverPhoto');
+    coverPhoto.src = URL.createObjectURL(event.target.files[0]);
+}
+
+function loadProfilePic(event) {
+    const profilePic = document.getElementById('profilePic');
+    profilePic.src = URL.createObjectURL(event.target.files[0]);
+}
+
+
+  // Function to show the popup message
+  function showPopupMessage(message, type) {
+    const popup = document.getElementById('popup-message');
+    popup.textContent = message;
+    popup.className = 'popup-message'; // Reset to default
+    if (type === 'success') {
+      popup.classList.add('success');
+    } else if (type === 'error') {
+      popup.classList.add('error');
+    }
+    popup.style.display = 'block';
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 3000); // Hide after 3 seconds
+  }
+
+  // Example usage for PHP error and success messages
+  document.addEventListener('DOMContentLoaded', function() {
+    <?php if (!empty($success_message)): ?>
+      showPopupMessage("<?php echo $success_message; ?>", 'success');
+    <?php elseif (!empty($error_message)): ?>
+      showPopupMessage("<?php echo $error_message; ?>", 'error');
+    <?php endif; ?>
+  });
+
+    // Check if there's a success message and display it
+    <?php if (!empty($success_message)): ?>
+      document.addEventListener('DOMContentLoaded', function() {
+        showPopupMessage("<?php echo $success_message; ?>", 'success');
+      });
+    <?php endif; ?>
+</script>
+
   </body>
 </html>

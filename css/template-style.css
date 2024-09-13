@@ -3187,145 +3187,230 @@ i.icon-circle {
 
 
 /* Profile container styling */
-/* Profile container styling */
+.popup-message {
+  display: none;
+  padding: 15px;
+  margin: 20px;
+  border-radius: 5px;
+  width: 20%;
+  color: white;
+  background-color: #4CAF50; /* Example background color */
+  position: fixed;
+  top: 65px;
+  right: 0px;
+  z-index: 1000;
+  text-align: center;
+}
+
+.popup-message.success {
+  background-color: #4CAF50; /* Green */
+}
+.popup-message.error {
+  background-color: #f44336; /* Red */
+}
+
+ .btn-container {
+  background-color: #282828;
+  width: 18%;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute; /* Changed from float to absolute positioning */
+  z-index: 1;
+  top: 450px; /* Adjust as needed */
+  left: 3rem; /* Adjust as needed */
+  padding: 10px;
+}
+
+.btn-cnt {
+  background-color: #282828; /* Adjust as needed */
+  color: #fff;
+  border-top: 0.5px solid lightgray;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between the icon and text */
+  transition: background-color 0.3s ease;
+  width: 100%; /* Ensure buttons take full width of container */
+}
+
+.btn-cnt i {
+  color: #f44336;
+  margin-right: 10px; /* Space between icon and text */
+}
+
+.btn-cnt:hover {
+  background-color: grey; /* Adjust as needed */
+}
+
+.btn-cnt.active {
+  background-color: #007bff; /* Change this to your desired active color */
+  color: #fff; /* Text color for active state */
+}
+
+/* Optional: Add media queries to make it responsive */
+@media (max-width: 768px) {
+  .btn-container {
+    width: 100%;
+    height: auto;
+    top: auto;
+    left: auto;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+
+.profile-cont{
+  background-color: #282828;
+  margin-top: 0;
+}
+/* Center the entire profile-container */
 .profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  overflow: hidden;
+  height: 70vh; /* Full height of the viewport */
   position: relative;
 }
 
-/* Container for the cover photo section */
+/* Styling the cover photo container */
 .cover-photo-container {
   width: 100%;
-  margin-bottom: -100px;
+  display: flex;
+  justify-content: center;
+  position: relative;
 }
 
 /* Cover photo styling */
 .cover-photo {
   position: relative;
   width: 100%;
-  height: 500px; /* Adjust as needed */
+  height: 100%;
   overflow: hidden;
 }
 
-/* File input styling */
-.file-input {
-  display: none;
-}
-
-/* Cover photo label styling */
-.cover-photo-label {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  z-index: 2;
-}
-
-/* Icon wrapper styling */
-.icon-wrapper {
-  margin-right: 5px;
-}
-
-/* Cover photo image styling */
+/* Cover photo image */
 .cover-photo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.3s ease;
-  border-top: 0.5px solid lightgray;
+  position: relative;
 }
 
-/* Overlay styling */
+/* Overlay for cover photo hover effect */
 .cover-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0; /* Hidden by default */
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
   transition: opacity 0.3s ease;
-  z-index: 0; /* Ensure it’s above the image */
 }
 
 .cover-photo:hover .cover-overlay {
   opacity: 1;
 }
 
-/* Centering mixin */
-.object-center {
+/* Cover photo label (for changing the cover) */
+/* Cover photo label (for changing the cover) */
+.cover-photo-label {
+  position: absolute;
+  bottom: 10px;  /* Distance from the bottom */
+  right: 10px;   /* Distance from the right */
   display: flex;
-  justify-content: center;
+  justify-content: center;  /* Centers the content within the label */
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.358);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;  /* Hidden initially */
+  pointer-events: none; /* Prevent the label from interfering with hover detection */
+  transition: opacity 0.3s ease;
+  z-index: 2; /* Make sure the label stays above the image */
 }
 
-/* Variables */
-:root {
-  --circle-size: 165px;
-  --radius: 100px;
-  --shadow: 0 0 10px 0 rgba(255, 255, 255, 0.35);
-  --font-color: rgb(250, 250, 250);
+/* Hover effect to show the label */
+.cover-photo:hover .cover-photo-label {
+  opacity: 1;
+  pointer-events: auto; /* Enable interaction with the label when it appears */
 }
 
-/* Profile picture styling */
-.profile-pic {
-  color: transparent;
-  transition: all 0.3s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+/* Styling for the icon and text */
+.icon-wrapper {
+  margin-right: 5px;
 }
 
-.profile-pic input {
+
+
+/* Icon inside the cover photo label */
+.icon-wrapper {
+  margin-right: 5px;
+}
+
+/* Hide the file input */
+.file-input {
   display: none;
 }
 
-.profile-pic img {
+/* Profile picture container */
+.profile-pic {
   position: absolute;
-  object-fit: cover;
-  width: var(--circle-size);
-  height: var(--circle-size);
+  bottom: -65px; /* Adjust the profile picture position relative to the cover photo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 4px solid #cbfff2;
   box-shadow: var(--shadow);
-  border-radius: var(--radius);
-  z-index: 1;
-  border: 0.5px solid lightskyblue;
-}
-
-.profile-pic .-label {
   cursor: pointer;
-  height: var(--circle-size);
-  width: var(--circle-size);
+  transition: all 0.3s ease;
 }
 
-.profile-pic:hover .-label {
+/* Profile picture image */
+.profile-pic-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Profile picture label (for changing the profile picture) */
+.profile-pic-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 10000;
-  color: var(--font-color);
-  transition: background-color 0.2s ease-in-out;
-  border-radius: var(--radius);
-  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.profile-pic span {
-  display: inline-flex;
-  padding: 0.2em;
-  height: 2em;
+.profile-pic:hover .profile-pic-label {
+  opacity: 1;
 }
+
 
 /* Account Settings */
 .acc-setting .unique-input-field {
@@ -3359,14 +3444,14 @@ i.icon-circle {
 
 /* Unique Container */
 .unique-container {
-  /* background-color: #282828; */
   text-align: left;
   padding: 20px;
   width: 80%;
+  align-items: center;
   position: relative; /* Add this */
-  margin: auto 290px;
+  margin: 50px 300px;
   right: 0; /* Aligns the container to the right */
-  border-top: 0.5px solid lightgray;
+  border-radius: 8px;
 }
 
 
@@ -3474,6 +3559,53 @@ input[type="checkbox"] {
   background-color: #00a2ff;
 }
 
+/* Button container for the profile management buttons */
+
+
+@media (max-width: 768px) {
+  .btn-container {
+    flex-direction: column;
+  }
+
+  .profile-pic img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .cover-photo {
+    height: 25vh;
+  }
+
+  .unique-container {
+    width: 90%;
+    margin: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .unique-button {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .unique-container {
+    margin: auto;
+    padding: 10px;
+  }
+
+  .dob-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .unique-info {
+    width: 100%;
+  }
+
+  .btn-cnt {
+    font-size: 14px;
+  }
+}
 
 /* ===================================News container====================================  */
 :root {

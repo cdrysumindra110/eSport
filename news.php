@@ -1,19 +1,31 @@
+<?php
+// Include the config file
+require_once 'config.php';
+
+// Start the session
+session_start();
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Esports Website</title>
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/icons.css">
-    <link rel="stylesheet" href="css/responsee.css">
-    <link rel="stylesheet" href="owl-carousel/owl.carousel.css">
-    <link rel="stylesheet" href="owl-carousel/owl.theme.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/icons.css">
+    <link rel="stylesheet" href="./css/responsee.css">
+    <link rel="stylesheet" href="./owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="./owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
-    <link rel="stylesheet" href="css/template-style.css">
+    <link rel="stylesheet" href="./css/template-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
 
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
@@ -33,7 +45,7 @@
       <!-- Top Navigation -->
       <nav class="background-transparent background-transparent-hightlight full-width sticky">
         <div class="s-12 l-2">
-          <a href="index.html" class="logo">
+          <a href="index.php" class="logo">
             <!-- Logo White Version -->
             <img class="logo-white" src="img/logo.png" alt="">
             <!-- Logo Dark Version -->
@@ -42,7 +54,7 @@
         </div>
         <div class="top-nav s-12 l-10">
           <ul class="right chevron">
-            <li><a href="index.html">Home</a></li>
+            <li><a href="index.php">Home</a></li>
            <li><a href="#">Tournaments</a>
               <ul>
                 <li><a href="#">Upcoming Tournaments</a>
@@ -50,21 +62,25 @@
                     <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
-                    <a href="tour_reg.html" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
+                    <a href="tour_reg.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
                   </ul>
               </li>
                 <li><a>Ongoing Tournaments</a></li>
                 </ul>
             </li>
-            <li><a href="games.html">Games</a></li>
-            <li><a href="our-services.html">Our Services</a></li>
-            <!-- <li><a href="our-history.html">Our History</a></li> -->
-            <!-- <li><a href="contact.html">Contact</a></li> -->
+            <li><a href="news.php">News</a></li>
+            <li><a href="our-services.php">Our Services</a></li>
              
-            <li><a href="organize.html">Organize</a></li>
-            <li><a href="about-us.html">About</a></li>
-            <li><a href="sig_in.html"><i class="fas fa-user"></i></a></li>
-            <li>
+            <li><a href="organize.php">Organize</a></li>
+            <li><a href="about-us.php">About</a></li>
+            <li><a href="#"><i class="fas fa-user"></i></a>
+              <ul>
+                <li><a href="signin.php">Signin</a></li>
+                <li><a href="signup.php">Signup</a></li>
+                <li><a href="index.php">Logout</a></li>
+              </ul>
+            </li>
+            <!-- <li>
               <a href="#">
               <label class="plane-switch">
               <input type="checkbox">
@@ -80,8 +96,8 @@
               </div>
               </label>
              </a>
+          </li> -->
           </li>
-          </ul>
         </div>
       </nav>
     </header>
@@ -396,16 +412,16 @@
     <div class="container-animated sticky" id="logo-container">
       <div class="scrollable-container">
         <button class="animated-btn left-button">&nbsp;&nbsp;&nbsp;&nbsp;We are Trusted By:&nbsp;&nbsp;&nbsp;&nbsp;</button>
-          <div class="logos">
-              <img src="../assets/img/ESports.jpg" alt="Esports" class="image">
-              <img src="../assets/img/amd.jpg" alt="AMD" class="image">
-              <img src="../assets/img/redbull.jpg" alt="Red Bull" class="image">
-              <img src="../assets/img/unicef.jpg" alt="UNICEF" class="image">
-              <img src="../assets/img/tencent.jpg" alt="Tencent" class="image">
-              <img src="../assets/img/KoHire.png" alt="KoHire" class="image">
-              <img src="../assets/img/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
-              <img src="../assets/img/Empyre.png" alt="Empyre" class="image">
-          </div>
+        <div class="logos">
+          <img src="img/logo/ESports.jpg" alt="Esports" class="image">
+          <img src="img/logo/amd.jpg" alt="AMD" class="image">
+          <img src="img/logo/redbull.jpg" alt="Red Bull" class="image">
+          <img src="img/logo/unicef.jpg" alt="UNICEF" class="image">
+          <img src="img/logo/tencent.jpg" alt="Tencent" class="image">
+          <img src="img/logo/KoHire.png" alt="KoHire" class="image">
+          <img src="img/logo/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
+          <img src="img/logo/Empyre.png" alt="Empyre" class="image">
+        </div>
           <button class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
       </div>
   </div>
