@@ -1,4 +1,5 @@
-<?php
+
+<?php 
 // Include the config file for database connection
 require_once 'config.php';
 
@@ -9,27 +10,38 @@ session_start();
 $error_message = '';
 $success_message = '';
 
+$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
+
+
+// Check if a success signin message exists in the URL
+$success_message = '';
+if (isset($_GET['success_signin'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
+}
+
+
+// Check if a success message exists in the URL
+if (isset($_GET['success_message'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
+}
+//Error Message
+if (isset($_GET['error_message'])) {
+  $error_message = htmlspecialchars(urldecode($_GET['error_message']));
+}
+
+
 // Check if the user is logged in
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     header('Location: signin.php');
     exit();
 }
 
-// Check if a success & error message exists in the URL
-if (isset($_GET['success_message'])) {
-    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
-}
-
-if (isset($_GET['error_message'])) {
-  $error_message = htmlspecialchars(urldecode($_GET['error_message']));
-}
-
 // Get the logged-in user ID
-$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-
-if (!$user_id) {
-    die('Error: User ID not set in session.');
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User ID not set in session.");
 }
+
+$user_id = $_SESSION['user_id'];
 
 // Fetch current email from the database
 $currentEmail = '';
@@ -161,6 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
             <li><a href="#"><i class="fas fa-user"></i></a>
                 <ul>
                     <?php if ($isSignin): ?>
+                      <li><a href="dashboard.php">Profile</a></li>
                         <li><a href="logout.php">Signout</a></li>
                     <?php else: ?>
                         <li><a href="signin.php">Signin</a></li>

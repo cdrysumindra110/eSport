@@ -85,7 +85,8 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
             <li><a href="about-us.php">About</a></li>
             <li><a href="#"><i class="fas fa-user"></i></a>
                 <ul>
-                    <?php if ($isSignin): ?>
+                    <?php if ($isSignin): ?> 
+                      <li><a href="dashboard.php">Profile</a></li>
                         <li><a href="logout.php">Signout</a></li>
                     <?php else: ?>
                         <li><a href="signin.php">Signin</a></li>
@@ -98,17 +99,23 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
       </nav>
     </header>
     
-   <!-- MAIN -->
-    <main role="main"> 
-        
+    <!-- MAIN -->
+    <main role="main">    
+      <article>
         <!-- Header -->
         <header class="section-head background-image" style="background-image:url(img/full_bg.jpg)">
-            <div class="line">
-              <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-                Organize Tournament
-              </h1>
-            </div>
-          </header>
+          <div class="line">
+  
+            <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
+              Our Services
+            </h1>
+          
+          </div>
+  
+        </header>
+        
+      </article>  
+
     </main>
 
     <div class="game-tournament">

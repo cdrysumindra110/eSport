@@ -1,5 +1,6 @@
-<?php
-// Include the config file
+
+<?php 
+// Include the config file for database connection
 require_once 'config.php';
 
 // Start the session
@@ -9,8 +10,24 @@ session_start();
 $error_message = '';
 $success_message = '';
 
-
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
+
+
+// Check if a success signin message exists in the URL
+$success_message = '';
+if (isset($_GET['success_signin'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
+}
+
+
+// Check if a success message exists in the URL
+if (isset($_GET['success_message'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
+}
+//Error Message
+if (isset($_GET['error_message'])) {
+  $error_message = htmlspecialchars(urldecode($_GET['error_message']));
+}
 
 
 // Check if the user is logged in
@@ -20,28 +37,36 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
 }
 
 // Get the logged-in user ID
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User ID not set in session.");
+}
+
 $user_id = $_SESSION['user_id'];
 
-// Check if the form has been submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_password'])) {
+    $currentPassword = $_POST['currentPassword'];
+    $newPassword = $_POST['newPassword'];
+    $newPasswordConfirm = $_POST['ConfirmnewPassword'];
 
-    // Handle the update password form
-    if (isset($_POST['update_password'])) {
-        $currentPassword = $_POST['currentPassword'];
-        $newPassword = $_POST['newPassword'];
-
-        // Verify current password
+    if ($newPassword !== $newPasswordConfirm) {
+        $error_message = 'New passwords do not match.';
+    } else {
         $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
+        if ($stmt === false) {
+            die('Prepare failed: ' . $conn->error);
+        }
         $stmt->bind_param('i', $user_id);
         $stmt->execute();
         $stmt->bind_result($db_password);
         $stmt->fetch();
         $stmt->close();
 
-        if (password_verify($currentPassword, $db_password)) {
-            // Hash new password and update it
+        if ($db_password !== null && password_verify($currentPassword, $db_password)) {
             $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+            if ($stmt === false) {
+                die('Prepare failed: ' . $conn->error);
+            }
             $stmt->bind_param('si', $newPasswordHash, $user_id);
 
             if ($stmt->execute()) {
@@ -55,22 +80,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Prepare query string for redirect
-    $query_string = '';
-    if (!empty($success_message)) {
-        $query_string .= 'success_message=' . urlencode($success_message);
-    }
-    if (!empty($error_message)) {
-        if (!empty($query_string)) $query_string .= '&';
-        $query_string .= 'error_message=' . urlencode($error_message);
-    }
+    $query_string = http_build_query([
+        'success_message' => $success_message,
+        'error_message' => $error_message
+    ]);
 
-    // Redirect the user back to the dashboard with messages
-    header('Location: dashboard.php?' . $query_string);
-    exit;
+    header('Location: change_password.php?' . $query_string);
+    exit();
 }
 ?>
-
 
 
 
@@ -197,26 +215,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </form>
 
-        <!-- Change Password Section -->
-        <div id="changePasswordSection" class="profile-section">
-            <form id="update_password" action="dashboard.php" method="post">
-                <div class="unique-container">
-                    <h2 class="unique-header">Change Password</h2>
-                    <div class="unique-input-field">
-                        <label for="currentPassword" class="unique-label">Current Password:</label>
-                        <input type="password" id="currentPassword" name="currentPassword" class="unique-input" placeholder="Current Password" required>
-                    </div>
-                    <div class="unique-input-field">
-                        <label for="newPassword" class="unique-label">New Password:</label>
-                        <input type="password" id="newPassword" name="newPassword" class="unique-input" placeholder="New Password" required>
-                    </div>
-                    <div class="unique-actions">
-                        <button type="button" class="unique-button" onclick="showSection('changePasswordSection')">CANCEL</button>
-                        <button type="submit" name="update_password" value="submit" class="unique-button">UPDATE PASSWORD</button>
-                    </div>
+    <!-- Change Password Section -->
+    <div id="changePasswordSection" class="profile-section">
+        <form id="update_password" action="change_password.php" method="post">
+            <div class="unique-container">
+                <h2 class="unique-header">Change Password</h2>
+                <div class="unique-input-field">
+                    <label for="currentPassword" class="unique-label">Current Password:</label>
+                    <input type="password" id="currentPassword" name="currentPassword" class="unique-input" placeholder="Current Password" required>
                 </div>
-            </form>
-        </div>
+                <div class="unique-input-field">
+                    <label for="newPassword" class="unique-label">New Password:</label>
+                    <input type="password" id="newPassword" name="newPassword" class="unique-input" placeholder="New Password" required>
+                </div>
+                <div class="unique-input-field">
+                    <label for="ConfirmnewPassword" class="unique-label">Confirm New Password:</label>
+                    <input type="password" id="ConfirmnewPassword" name="ConfirmnewPassword" class="unique-input" placeholder="Confirm New Password" required>
+                </div>
+                <div class="unique-actions">
+                    <button type="button" class="unique-button" onclick="showSection('changePasswordSection')">CANCEL</button>
+                    <button type="submit" name="update_password" value="submit" class="unique-button">UPDATE PASSWORD</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
             
@@ -369,36 +391,29 @@ function loadProfilePic(event) {
 
   // Function to show the popup message
   function showPopupMessage(message, type) {
-    const popup = document.getElementById('popup-message');
-    popup.textContent = message;
-    popup.className = 'popup-message'; // Reset to default
-    if (type === 'success') {
-      popup.classList.add('success');
-    } else if (type === 'error') {
-      popup.classList.add('error');
-    }
-    popup.style.display = 'block';
-    setTimeout(() => {
-      popup.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
   }
+  popup.style.display = 'block'; // Show the popup
+  setTimeout(() => {
+    popup.style.display = 'none'; // Hide after 3 seconds
+  }, 3000);
+}
 
-  // Example usage for PHP error and success messages
-  document.addEventListener('DOMContentLoaded', function() {
-    <?php if (!empty($success_message)): ?>
-      showPopupMessage("<?php echo $success_message; ?>", 'success');
-    <?php elseif (!empty($error_message)): ?>
-      showPopupMessage("<?php echo $error_message; ?>", 'error');
-    <?php endif; ?>
-  });
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
+});
 
-    // Check if there's a success message and display it
-    <?php if (!empty($success_message)): ?>
-      document.addEventListener('DOMContentLoaded', function() {
-        showPopupMessage("<?php echo $success_message; ?>", 'success');
-      });
-    <?php endif; ?>
 </script>
-
-  </body>
+</body>
 </html>

@@ -179,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <li><a href="#"><i class="fas fa-user"></i></a>
                 <ul>
                     <?php if ($isSignin): ?>
+                      <li><a href="dashboard.php">Profile</a></li>
                         <li><a href="logout.php">Signout</a></li>
                     <?php else: ?>
                         <li><a href="signin.php">Signin</a></li>
