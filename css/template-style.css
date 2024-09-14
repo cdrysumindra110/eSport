@@ -3278,6 +3278,7 @@ i.icon-circle {
   width: 100%;
   height: 70vh; /* Full height of the viewport */
   position: relative;
+  overflow: hidden; /* Ensure no overflow */
 }
 
 /* Styling the cover photo container */
@@ -3286,6 +3287,7 @@ i.icon-circle {
   display: flex;
   justify-content: center;
   position: relative;
+  overflow: hidden;
 }
 
 /* Cover photo styling */
@@ -3388,6 +3390,8 @@ i.icon-circle {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  max-width: 150px; /* Limit image dimensions */
+  max-height: 150px;
 }
 
 /* Profile picture label (for changing the profile picture) */
