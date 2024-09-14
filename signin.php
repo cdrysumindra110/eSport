@@ -66,7 +66,7 @@ $conn->close();
   <title>Sign In Page</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,800">
-  <link rel="stylesheet" href="css/signin.css">
+  <link rel="stylesheet" href="./css/signin.css">
   <style>
     .popup-message {
       display: none;
@@ -90,6 +90,7 @@ $conn->close();
 </head>
 <body>
   <div class="popup-message" id="popup-message"></div>
+  
   <div class="container" id="container">
     <div class="form-container sign-in-container">
       <form action="signin.php" method="post">
@@ -111,7 +112,7 @@ $conn->close();
       <div class="overlay">
         <div class="overlay-panel overlay-right">
           <div class="logo-container">
-            <a href="../index.html"><img src="img/logo.png" alt="Logo"></a>
+            <a href="./index.php"><img src="./img/logo.png" alt="Logo"></a>
           </div>
           <h1>Welcome !</h1>
           <p>Don't have an account?</p>
@@ -121,6 +122,11 @@ $conn->close();
     </div>
   </div>
   <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    myModal.show();
+  });
+
 // Function to show the popup message
 function showPopupMessage(message, type) {
   const popup = document.getElementById('popup-message');

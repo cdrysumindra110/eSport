@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <title>Signup Page</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,800">
-  <link rel="stylesheet" href="css/signup.css">
+  <link rel="stylesheet" href="./css/signup.css">
   <style>
     .popup-message {
       display: none;
@@ -88,6 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
   <div class="popup-message" id="popup-message"></div>
+
   <div class="container" id="container">
     <div class="form-container sign-up-container">
       <form id="signup-form" action="signup.php" method="post">
@@ -110,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="overlay">
         <div class="overlay-panel overlay-left">
           <div class="logo-container">
-            <a href="../index.html"><img src="img/logo.png" alt="Logo"></a>
+            <a href="./index.php"><img src="./img/logo.png" alt="Logo"></a>
           </div>
           <h1>Welcome!</h1>
           <p>Already have an account?</p>
@@ -120,6 +121,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
   </div>
   <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    myModal.show();
+  });
+
     function showPopupMessage(message, type) {
       const popup = document.getElementById('popup-message');
       popup.textContent = message;

@@ -227,7 +227,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
                 <iframe width="800" height="400" src="https://www.youtube.com/embed/u1oqfdh4xBY?si=vhWBHZT9TCSuW0Mi" 
-                title="Dota 2 The International 2024" frameborder="0" 
+                title="Pubg Tournaments" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen></iframe>
               </a>	
@@ -236,7 +236,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
                 <iframe width="800" height="400" src="https://www.youtube.com/embed/oq2Rz2I11l0?si=SMtxcxt0eeu_LMoK" 
-                title="Dota 2 The International 2024" frameborder="0" 
+                title="Free Fire Tournament" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen></iframe>
               </a>	
@@ -244,8 +244,8 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-                <iframe width="800" height="400" src="https://www.youtube.com/embed/ColfvV3PGvc?si=tDtjUanZC0PMu136" 
-                title="Dota 2 The International 2024" frameborder="0" 
+                <iframe width="800" height="400" src="https://www.youtube.com/embed/IS4uCwQ26po?si=6tHwitMYEMoHN8M8" 
+                title="Esport Tournament 2024" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen></iframe>
               </a>	

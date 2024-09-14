@@ -3278,7 +3278,6 @@ i.icon-circle {
   width: 100%;
   height: 70vh; /* Full height of the viewport */
   position: relative;
-  overflow: hidden; /* Ensure no overflow */
 }
 
 /* Styling the cover photo container */
@@ -3368,7 +3367,7 @@ i.icon-circle {
 /* Profile picture container */
 .profile-pic {
   position: absolute;
-  bottom: -120px; /* Adjust the profile picture position relative to the cover photo */
+  bottom: -75px; /* Adjust the profile picture position relative to the cover photo */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3377,11 +3376,12 @@ i.icon-circle {
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: #000000ad;
   border: 4px solid #cbfff2;
   box-shadow: var(--shadow);
   cursor: pointer;
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 /* Profile picture image */
@@ -3436,9 +3436,7 @@ i.icon-circle {
   flex: 1;
 }
 
-.acc-setting .unique-button {
-  /* Optional: Add margin or padding if needed */
-}
+
 
 .acc-setting .unique-input,
 .acc-setting .unique-button {
