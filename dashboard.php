@@ -1,4 +1,3 @@
-
 <?php 
 // Include the config file for database connection
 require_once 'config.php';
@@ -9,26 +8,6 @@ session_start();
 // Initialize messages
 $error_message = '';
 $success_message = '';
-
-$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
-
-
-// Check if a success signin message exists in the URL
-$success_message = '';
-if (isset($_GET['success_signin'])) {
-    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
-}
-
-
-// Check if a success message exists in the URL
-if (isset($_GET['success_message'])) {
-    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
-}
-//Error Message
-if (isset($_GET['error_message'])) {
-  $error_message = htmlspecialchars(urldecode($_GET['error_message']));
-}
-
 
 // Check if the user is logged in
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
@@ -43,48 +22,59 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Check if success or error messages are set in the URL
+if (isset($_GET['success_signin'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
+}
+if (isset($_GET['success_message'])) {
+    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
+}
+if (isset($_GET['error_message'])) {
+    $error_message = htmlspecialchars(urldecode($_GET['error_message']));
+}
+
 // Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Handle the update profile form
     if (isset($_POST['update_profile'])) {
         // Collect the form data
-        $role = $_POST['role'];
-        $uname = $_POST['uname'];
-        $dob_month = $_POST['dob-month'];
-        $dob_day = $_POST['dob-day'];
-        $dob_year = $_POST['dob-year'];
-        $country = $_POST['country'];
-        $city = $_POST['city'];
+        $role = trim($_POST['role']);
+        $full_name = trim($_POST['full_name']);
+        $dob_month = (int)$_POST['dob-month'];
+        $dob_day = (int)$_POST['dob-day'];
+        $dob_year = (int)$_POST['dob-year'];
+        $country = trim($_POST['country']);
+        $city = trim($_POST['city']);
 
         // Validate data
-        if (empty($uname) || empty($country) || empty($city) || empty($dob_month) || empty($dob_day) || empty($dob_year)) {
-          $error_message = 'Please fill in all required fields.';
-      } elseif (!checkdate($dob_month, $dob_day, $dob_year)) {
-          $error_message = 'Invalid date provided.';
-      } else {
-          // Prepare the date of birth in YYYY-MM-DD format
-          $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
+        if (empty($full_name) || empty($country) || empty($city) || empty($dob_month) || empty($dob_day) || empty($dob_year)) {
+            $error_message = 'Please fill in all required fields.';
+        } elseif (!checkdate($dob_month, $dob_day, $dob_year)) {
+            $error_message = 'Invalid date provided.';
+        } else {
+            // Prepare the date of birth in YYYY-MM-DD format
+            $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
 
-          // Prepare the SQL query
-          $stmt = $conn->prepare("UPDATE users SET role = ?, uname = ?, dob = ?, country = ?, city = ? WHERE id = ?");
-          if (!$stmt) {
-              die('Prepare failed: ' . $conn->error);
-          }
+            // Prepare the SQL query
+            $stmt = $conn->prepare("UPDATE users SET role = ?, full_name = ?, dob = ?, country = ?, city = ? WHERE id = ?");
+            if (!$stmt) {
+                die('Prepare failed: ' . $conn->error);
+            }
 
-          // Bind the parameters to the SQL query
-          $stmt->bind_param('sssssi', $role, $uname, $dob, $country, $city, $user_id);
+            // Bind the parameters to the SQL query
+            $stmt->bind_param('sssssi', $role, $full_name, $dob, $country, $city, $user_id);
 
-          // Execute the query and check for errors
-          if ($stmt->execute()) {
-              $success_message = 'Profile updated successfully.';
-          } else {
-              $error_message = 'Error updating profile: ' . $stmt->error;
-          }
+            // Execute the query and check for errors
+            if ($stmt->execute()) {
+                $success_message = 'Profile updated successfully.';
+            } else {
+                $error_message = 'Error updating profile: ' . $stmt->error;
+            }
 
-          // Close the statement
-          $stmt->close();
-      }
+            // Close the statement
+            $stmt->close();
+        }
 
         // Prepare query string for redirect with success or error messages
         $query_string = '';
@@ -103,7 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 }
+
+// Close the connection
+$conn->close();
 ?>
+
 
 
 
@@ -176,17 +170,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
              
             <li><a href="organize.php">Organize</a></li>
             <li><a href="about-us.php">About</a></li>
-            <li><a href="#"><i class="fas fa-user"></i></a>
-                <ul>
-                    <?php if ($isSignin): ?>
+            <li><a href="#"><i class="fas fa-user"></i><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?></a>
+              <ul>
+                  <?php if ($isSignin): ?>
                       <li><a href="dashboard.php">Profile</a></li>
-                        <li><a href="logout.php">Signout</a></li>
-                    <?php else: ?>
-                        <li><a href="signin.php">Signin</a></li>
-                        <li><a href="signup.php">Signup</a></li>
-                    <?php endif; ?>
-                </ul>
-            </li>
+                      <li><a href="logout.php">Signout</a></li>
+                  <?php else: ?>
+                      <li><a href="signin.php">Signin</a></li>
+                      <li><a href="signup.php">Signup</a></li>
+                  <?php endif; ?>
+              </ul>
+          </li>
+
 
             <!-- <li>
               <a href="#">
@@ -271,8 +266,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <h2 class="unique-header">Personal Information</h2>
                     <div class="unique-input-field">
-                        <label for="uname" class="unique-label">User Name</label>
-                        <input type="text" id="uname" name="uname" class="unique-input" placeholder="@BloodeHancxy" required>
+                        <label for="full_name" class="unique-label">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" class="unique-input" placeholder="Fname Lname" required>
                     </div>
                     <div class="unique-input-field">
                         <label for="dob" class="unique-label">Date Of Birth</label>

@@ -1,23 +1,28 @@
 <?php
-// Include the config file
-require_once 'config.php';
-
 // Start the session
 session_start();
+
+// Include the config file
+require_once 'config.php';
 
 // Initialize messages
 $error_message = '';
 $success_message = '';
 
-// Check if a success message is set in the URL
+// Check if the user is already logged in
+if (isset($_SESSION['username'])) {
+    $uname = $_SESSION['username'];
+}
+
+// Check if a success message is set in the URL for signup
 if (isset($_GET['success_signup'])) {
     $success_message = htmlspecialchars($_GET['success_signup']);
     echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
 }
 
-// Check if form is submitted
+// Check if the login form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get the email and password from the form
+    // Get the form data
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
@@ -25,35 +30,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $conn->real_escape_string($email);
     $password = $conn->real_escape_string($password);
 
-    // Query to check if user exists
-    $sql = "SELECT * FROM users WHERE email = '$email'";
-    $result = $conn->query($sql);
+    // Query to check if the user exists
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
+    // Check if the user was found
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        // Verify password
+        // Verify the password
         if (password_verify($password, $user['password'])) {
-            // User exists and password is correct, set session variables
+            // Valid login, set session variables
             $_SESSION['isSignin'] = true;
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['uname'];
 
-            // Redirect to dashboard with a success message
+            // Redirect to the dashboard with a success message
             header("Location: dashboard.php?success_signin=" . urlencode("Successfully logged in!"));
             exit();
         } else {
-            // Invalid password
+            // Password incorrect
             $error_message = "Invalid email or password. Please try again.";
         }
     } else {
         // User does not exist
         $error_message = "Invalid email or password. Please try again.";
     }
+
+    // Close the statement
+    $stmt->close();
 }
 
 // Close the connection
 $conn->close();
 ?>
+
 
 
 

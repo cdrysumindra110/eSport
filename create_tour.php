@@ -1,12 +1,115 @@
 <?php
 // Include the config file
 require_once 'config.php';
+
 // Start the session
 session_start();
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Process form data
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Collect form data
+    $selected_game = $_POST['selected_game'];
+    $tname = $_POST['tname'];
+    $sdate = $_POST['sdate'];
+    $stime = $_POST['stime'];
+
+    // Handle file upload
+    if (isset($_FILES['bannerimg']) && $_FILES['bannerimg']['error'] == UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['bannerimg']['tmp_name'];
+        $file_name = basename($_FILES['bannerimg']['name']);
+        $upload_dir = 'uploads/'; // Ensure this directory exists and is writable
+        $bannerimg = $upload_dir . $file_name;
+        move_uploaded_file($file_tmp, $bannerimg);
+    } else {
+        $bannerimg = ''; // Handle the case where no file is uploaded
+    }
+
+    $about = $_POST['about'];
+    $bracket_type = $_POST['bracket-type'];
+    $match_type = $_POST['match-type'];
+    $solo_players = $_POST['solo-players'];
+    $duo_teams = $_POST['duo-teams'];
+    $squad_teams = $_POST['squad-teams'];
+    $solo_adv = $_POST['solo-adv'];
+    $duo_adv = $_POST['duo-adv'];
+    $squad_adv = $_POST['squad-adv'];
+    $solo_rounds = $_POST['solo-rounds'];
+    $duo_rounds = $_POST['duo-rounds'];
+    $squad_rounds = $_POST['squad-rounds'];
+    $placement_points = isset($_POST['placement_points']) ? $_POST['placement_points'] : NULL;
+    $contact = $_POST['contact'];
+    $rules = $_POST['rules'];
+    $prizes = $_POST['prizes'];
+
+    // Process streams
+    $streams = array();
+    if (isset($_POST['select-provider']) && is_array($_POST['select-provider'])) {
+        foreach ($_POST['select-provider'] as $key => $provider) {
+            $streams[] = array(
+                'provider' => $provider,
+                'channel_name' => $_POST['channel-name'][$key]
+            );
+        }
+    }
+
+    // Insert tournament data
+    $query = "INSERT INTO tournaments (selected_game, tname, sdate, stime, bannerimg, about) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
+    $stmt->bind_param("ssssss", $selected_game, $tname, $sdate, $stime, $bannerimg, $about);
+    if (!$stmt->execute()) {
+        die("Error inserting tournament data: " . $stmt->error);
+    }
+    $tournament_id = $stmt->insert_id;
+
+    // Insert bracket data
+    $query = "INSERT INTO brackets (tournament_id, bracket_type, match_type, solo_players, duo_teams, squad_teams, solo_adv, duo_adv, squad_adv, solo_rounds, duo_rounds, squad_rounds, placement_points, contact, rules, prizes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
+    $stmt->bind_param("iissiiiiiiiiisss", $tournament_id, $bracket_type, $match_type, $solo_players, $duo_teams, $squad_teams, $solo_adv, $duo_adv, $squad_adv, $solo_rounds, $duo_rounds, $squad_rounds, $placement_points, $contact, $rules, $prizes);
+    if (!$stmt->execute()) {
+        die("Error inserting bracket data: " . $stmt->error);
+    }
+
+    // Insert stream data
+    foreach ($streams as $stream) {
+        $query = "INSERT INTO streams (tournament_id, provider, channel_name) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        if ($stmt === false) {
+            die("Prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("iss", $tournament_id, $stream['provider'], $stream['channel_name']);
+        if (!$stmt->execute()) {
+            error_log("Error inserting stream data: " . $stmt->error);
+            die("Error inserting stream data: " . $stmt->error);
+        }
+    }
+
+    // Close connection
+    $stmt->close();
+    $conn->close();
+    header("Location: tournament-details.php");
+    exit;
+}
 ?>
+
+
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en-US">
@@ -36,6 +139,8 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
 
+    <!-- Include Quill's CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -79,17 +184,17 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
              
             <li><a href="organize.php">Organize</a></li>
             <li><a href="about-us.php">About</a></li>
-            <li><a href="#"><i class="fas fa-user"></i></a>
-                <ul>
-                    <?php if ($isSignin): ?> 
+            <li><a href="#"><i class="fas fa-user"></i><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?></a>
+              <ul>
+                  <?php if ($isSignin): ?>
                       <li><a href="dashboard.php">Profile</a></li>
-                        <li><a href="logout.php">Signout</a></li>
-                    <?php else: ?>
-                        <li><a href="signin.php">Signin</a></li>
-                        <li><a href="signup.php">Signup</a></li>
-                    <?php endif; ?>
-                </ul>
-            </li>
+                      <li><a href="logout.php">Signout</a></li>
+                  <?php else: ?>
+                      <li><a href="signin.php">Signin</a></li>
+                      <li><a href="signup.php">Signup</a></li>
+                  <?php endif; ?>
+              </ul>
+          </li>
           </li>
         </div>
       </nav>
@@ -107,7 +212,6 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
             </div>
           </header>
     </main>
-
 <!-- ++++++++++++++++++++++++++++++++++++++++++++++Form containrerer+++++++++++++++++++++++++++++++++++ -->
     <div id="tournament-form" class="tournament_form">
       <div id="popup-alert" class="popup hidden">
@@ -116,7 +220,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
         <span id="close-popup" class="close-btn">&times;</span>
       </div>
       
-          <!-- partial:index.partial.html -->
+          <!-- partial:index.partial.php -->
           <div class="container-fluid" style="width: 100%;">
             <div class="row justify-content-center" style="width: 100%;">
                 <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2" style="width: 100%;">
@@ -128,7 +232,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
                         </div>
                         <h2 id="heading">Create Tournament</h2>
                         <p>Fill all form field to go to next step</p>
-                        <form id="msform" action="organize.html" method="POST">
+                        <form id="msform" action="create_tour.php" method="post" enctype="multipart/form-data">
                             <!-- progressbar -->
                             <ul id="progressbar">
                                 <li class="active" id="setup"><strong>Setup</strong></li>
@@ -152,62 +256,23 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
                                       <label class="fieldlabels">Selected Game</label>
                                       <input type="text" id="selected_game" name="selected_game" readonly />
                                       <label class="fieldlabels">Tournament Name</label> 
-                                      <input type="text" name="tname" id="tname" placeholder="Tournament Name" /> 
+                                      <input type="text" name="tname" id="tname" placeholder="Tournament Name" required /> 
                                       <label class="fieldlabels">Start Date</label> 
-                                      <input type="date" name="sdate" id="sdate" placeholder="Start Date(DD/MM/YYYY)" /> 
+                                      <input type="date" name="sdate" id="sdate" placeholder="Start Date(DD/MM/YYYY)" required /> 
                                       <label class="fieldlabels">Start Time</label> 
-                                      <input type="time" name="stime" id="stime" placeholder="Time displayed in Time displayed in +0545" /> 
+                                      <input type="time" name="stime" id="stime" placeholder="Time displayed in Time displayed in +0545" required /> 
                                       <label class="fieldlabels">Game Banner</label>
-                                      <input type="file" id="bannerimg" name="bannerimg" accept="image/*" onchange="showPreview(event);">
+                                      <input type="file" id="bannerimg" name="bannerimg" accept="image/*" onchange="showPreview(event);" required />
                                       <div class="preview">
                                         <img id="bannerimg-preview">
                                       </div>
                                       <label class="fieldlabels">About</label>
-                                      <div class="textfield-cnt">
-                                        <div class="toolbar">
-                                            <button onclick="formatText('bold'); return false;">
-                                                <i class="fas fa-bold"></i></button>
-                                            <button onclick="formatText('italic'); return false;">
-                                                <i class="fas fa-italic"></i></button>
-                                            <button onclick="formatText('underline'); return false;">
-                                                <i class="fas fa-underline"></i></button>
-                                            <button onclick="formatText('strikeThrough'); return false;">
-                                                <i class="fas fa-strikethrough"></i></button>
-                                            <button onclick="formatText('subscript'); return false;">
-                                                <i class="fas fa-subscript"></i></button>
-                                            <button onclick="formatText('superscript'); return false;">
-                                                <i class="fas fa-superscript"></i></button>
-                                            <button onclick="formatText('justifyLeft'); return false;">
-                                                <i class="fas fa-align-left"></i>
-                                            </button>
-                                            <button onclick="formatText('justifyCenter'); return false;">
-                                                <i class="fas fa-align-center"></i>
-                                            </button>
-                                            <button onclick="formatText('justifyRight'); return false;">
-                                                <i class="fas fa-align-right"></i>
-                                            </button>
-                                            <button onclick="formatText('insertOrderedList'); return false;">
-                                                <i class="fas fa-list-ol"></i>
-                                            </button>
-                                            <button onclick="formatText('insertUnorderedList'); return false;">
-                                                <i class="fas fa-list-ul"></i>
-                                            </button>
-                                            <button onclick="formatText('createLink'); return false;">
-                                                <i class="fas fa-link"></i></button>
-                                            <button onclick="formatText('insertHorizontalRule'); return false;">
-                                                <i class="fas fa-ruler-horizontal"></i>
-                                            </button>
-                                        </div>
-                                            <div class="textarea" contenteditable="true" id="editor">
-                                              <p></p>
-                                            </div>
-                                            <!-- Hidden textarea that will store the content for form submission -->
-                                            <textarea id="hiddenInput" name="about" id="about" style="display:none;"></textarea>
-                                      </div>                                
+                                      <div id="editor-container-about" style="height: 200px; display: block !important; height: 200px !important;"></div>
+                                      <input type="hidden" name="about" id="about">                           
                                     </div> 
                                       <input type="button" name="next" class="next action-button" value="Next" />
                             </fieldset>
-
+                            <!-- Bracket & Rules -->
                             <fieldset>
                                 <div class="form-card">
                                     <div class="row">
@@ -366,15 +431,18 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
                                        <dl class="accordion">
                                            <dt class="expand">Contact Details</dt>
                                            <dd> 
-                                            
+                                           <div id="editor-container-contact" style="height: 200px;display: block !important; height: 200px !important;"></div>
+                                            <input type="hidden" name="contact" id="contact">
                                            </dd>
                                            <dt>Critical Rules</dt>
                                            <dd>
-                                            
+                                           <div id="editor-container-rules" style="height: 200px;display: block !important; height: 200px !important;"></div>
+                                            <input type="hidden" name="rules" id="rules">
                                            </dd>
                                            <dt>Prizes</dt>
                                            <dd>
-                                            
+                                           <div id="editor-container-prizes" style="height: 200px;display: block !important; height: 200px !important;"></div>
+                                            <input type="hidden" name="prizes" id="prizes">
                                            </dd>
                                        </dl>
                                    </main>
@@ -383,6 +451,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
                                 <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
                             </fieldset>
 
+                              <!-- Streams -->
                             <fieldset>
                                 <div class="form-card">
                                     <div class="row">
@@ -420,7 +489,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
                                     </div>
                                     
                                 </div> 
-                                  <input type="button" name="next" class="next action-button" value="Submit" /> 
+                                  <input type="submit" name="next" class="next action-button" id="create_tour" value="Submit" /> 
                                   <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
                             </fieldset>
                             
@@ -451,7 +520,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
                                   <br>
                                   <div class="row justify-content-center">
                                       <div class="col-7 text-center">
-                                        <a href="tournament-details.html" class="button-custom">View Tournament</a>
+                                        <a href="tournament-details.php" class="button-custom">View Tournament</a>
                                       </div>
                                   </div>
                                 </div>
@@ -499,15 +568,15 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
             </div>
             <div class="s-12 m-6 l-3 xl-2">
                <h4 class="text-white text-strong margin-m-top-30">Useful Links</h4>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">FAQ</a><br>      
-               <a class="text-primary-hover" href="contact-1.html">Contact Us</a><br>
-               <a class="text-primary-hover" href="blog.html">Blog</a>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.php">FAQ</a><br>      
+               <a class="text-primary-hover" href="contact-1.php">Contact Us</a><br>
+               <a class="text-primary-hover" href="blog.php">Blog</a>
             </div>
             <div class="s-12 m-6 l-3 xl-2">
                <h4 class="text-white text-strong margin-m-top-30">Term of Use</h4>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Terms and Conditions</a><br>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Refund Policy</a><br>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Disclaimer</a>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.php">Terms and Conditions</a><br>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.php">Refund Policy</a><br>
+               <a class="text-primary-hover" href="sample-post-without-sidebar.php">Disclaimer</a>
             </div>
             <div class="s-12 m-6 l-3 xl-3">
                <h4 class="text-white text-strong margin-m-top-30">Contact Us</h4>
@@ -550,9 +619,95 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
     }, 1000); // 1-second delay before modal appears
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.editor-container').forEach((container) => {
+        container.style.display = 'block';
+    });
+
+    var quillAbout = new Quill('#editor-container-about', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
+        }
+    });
+    console.log('Quill About initialized:', quillAbout);
+
+    var quillContact = new Quill('#editor-container-contact', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
+        }
+    });
+    console.log('Quill Contact initialized:', quillContact);
+
+    var quillRules = new Quill('#editor-container-rules', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
+        }
+    });
+    console.log('Quill Rules initialized:', quillRules);
+
+    var quillPrizes = new Quill('#editor-container-prizes', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
+        }
+    });
+    console.log('Quill Prizes initialized:', quillPrizes);
+});
+
 </script>
 <!-- Accordian jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 </body>
 </html>

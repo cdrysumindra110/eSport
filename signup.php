@@ -1,57 +1,70 @@
-<?php 
+<?php
+// Start the session
+session_start();
+
 // Database configuration
 include_once('config.php');
 
 // Initialize messages
 $error_message = '';
-$success_signup = '';  // Changed here
+$success_signup = '';
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get the form data
-    $full_name = $_POST['full_name'];
+    $uname = $_POST['uname'];
     $email = $_POST['email'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    // Sanitize inputs
-    $full_name = $conn->real_escape_string($full_name);
-    $email = $conn->real_escape_string($email);
-    $password = $conn->real_escape_string($password);
-    $confirm_password = $conn->real_escape_string($confirm_password);
-
     // Validate form data
-    if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
+    if (empty($uname) || empty($email) || empty($password) || empty($confirm_password)) {
         $error_message = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = "Invalid email format.";
     } elseif ($password !== $confirm_password) {
         $error_message = "Passwords do not match.";
     } else {
-        // Check if email already exists
-        $sql = "SELECT * FROM users WHERE email = '$email'";
-        $result = $conn->query($sql);
 
-        if ($result->num_rows > 0) {
-            $error_message = "Email already exists.";
+
+        // Check connection
+        if ($conn->connect_error) {
+            $error_message = "Connection failed: " . $conn->connect_error;
         } else {
-            // Hash the password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            // Prepare and bind the query to check if email already exists
+            $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-            // Insert new user into database
-            $sql = "INSERT INTO users (full_name, email, password) VALUES ('$full_name', '$email', '$hashed_password')";
-            if ($conn->query($sql) === TRUE) {
-                $success_signup = "Account created successfully!";  // Changed here
-                header("Location: signin.php?success_signup=" . urlencode($success_signup));  // Changed here
-                exit();
+            if ($result->num_rows > 0) {
+                $error_message = "Email already exists.";
             } else {
-                $error_message = "Error: " . $conn->error;
+                // Hash the password
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+                // Prepare and bind the query to insert new user
+                $stmt = $conn->prepare("INSERT INTO users (uname, email, password) VALUES (?, ?, ?)");
+                $stmt->bind_param("sss", $uname, $email, $hashed_password);
+                $stmt->execute();
+
+                if ($stmt->affected_rows > 0) {
+                    // Set session variable for username
+                    $_SESSION['username'] = $uname;
+
+                    // Success message and redirect
+                    $success_signup = "Account created successfully!";
+                    header("Location: signin.php?success_signup=" . urlencode($success_signup));
+                    exit();
+                } else {
+                    $error_message = "Error: " . $conn->error;
+                }
             }
+
+            // Close the connection
+            $conn->close();
         }
     }
-
-    // Close the connection
-    $conn->close();
 }
 ?>
 
@@ -100,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <a class="social-icon" id="discord-signup" title="Sign Up with Discord"><i class="fab fa-discord"></i></a>
         </div>
         <span>| or |</span>
-        <input type="text" id="full_name" name="full_name" placeholder="Enter a valid Name" required />
+        <input type="text" id="uname" name="uname" placeholder="Enter a valid Username" required />
         <input type="email" id="email" name="email" placeholder="Enter your Email" required />
         <input type="password" id="password" name="password" placeholder="Enter your Password" required />
         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required />
@@ -166,7 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Client-side validation
     document.getElementById('signup-form').addEventListener('submit', function(event) {
-      const fullName = document.getElementById('full_name').value.trim();
+      const fullName = document.getElementById('uname').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm_password').value;

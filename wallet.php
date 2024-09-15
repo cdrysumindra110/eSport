@@ -130,17 +130,17 @@ exit;
              
             <li><a href="organize.php">Organize</a></li>
             <li><a href="about-us.php">About</a></li>
-            <li><a href="#"><i class="fas fa-user"></i></a>
-                <ul>
-                    <?php if ($isSignin): ?> 
+            <li><a href="#"><i class="fas fa-user"></i><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?></a>
+              <ul>
+                  <?php if ($isSignin): ?>
                       <li><a href="dashboard.php">Profile</a></li>
-                        <li><a href="logout.php">Signout</a></li>
-                    <?php else: ?>
-                        <li><a href="signin.php">Signin</a></li>
-                        <li><a href="signup.php">Signup</a></li>
-                    <?php endif; ?>
-                </ul>
-             </li>
+                      <li><a href="logout.php">Signout</a></li>
+                  <?php else: ?>
+                      <li><a href="signin.php">Signin</a></li>
+                      <li><a href="signup.php">Signup</a></li>
+                  <?php endif; ?>
+              </ul>
+          </li>
           </li>
         </div>
       </nav>

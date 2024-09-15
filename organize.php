@@ -8,7 +8,13 @@ session_start();
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
-
+if (!$isSignin) {
+  // Set an error message in the session
+  $_SESSION['error_message'] = 'Please login to access this page.';
+  // Redirect to the index page
+  header('Location: index.php');
+  exit();
+}
 ?>
 
 
@@ -83,17 +89,17 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
              
             <li><a href="organize.php">Organize</a></li>
             <li><a href="about-us.php">About</a></li>
-            <li><a href="#"><i class="fas fa-user"></i></a>
-                <ul>
-                    <?php if ($isSignin): ?> 
+            <li><a href="#"><i class="fas fa-user"></i><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?></a>
+              <ul>
+                  <?php if ($isSignin): ?>
                       <li><a href="dashboard.php">Profile</a></li>
-                        <li><a href="logout.php">Signout</a></li>
-                    <?php else: ?>
-                        <li><a href="signin.php">Signin</a></li>
-                        <li><a href="signup.php">Signup</a></li>
-                    <?php endif; ?>
-                </ul>
-            </li>
+                      <li><a href="logout.php">Signout</a></li>
+                  <?php else: ?>
+                      <li><a href="signin.php">Signin</a></li>
+                      <li><a href="signup.php">Signup</a></li>
+                  <?php endif; ?>
+              </ul>
+          </li>
           </li>
         </div>
       </nav>
@@ -117,6 +123,9 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
       </article>  
 
     </main>
+
+            <!-- Popup Message -->
+            <div class="popup-message" id="popup-message"></div>
 
     <div class="game-tournament">
       <h2 class="section-heading">Select a Game</h2>
@@ -312,6 +321,30 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
     }, 1000); // 1-second delay before modal appears
 });
 
+  // Function to show the popup message
+  function showPopupMessage(message, type) {
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
+  }
+  popup.style.display = 'block'; // Show the popup
+  setTimeout(() => {
+    popup.style.display = 'none'; // Hide after 3 seconds
+  }, 3000);
+}
+
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
+});
 </script>
 <!-- Accordian jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

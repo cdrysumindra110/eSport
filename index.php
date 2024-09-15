@@ -6,6 +6,9 @@ session_start();
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
+if (!$isSignin) {
+  $error_message = 'Please login to access this page.';
+}
 ?>
 
 
@@ -73,22 +76,25 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
              
             <li><a href="organize.php">Organize</a></li>
             <li><a href="about-us.php">About</a></li>
-            <li><a href="#"><i class="fas fa-user"></i></a>
-                <ul>
-                    <?php if ($isSignin): ?>
-                        <li><a href="dashboard.php">Profile</a></li>
-                        <li><a href="logout.php">Signout</a></li>
-                    <?php else: ?>
-                        <li><a href="signin.php">Signin</a></li>
-                        <li><a href="signup.php">Signup</a></li>
-                    <?php endif; ?>
-                </ul>
-            </li>
+            <li><a href="#"><i class="fas fa-user"></i><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?></a>
+              <ul>
+                  <?php if ($isSignin): ?>
+                      <li><a href="dashboard.php">Profile</a></li>
+                      <li><a href="logout.php">Signout</a></li>
+                  <?php else: ?>
+                      <li><a href="signin.php">Signin</a></li>
+                      <li><a href="signup.php">Signup</a></li>
+                  <?php endif; ?>
+              </ul>
+          </li>
           </li>
         </div>
       </nav>
     </header>
     
+        <!-- Popup Message -->
+        <div class="popup-message" id="popup-message"></div>
+
    <!-- MAIN -->
     <main role="main">    
       <!-- Main Carousel -->
@@ -702,6 +708,31 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
     var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
     myModal.show();
   });
+
+  // Function to show the popup message
+function showPopupMessage(message, type) {
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
+  }
+  popup.style.display = 'block'; // Show the popup
+  setTimeout(() => {
+    popup.style.display = 'none'; // Hide after 3 seconds
+  }, 3000);
+}
+
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
+});
 </script>
 
   </body>

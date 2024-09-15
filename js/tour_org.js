@@ -295,3 +295,4 @@ document.addEventListener('DOMContentLoaded', function() {
   // Add event listener to update the container when the selection changes
   matchTypeSelect.addEventListener('change', updateMatchContainer);
 });
+
