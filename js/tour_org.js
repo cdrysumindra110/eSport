@@ -258,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+// -----------------------------Bracket Setting---------------------------------------
 
 document.addEventListener('DOMContentLoaded', function() {
   const matchTypeSelect = document.getElementById('match-type');

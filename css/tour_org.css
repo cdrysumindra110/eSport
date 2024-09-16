@@ -335,7 +335,8 @@
   box-shadow: none !important;
   outline: none !important;
   padding: 0;
-  background-color: transparent; /* Ensure background is transparent */
+  background-color: #282828; /* Ensure background is transparent */
+  
 }
 
 
@@ -347,7 +348,7 @@
 }
 
 #msform{
-  width: 100%;
+    width: 100%;
     text-align: center;
     position: relative;
     margin-top: 20px;
@@ -706,7 +707,7 @@
     }
 }
 
-/* COntact with you text field */
+/* Contact with you text field */
 
 .fieldlabels {
   margin-bottom: 5px;
@@ -933,7 +934,7 @@
 /* General Styling for Containers */
 .match-details-container {
   padding: 20px;
-  background-color: #f4f4f4;
+  background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

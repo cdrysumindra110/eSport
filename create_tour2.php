@@ -1,136 +1,107 @@
-<?php 
-// Include the config file for database connection
+<?php
+// Include the config file
 require_once 'config.php';
 
 // Start the session
 session_start();
 
-// Initialize messages
-$error_message = '';
-$success_message = '';
+$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
-// Check if the user is logged in
-if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
-    header('Location: signin.php');
-    exit();
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the logged-in user ID
-if (!isset($_SESSION['user_id'])) {
-    die("Error: User ID not set in session.");
-}
-
-$user_id = $_SESSION['user_id'];
-
-if ($user_id === null) {
-    die("User not logged in or user_id is missing.");
-}
-
-// Check if form data is submitted
+// Process form data
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve form data
-    $selected_game = $_POST['selected_game'] ?? null;
-    $tname = $_POST['tname'] ?? null;
-    $sdate = $_POST['sdate'] ?? null;
-    $stime = $_POST['stime'] ?? null;
-    $about = $_POST['about'] ?? null;
-
-    // Validate required fields
-    if (empty($selected_game) || empty($tname) || empty($sdate) || empty($stime)) {
-        die("Required fields are missing.");
-    }
+    // Collect form data
+    $selected_game = $_POST['selected_game'];
+    $tname = $_POST['tname'];
+    $sdate = $_POST['sdate'];
+    $stime = $_POST['stime'];
 
     // Handle file upload
-    $bannerimg = null;
-    if (isset($_FILES['bannerimg']) && $_FILES['bannerimg']['error'] === UPLOAD_ERR_OK) {
-        $bannerimg = $_FILES['bannerimg']['name'];
-        $bannerimg_tmp = $_FILES['bannerimg']['tmp_name'];
-        $upload_dir = 'uploads/'; // Directory where you want to save the file
-        $upload_file = $upload_dir . basename($bannerimg);
+    if (isset($_FILES['bannerimg']) && $_FILES['bannerimg']['error'] == UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['bannerimg']['tmp_name'];
+        $file_name = basename($_FILES['bannerimg']['name']);
+        $upload_dir = 'uploads/'; // Ensure this directory exists and is writable
+        $bannerimg = $upload_dir . $file_name;
+        move_uploaded_file($file_tmp, $bannerimg);
+    } else {
+        $bannerimg = ''; // Handle the case where no file is uploaded
+    }
 
-        // Ensure the upload directory exists
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
+    $about = $_POST['about'];
+    $bracket_type = $_POST['bracket-type'];
+    $match_type = $_POST['match-type'];
+    $solo_players = $_POST['solo-players'];
+    $duo_teams = $_POST['duo-teams'];
+    $squad_teams = $_POST['squad-teams'];
+    $solo_adv = $_POST['solo-adv'];
+    $duo_adv = $_POST['duo-adv'];
+    $squad_adv = $_POST['squad-adv'];
+    $solo_rounds = $_POST['solo-rounds'];
+    $duo_rounds = $_POST['duo-rounds'];
+    $squad_rounds = $_POST['squad-rounds'];
+    $placement_points = isset($_POST['placement_points']) ? $_POST['placement_points'] : NULL;
+    $contact = $_POST['contact'];
+    $rules = $_POST['rules'];
+    $prizes = $_POST['prizes'];
 
-        // Move the uploaded file
-        if (!move_uploaded_file($bannerimg_tmp, $upload_file)) {
-            die("Failed to upload banner image.");
+    // Process streams
+    $streams = array();
+    if (isset($_POST['select-provider']) && is_array($_POST['select-provider'])) {
+        foreach ($_POST['select-provider'] as $key => $provider) {
+            $streams[] = array(
+                'provider' => $provider,
+                'channel_name' => $_POST['channel-name'][$key]
+            );
         }
     }
 
-    // Insert into tournaments table
-    $stmt = $conn->prepare("INSERT INTO tournaments (user_id, selected_game, tname, sdate, stime, bannerimg, about) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    if (!$stmt) {
+    // Insert tournament data
+    $query = "INSERT INTO tournaments (selected_game, tname, sdate, stime, bannerimg, about) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    if ($stmt === false) {
         die("Prepare failed: " . $conn->error);
     }
-    $stmt->bind_param("issssss", $user_id, $selected_game, $tname, $sdate, $stime, $bannerimg, $about);
+    $stmt->bind_param("ssssss", $selected_game, $tname, $sdate, $stime, $bannerimg, $about);
+    if (!$stmt->execute()) {
+        die("Error inserting tournament data: " . $stmt->error);
+    }
+    $tournament_id = $stmt->insert_id;
 
-    if ($stmt->execute()) {
-        // Get the last inserted ID
-        $tournament_id = $stmt->insert_id;
-
-        // Insert into brackets table
-        $bracket_type = $_POST['bracket-type'] ?? null;
-        $match_type = $_POST['match-type'] ?? null;
-        $solo_players = $_POST['solo-players'] ?? null;
-        $duo_teams = $_POST['duo-teams'] ?? null;
-        $duo_players_per_team = $_POST['duo-players'] ?? null;
-        $squad_teams = $_POST['squad-teams'] ?? null;
-        $squad_players_per_team = $_POST['squad-players'] ?? null;
-        $rounds = $_POST['rounds'] ?? null;
-        $advancement = $_POST['advancement'] ?? null;
-        $placement = $_POST['placement'] ?? null;
-        $rules = $_POST['rules'] ?? null;
-        $prizes = $_POST['prizes'] ?? null;
-
-        // Insert into brackets table
-        $stmt = $conn->prepare("INSERT INTO brackets (tournament_id, bracket_type, match_type, solo_players, duo_teams, duo_players_per_team, squad_teams, squad_players_per_team, rounds, advancement, placement, rules, prizes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        if (!$stmt) {
-            die("Prepare failed: " . $conn->error);
-        }
-        // Adjust types as necessary
-        $stmt->bind_param("issiiiiiiisss", $tournament_id, $bracket_type, $match_type, $solo_players, $duo_teams, $duo_players_per_team, $squad_teams, $squad_players_per_team, $rounds, $advancement, $placement, $rules, $prizes);
-
-        if ($stmt->execute()) {
-            // Insert streams data
-            if (isset($_POST['streams']) && is_array($_POST['streams'])) {
-                $streams = $_POST['streams']; // Assuming this is an array of stream data
-                $stmt = $conn->prepare("INSERT INTO streams (tournament_id, provider, channel_name) VALUES (?, ?, ?)");
-                if (!$stmt) {
-                    die("Prepare failed: " . $conn->error);
-                }
-
-                foreach ($streams as $stream) {
-                    $provider = $stream['provider'] ?? null;
-                    $channel_name = $stream['channel_name'] ?? null;
-                    if ($provider && $channel_name) {
-                        $stmt->bind_param("iss", $tournament_id, $provider, $channel_name);
-                        if (!$stmt->execute()) {
-                            echo "Error inserting stream: " . $stmt->error;
-                        }
-                    } else {
-                        echo "Invalid stream data.";
-                    }
-                }
-                $stmt->close();
-            } else {
-                echo "No streams data or data is not an array.";
-            }
-
-            echo "Tournament, brackets, and related data successfully inserted!";
-        } else {
-            echo "Error inserting brackets: " . $stmt->error;
-        }
-    } else {
-        echo "Error inserting tournament: " . $stmt->error;
+    // Insert bracket data
+    $query = "INSERT INTO brackets (tournament_id, bracket_type, match_type, solo_players, duo_teams, squad_teams, solo_adv, duo_adv, squad_adv, solo_rounds, duo_rounds, squad_rounds, placement_points, contact, rules, prizes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
+    $stmt->bind_param("iissiiiiiiiiisss", $tournament_id, $bracket_type, $match_type, $solo_players, $duo_teams, $squad_teams, $solo_adv, $duo_adv, $squad_adv, $solo_rounds, $duo_rounds, $squad_rounds, $placement_points, $contact, $rules, $prizes);
+    if (!$stmt->execute()) {
+        die("Error inserting bracket data: " . $stmt->error);
     }
 
-    $stmt->close();
-}
+    // Insert stream data
+    foreach ($streams as $stream) {
+        $query = "INSERT INTO streams (tournament_id, provider, channel_name) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        if ($stmt === false) {
+            die("Prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("iss", $tournament_id, $stream['provider'], $stream['channel_name']);
+        if (!$stmt->execute()) {
+            error_log("Error inserting stream data: " . $stmt->error);
+            die("Error inserting stream data: " . $stmt->error);
+        }
+    }
 
-// Close connection
-$conn->close();
+    // Close connection
+    $stmt->close();
+    $conn->close();
+    header("Location: tournament-details.php");
+    exit;
+}
 ?>
 
 
@@ -215,15 +186,15 @@ $conn->close();
             <li><a href="about-us.php">About</a></li>
             <li><a href="#"><i class="fas fa-user"></i><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?></a>
               <ul>
-                <?php if (isset($_SESSION['isSignin']) && $_SESSION['isSignin']): ?>
-                  <li><a href="dashboard.php">Profile</a></li>
-                  <li><a href="logout.php">Signout</a></li>
-                <?php else: ?>
-                  <li><a href="signin.php">Signin</a></li>
-                  <li><a href="signup.php">Signup</a></li>
-                <?php endif; ?>
+                  <?php if ($isSignin): ?>
+                      <li><a href="dashboard.php">Profile</a></li>
+                      <li><a href="logout.php">Signout</a></li>
+                  <?php else: ?>
+                      <li><a href="signin.php">Signin</a></li>
+                      <li><a href="signup.php">Signup</a></li>
+                  <?php endif; ?>
               </ul>
-            </li>
+          </li>
           </li>
         </div>
       </nav>
@@ -418,6 +389,11 @@ $conn->close();
                                         </div>
                                         
                                        <dl class="accordion">
+                                           <dt class="expand">Contact Details</dt>
+                                           <dd> 
+                                           <div id="editor-container-contact" style="height: 200px;display: block !important; height: 200px !important;"></div>
+                                            <input type="hidden" name="contact" id="contact">
+                                           </dd>
                                            <dt>Critical Rules</dt>
                                            <dd>
                                            <div id="editor-container-rules" style="height: 200px;display: block !important; height: 200px !important;"></div>
@@ -604,7 +580,10 @@ $conn->close();
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Quill editors
+    document.querySelectorAll('.editor-container').forEach((container) => {
+        container.style.display = 'block';
+    });
+
     var quillAbout = new Quill('#editor-container-about', {
         theme: 'snow',
         modules: {
@@ -684,15 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     console.log('Quill Prizes initialized:', quillPrizes);
-
-    // Update hidden input fields with Quill content before form submission
-    document.querySelector('form').addEventListener('submit', function() {
-        document.getElementById('about').value = quillAbout.root.innerHTML;
-        document.getElementById('rules').value = quillRules.root.innerHTML;
-        document.getElementById('prizes').value = quillPrizes.root.innerHTML;
-    });
 });
-
 
 </script>
 <!-- Accordian jQuery -->

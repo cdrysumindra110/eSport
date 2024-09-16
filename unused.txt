@@ -114,3 +114,119 @@ $success_message = '';
 if (isset($_GET['success_signin'])) {
     $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
 }
+
+
+database         fot             sa;smac=================================================================================
+
+
+
+<?php
+// Include the config file
+require_once 'config.php';
+
+// Start the session
+session_start();
+
+$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Process form data
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Collect form data
+    $selected_game = $_POST['selected_game'];
+    $tname = $_POST['tname'];
+    $sdate = $_POST['sdate'];
+    $stime = $_POST['stime'];
+
+    // Handle file upload
+    if (isset($_FILES['bannerimg']) && $_FILES['bannerimg']['error'] == UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['bannerimg']['tmp_name'];
+        $file_name = basename($_FILES['bannerimg']['name']);
+        $upload_dir = 'uploads/'; // Ensure this directory exists and is writable
+        $bannerimg = $upload_dir . $file_name;
+        move_uploaded_file($file_tmp, $bannerimg);
+    } else {
+        $bannerimg = ''; // Handle the case where no file is uploaded
+    }
+
+    $about = $_POST['about'];
+    $bracket_type = $_POST['bracket-type'];
+    $match_type = $_POST['match-type'];
+    $solo_players = $_POST['solo-players'];
+    $duo_teams = $_POST['duo-teams'];
+    $squad_teams = $_POST['squad-teams'];
+    $solo_adv = $_POST['solo-adv'];
+    $duo_adv = $_POST['duo-adv'];
+    $squad_adv = $_POST['squad-adv'];
+    $solo_rounds = $_POST['solo-rounds'];
+    $duo_rounds = $_POST['duo-rounds'];
+    $squad_rounds = $_POST['squad-rounds'];
+    $placement_points = isset($_POST['placement_points']) ? $_POST['placement_points'] : NULL;
+    $contact = $_POST['contact'];
+    $rules = $_POST['rules'];
+    $prizes = $_POST['prizes'];
+
+    // Process streams
+    $streams = array();
+    if (isset($_POST['select-provider']) && is_array($_POST['select-provider'])) {
+        foreach ($_POST['select-provider'] as $key => $provider) {
+            $streams[] = array(
+                'provider' => $provider,
+                'channel_name' => $_POST['channel-name'][$key]
+            );
+        }
+    }
+
+    // Insert tournament data
+    $query = "INSERT INTO tournaments (selected_game, tname, sdate, stime, bannerimg, about) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
+    $stmt->bind_param("ssssss", $selected_game, $tname, $sdate, $stime, $bannerimg, $about);
+    if (!$stmt->execute()) {
+        die("Error inserting tournament data: " . $stmt->error);
+    }
+    $tournament_id = $stmt->insert_id;
+
+    // Insert bracket data
+    $query = "INSERT INTO brackets (tournament_id, bracket_type, match_type, solo_players, duo_teams, squad_teams, solo_adv, duo_adv, squad_adv, solo_rounds, duo_rounds, squad_rounds, placement_points, contact, rules, prizes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
+    $stmt->bind_param("iissiiiiiiiiisss", $tournament_id, $bracket_type, $match_type, $solo_players, $duo_teams, $squad_teams, $solo_adv, $duo_adv, $squad_adv, $solo_rounds, $duo_rounds, $squad_rounds, $placement_points, $contact, $rules, $prizes);
+    if (!$stmt->execute()) {
+        die("Error inserting bracket data: " . $stmt->error);
+    }
+
+    // Insert stream data
+    foreach ($streams as $stream) {
+        $query = "INSERT INTO streams (tournament_id, provider, channel_name) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        if ($stmt === false) {
+            die("Prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("iss", $tournament_id, $stream['provider'], $stream['channel_name']);
+        if (!$stmt->execute()) {
+            error_log("Error inserting stream data: " . $stmt->error);
+            die("Error inserting stream data: " . $stmt->error);
+        }
+    }
+
+    // Close connection
+    $stmt->close();
+    $conn->close();
+    header("Location: tournament-details.php");
+    exit;
+}
+?>
+
+
+
+
+

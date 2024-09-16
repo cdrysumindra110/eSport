@@ -258,7 +258,7 @@ if (!$isSignin) {
         <div class="line"> 
           <div class="margin2x">
             <div class="hide-s hide-m hide-l xl-2">
-               <img src="img/logo_red.png" alt="">
+               <img src="img/logo.png" alt="">
             </div>
             <div class="s-12 m-6 l-3 xl-3">
                <h4 class="text-white text-strong">Our Mission</h4>
