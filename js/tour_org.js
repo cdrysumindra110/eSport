@@ -168,6 +168,17 @@ document.getElementById('social-media').addEventListener('change', function() {
     }
 });
 
+document.getElementById('select-provider').addEventListener('change', function() {
+  var selectedValue = this.value;
+  var inputField = document.getElementById('channel-name');
+  
+  if (selectedValue) {
+      inputField.style.display = 'block'; // Show the input field
+  } else {
+      inputField.style.display = 'none'; // Hide the input field
+  }
+});
+
 // --------------------------------------------------Add stream Js+++++++++++++++++++++++++++++++++++++++++++++++++
 document.addEventListener('DOMContentLoaded', function() {
   // Function to show the popup alert
@@ -187,74 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  document.getElementById('add-new-stream').addEventListener('click', function(event) {
-    event.preventDefault();
-
-    const newStreamForm = document.querySelector('.new-stream-form').cloneNode(true);
-    newStreamForm.classList.remove('hidden');
-
-    // Clear input values and update names
-    newStreamForm.querySelectorAll('input').forEach(input => {
-      input.value = '';
-      input.name = input.name + '_clone_' + Date.now();
-    });
-
-    newStreamForm.querySelectorAll('select').forEach(select => {
-      select.selectedIndex = 0;
-      select.name = select.name + '_clone_' + Date.now();
-    });
-
-    // Add event listener to the remove button for this cloned form
-    newStreamForm.querySelector('.remove-btn').addEventListener('click', function(event) {
-      event.preventDefault();
-      newStreamForm.remove();
-
-      if (document.querySelectorAll('.new-stream-form').length === 0) {
-        document.getElementById('add-new-stream').disabled = false;
-      }
-    });
-
-    // Add event listener for save button
-    newStreamForm.querySelector('.save-btn').addEventListener('click', function(event) {
-      event.preventDefault();
-      const providerSelect = newStreamForm.querySelector('select');
-      if (!providerSelect || !providerSelect.value) {
-        showPopup('Please select a provider.');
-        return;
-      }
-      console.log('Stream saved');
-    });
-
-    document.querySelector('.new-stream-container').insertBefore(newStreamForm, document.getElementById('add-new-stream'));
-  });
-
-  // Initialize remove and save functionality for existing forms
-  function initFormControls() {
-    document.querySelectorAll('.remove-btn').forEach(button => {
-      button.addEventListener('click', function(event) {
-        event.preventDefault();
-        this.closest('.new-stream-form').remove();
-
-        if (document.querySelectorAll('.new-stream-form').length === 0) {
-          document.getElementById('add-new-stream').disabled = false;
-        }
-      });
-    });
-
-    document.querySelectorAll('.save-btn').forEach(button => {
-      button.addEventListener('click', function(event) {
-        event.preventDefault();
-        const providerSelect = this.closest('.new-stream-form').querySelector('select');
-        if (!providerSelect || !providerSelect.value) {
-          showPopup('Please select a provider.');
-          return;
-        }
-        console.log('Stream saved');
-      });
-    });
-  }
-
-  initFormControls();
 });
 
 

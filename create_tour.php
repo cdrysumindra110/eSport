@@ -1,4 +1,4 @@
-<?php 
+<?php
 // Include the config file for database connection
 require_once 'config.php';
 
@@ -22,10 +22,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-if ($user_id === null) {
-    die("User not logged in or user_id is missing.");
-}
-
 // Check if form data is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
@@ -35,105 +31,92 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stime = $_POST['stime'] ?? null;
     $about = $_POST['about'] ?? null;
 
+    // Retrieve stream and social media data
+    $provider = $_POST['select-provider'] ?? null;
+    $channel_name = $_POST['channel-name'] ?? null;
+    $social_media = $_POST['social-media'] ?? null;
+    $social_media_input = $_POST['social-media-input'] ?? null;
+
     // Validate required fields
     if (empty($selected_game) || empty($tname) || empty($sdate) || empty($stime)) {
-        die("Required fields are missing.");
-    }
-
-    // Handle file upload
-    $bannerimg = null;
-    if (isset($_FILES['bannerimg']) && $_FILES['bannerimg']['error'] === UPLOAD_ERR_OK) {
-        $bannerimg = $_FILES['bannerimg']['name'];
-        $bannerimg_tmp = $_FILES['bannerimg']['tmp_name'];
-        $upload_dir = 'uploads/'; // Directory where you want to save the file
-        $upload_file = $upload_dir . basename($bannerimg);
-
-        // Ensure the upload directory exists
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+        $error_message = "Required fields are missing.";
+    } else {
+        // Handle file upload and read binary data
+        $bannerimg = null;
+        if (isset($_FILES['bannerimg']) && $_FILES['bannerimg']['error'] === UPLOAD_ERR_OK) {
+            $bannerimg = file_get_contents($_FILES['bannerimg']['tmp_name']);
         }
 
-        // Move the uploaded file
-        if (!move_uploaded_file($bannerimg_tmp, $upload_file)) {
-            die("Failed to upload banner image.");
-        }
-    }
+        // Insert into tournaments table
+        if (empty($error_message)) {
+            $stmt = $conn->prepare("INSERT INTO tournaments (user_id, selected_game, tname, sdate, stime, bannerimg, about) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                $error_message = "Prepare failed: " . $conn->error;
+            } else {
+                $stmt->bind_param("issssss", $user_id, $selected_game, $tname, $sdate, $stime, $bannerimg, $about);
 
-    // Insert into tournaments table
-    $stmt = $conn->prepare("INSERT INTO tournaments (user_id, selected_game, tname, sdate, stime, bannerimg, about) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    if (!$stmt) {
-        die("Prepare failed: " . $conn->error);
-    }
-    $stmt->bind_param("issssss", $user_id, $selected_game, $tname, $sdate, $stime, $bannerimg, $about);
+                if ($stmt->execute()) {
+                    // Get the last inserted ID
+                    $tournament_id = $stmt->insert_id;
 
-    if ($stmt->execute()) {
-        // Get the last inserted ID
-        $tournament_id = $stmt->insert_id;
+                    // Insert into brackets table
+                    $bracket_type = $_POST['bracket-type'] ?? null;
+                    $match_type = $_POST['match-type'] ?? null;
+                    $solo_players = $_POST['solo-players'] ?? null;
+                    $duo_teams = $_POST['duo-teams'] ?? null;
+                    $duo_players_per_team = $_POST['duo-players'] ?? null;
+                    $squad_teams = $_POST['squad-teams'] ?? null;
+                    $squad_players_per_team = $_POST['squad-players'] ?? null;
+                    $rounds = $_POST['rounds'] ?? null;
+                    $placement = $_POST['placement'] ?? null;
+                    $rules = $_POST['rules'] ?? null;
+                    $prizes = $_POST['prizes'] ?? null;
 
-        // Insert into brackets table
-        $bracket_type = $_POST['bracket-type'] ?? null;
-        $match_type = $_POST['match-type'] ?? null;
-        $solo_players = $_POST['solo-players'] ?? null;
-        $duo_teams = $_POST['duo-teams'] ?? null;
-        $duo_players_per_team = $_POST['duo-players'] ?? null;
-        $squad_teams = $_POST['squad-teams'] ?? null;
-        $squad_players_per_team = $_POST['squad-players'] ?? null;
-        $rounds = $_POST['rounds'] ?? null;
-        $advancement = $_POST['advancement'] ?? null;
-        $placement = $_POST['placement'] ?? null;
-        $rules = $_POST['rules'] ?? null;
-        $prizes = $_POST['prizes'] ?? null;
-
-        // Insert into brackets table
-        $stmt = $conn->prepare("INSERT INTO brackets (tournament_id, bracket_type, match_type, solo_players, duo_teams, duo_players_per_team, squad_teams, squad_players_per_team, rounds, advancement, placement, rules, prizes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        if (!$stmt) {
-            die("Prepare failed: " . $conn->error);
-        }
-        // Adjust types as necessary
-        $stmt->bind_param("issiiiiiiisss", $tournament_id, $bracket_type, $match_type, $solo_players, $duo_teams, $duo_players_per_team, $squad_teams, $squad_players_per_team, $rounds, $advancement, $placement, $rules, $prizes);
-
-        if ($stmt->execute()) {
-            // Insert streams data
-            if (isset($_POST['streams']) && is_array($_POST['streams'])) {
-                $streams = $_POST['streams']; // Assuming this is an array of stream data
-                $stmt = $conn->prepare("INSERT INTO streams (tournament_id, provider, channel_name) VALUES (?, ?, ?)");
-                if (!$stmt) {
-                    die("Prepare failed: " . $conn->error);
-                }
-
-                foreach ($streams as $stream) {
-                    $provider = $stream['provider'] ?? null;
-                    $channel_name = $stream['channel_name'] ?? null;
-                    if ($provider && $channel_name) {
-                        $stmt->bind_param("iss", $tournament_id, $provider, $channel_name);
-                        if (!$stmt->execute()) {
-                            echo "Error inserting stream: " . $stmt->error;
-                        }
+                    // Insert into brackets table
+                    $stmt2 = $conn->prepare("INSERT INTO brackets (tournament_id, bracket_type, match_type, solo_players, duo_teams, duo_players_per_team, squad_teams, squad_players_per_team, rounds, placement, rules, prizes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    if (!$stmt2) {
+                        $error_message = "Prepare failed: " . $conn->error;
                     } else {
-                        echo "Invalid stream data.";
+                        $stmt2->bind_param("issiiiiiiiss", $tournament_id, $bracket_type, $match_type, $solo_players, $duo_teams, $duo_players_per_team, $squad_teams, $squad_players_per_team, $rounds, $placement, $rules, $prizes);
+                        if ($stmt2->execute()) {
+                            // Insert stream data if available
+                            if ($provider && $channel_name) {
+                                $stmt3 = $conn->prepare("INSERT INTO streams (tournament_id, provider, channel_name, social_media, social_media_input) VALUES (?, ?, ?, ?, ?)");
+                                if (!$stmt3) {
+                                    $error_message = "Prepare failed: " . $conn->error;
+                                } else {
+                                    $stmt3->bind_param("issss", $tournament_id, $provider, $channel_name, $social_media, $social_media_input);
+                                    if ($stmt3->execute()) {
+                                        $success_message = "Tournament, brackets, and related data successfully inserted!";
+                                        header('Location: tournament_details.php');
+                                        exit();
+                                    } else {
+                                        $error_message = "Error inserting stream: " . $stmt3->error;
+                                    }
+                                    $stmt3->close();
+                                }
+                            } else {
+                                $success_message = "Tournament and brackets successfully inserted!";
+                                header('Location: tournament_details.php');
+                                exit();
+                            }
+                        } else {
+                            $error_message = "Error inserting brackets: " . $stmt2->error;
+                        }
+                        $stmt2->close();
                     }
+                } else {
+                    $error_message = "Error inserting tournament: " . $stmt->error;
                 }
                 $stmt->close();
-            } else {
-                echo "No streams data or data is not an array.";
             }
-
-            echo "Tournament, brackets, and related data successfully inserted!";
-        } else {
-            echo "Error inserting brackets: " . $stmt->error;
         }
-    } else {
-        echo "Error inserting tournament: " . $stmt->error;
     }
 
-    $stmt->close();
+    // Close connection
+    $conn->close();
 }
-
-// Close connection
-$conn->close();
 ?>
-
-
 
 
 
@@ -241,6 +224,9 @@ $conn->close();
             </div>
           </header>
     </main>
+
+        <!-- Popup Message -->
+        <div class="popup-message" id="popup-message"></div>
 <!-- ++++++++++++++++++++++++++++++++++++++++++++++Form containrerer+++++++++++++++++++++++++++++++++++ -->
     <div id="tournament-form" class="tournament_form">
       <div id="popup-alert" class="popup hidden">
@@ -389,47 +375,17 @@ $conn->close();
                                           <option value="6">6</option>
                                         </select>
 
-                                      <label for="advancement" class="brac-label">Group Advancement Style</label>
+                                        <!-- <label for="advancement" class="brac-label">Group Advancement</label>
                                         <select id="advancement" name="advancement" class="brac-input">
-                                          <option value="random">Random</option>
-                                          <option value="elimination">Elimination</option>
-                                        </select>
+                                            <option value="random">Random</option>
+                                            <option value="elimination">Elimination</option>
+                                        </select> -->
                                     
                                         <h3 class="fs-titleh3">Placement Point System</h3>
                                         <label for="placement" class="brac-label">Placement</label>
                                         <textarea id="placement" name="placement" class="brac-input" rows="7" placeholder="#1 = 10pts\n#2 = 8pts\n#3 = 6pts\n#Kill = 1pt"></textarea>
                                     </div>
                                     
-                                    <main class="main-container section-padding">
-                                        <div class="unique-input-field">
-                                            <label for="social-media" class="unique-label">Social Media</label>
-                                            <div class="social-media-row">
-                                                <select id="social-media" class="unique-select">
-                                                    <option value="">Select a social media</option>
-                                                    <option value="facebook">Facebook</option>
-                                                    <option value="twitter">Twitter</option>
-                                                    <option value="discord">Discord</option>
-                                                    <option value="instagram">Instagram</option>
-                                                    <option value="linkedin">LinkedIn</option>
-                                                    <!-- Add more social media options here -->
-                                                </select>
-                                                <input id="social-media-input" class="dynamic-input" type="text" placeholder="Enter your username">
-                                            </div>
-                                        </div>
-                                        
-                                       <dl class="accordion">
-                                           <dt>Critical Rules</dt>
-                                           <dd>
-                                           <div id="editor-container-rules" style="height: 200px;display: block !important; height: 200px !important;"></div>
-                                            <input type="hidden" name="rules" id="rules">
-                                           </dd>
-                                           <dt>Prizes</dt>
-                                           <dd>
-                                           <div id="editor-container-prizes" style="height: 200px;display: block !important; height: 200px !important;"></div>
-                                            <input type="hidden" name="prizes" id="prizes">
-                                           </dd>
-                                       </dl>
-                                   </main>
                                 </div> 
                                 <input type="button" name="next" class="next action-button" value="Next" /> 
                                 <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
@@ -446,31 +402,49 @@ $conn->close();
                                             <h2 class="steps">Step 3 - 4</h2>
                                         </div>
                                     </div> 
-                                    <div class="new-stream-container">
-                                      <div id="new-stream-form" class="new-stream-form hidden">
-                                        <div class="form-group">
-                                          <div class="stream-input">
-                                            <select id="select-provider" name="select-provider" aria-placeholder="Select Provider">
-                                              <option value="">Select Provider</option>
-                                              <option value="twitch">Twitch</option>
-                                              <option value="youtube">YouTube</option>
-                                              <option value="facebook">Facebook</option>
-                                            </select>
-                                          </div>
-                                          <div class="stream-input">
-                                            <div class="input-wrapper">
-                                              <input type="text" id="channel-name" name="channel-name" placeholder=" " />
-                                              <label for="channel-name">Enter channel name</label>
+
+                                    <main class="main-container section-padding">
+                                        <div class="unique-input-field">
+                                            <label for="select-provider" class="unique-label">Select Provider</label>
+                                            <div class="social-media-row">
+                                                  <select id="select-provider" name="select-provider" class="unique-select">
+                                                    <option value="">Select Provider</option>
+                                                    <option value="twitch">Twitch</option>
+                                                    <option value="youtube">YouTube</option>
+                                                    <option value="facebook">Facebook</option>
+                                                  </select>
+                                                <input type="text" id="channel-name" name="channel-name" class="dynamic-input" placeholder="Enter your Channel Name" />
                                             </div>
-                                          </div>
+
+                                            <label for="social-media" class="unique-label">How players will contact you ?</label>
+                                            <div class="social-media-row">
+                                                <select id="social-media" name="social-media" class="unique-select">
+                                                    <option value="">Select a social media</option>
+                                                    <option value="facebook">Facebook</option>
+                                                    <option value="twitter">Twitter</option>
+                                                    <option value="discord">Discord</option>
+                                                    <option value="instagram">Instagram</option>
+                                                    <option value="linkedin">LinkedIn</option>
+                                                    <!-- Add more social media options here -->
+                                                </select>
+                                                <input id="social-media-input" name="social-media-input" class="dynamic-input" type="text" placeholder="Enter your username">
+                                            </div>
                                         </div>
-                                        <div class="form-buttons">
-                                          <button id="save-button" class="save-btn">Save</button>
-                                          <button id="remove-button" class="remove-btn">Remove</button>
-                                        </div>
-                                      </div>
-                                      <button id="add-new-stream" class="add-btn">+ Add New Stream</button>
-                                    </div>
+                                        
+                                       <dl class="accordion">
+                                           <dt>Critical Rules</dt>
+                                           <dd>
+                                           <div id="editor-container-rules" style="height: 200px;display: block !important; height: 200px !important;"></div>
+                                            <input type="hidden" name="rules" id="rules">
+                                           </dd>
+                                           <dt>Prizes</dt>
+                                           <dd>
+                                           <div id="editor-container-prizes" style="height: 200px;display: block !important; height: 200px !important;"></div>
+                                            <input type="hidden" name="prizes" id="prizes">
+                                           </dd>
+                                       </dl>
+                                   </main>
+
                                     
                                 </div> 
                                   <input type="submit" name="next" class="next action-button" id="create_tour" value="Submit" /> 
@@ -623,27 +597,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ]
         }
     });
-    console.log('Quill About initialized:', quillAbout);
-
-    var quillContact = new Quill('#editor-container-contact', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                [{ 'script': 'sub' }, { 'script': 'super' }],
-                [{ 'indent': '-1' }, { 'indent': '+1' }],
-                [{ 'direction': 'rtl' }],
-                [{ 'size': ['small', false, 'large', 'huge'] }],
-                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                [{ 'color': [] }, { 'background': [] }],
-                [{ 'align': [] }],
-                ['clean']
-            ]
-        }
-    });
-    console.log('Quill Contact initialized:', quillContact);
 
     var quillRules = new Quill('#editor-container-rules', {
         theme: 'snow',
@@ -663,7 +616,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ]
         }
     });
-    console.log('Quill Rules initialized:', quillRules);
 
     var quillPrizes = new Quill('#editor-container-prizes', {
         theme: 'snow',
@@ -683,14 +635,41 @@ document.addEventListener('DOMContentLoaded', function() {
             ]
         }
     });
-    console.log('Quill Prizes initialized:', quillPrizes);
 
-    // Update hidden input fields with Quill content before form submission
-    document.querySelector('form').addEventListener('submit', function() {
-        document.getElementById('about').value = quillAbout.root.innerHTML;
-        document.getElementById('rules').value = quillRules.root.innerHTML;
-        document.getElementById('prizes').value = quillPrizes.root.innerHTML;
+        // Update hidden input fields with Quill plain text content before form submission
+        document.querySelector('form').addEventListener('submit', function() {
+        document.getElementById('about').value = quillAbout.getText().trim();
+        document.getElementById('rules').value = quillRules.getText().trim();
+        document.getElementById('prizes').value = quillPrizes.getText().trim();
     });
+});
+
+
+
+
+// Function to show the popup message
+function showPopupMessage(message, type) {
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
+  }
+  popup.style.display = 'block'; // Show the popup
+  setTimeout(() => {
+    popup.style.display = 'none'; // Hide after 3 seconds
+  }, 3000);
+}
+
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
 });
 
 

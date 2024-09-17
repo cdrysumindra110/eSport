@@ -718,6 +718,11 @@
   align-items: center; /* Center items vertically */
   gap: 10px; /* Space between select and input */
 }
+.select-provider-row {
+  display: flex;
+  align-items: center; /* Center items vertically */
+  gap: 10px; /* Space between select and input */
+}
 
 .unique-select, .dynamic-input input {
   flex: 1 0 auto; /* Allow elements to grow but not shrink */
@@ -739,121 +744,7 @@
 }
 
 /* --------------------------------------------------Add Stream +++++++++++++++++++++++++++++++++++++++++++++++  */
-.new-stream-form {
-  display: flex;
-  flex-direction: column; /* Stack items vertically */
-  gap: 10px; /* Space between elements */
-  margin-top: 10px;
-}
 
-.form-group {
-  display: flex;
-  flex-direction: row; /* Stack input fields vertically */
-  gap: 10px; /* Space between elements within the form-group */
-}
-
-.stream-input {
-  flex: 1; /* Allow elements to grow */
-  margin-bottom: 10px; /* Space below each input */
-}
-
-.stream-input select,
-.stream-input input {
-  width: 100%; /* Full width of container */
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #383838; /* Same background color */
-  color: #fff; /* Same text color */
-  height: 40px; /* Consistent height */
-}
-
-.form-buttons {
-  display: flex;
-  flex-direction: row; /* Keep buttons in a row */
-  gap: 10px; /* Space between buttons */
-  margin-top: -25px;
-}
-.form-buttons {
-  display: flex;
-  justify-content: flex-end; /* Align buttons to the right */
-  gap: 10px; /* Space between buttons */
-}
-
-.save-btn{
-  cursor: pointer;
-  padding: 10px 20px;
-  background-color: #6c5ce7cc;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  height: 40px; /* Consistent height */
-  display: flex;
-  align-items: center; /* Vertically center align text */
-  justify-content: center; /* Center align text within the button */
-  border: 2px solid rgba(74, 74, 74, 0.81);
-}
-.save-btn:hover {
-  background-color: #6c5ce7; /* Darker shade on hover */
-  border-color: #383838; /* Change border color on hover */
-}
-.remove-btn{
-  cursor: pointer;
-  padding: 10px 20px;
-  background-color: #ff0000c2;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  height: 40px; /* Consistent height */
-  display: flex;
-  align-items: center; /* Vertically center align text */
-  justify-content: center; /* Center align text within the button */
-  border: 2px solid rgba(74, 74, 74, 0.81);
-}
-.remove-btn:hover {
-  background-color: #ff0000; /* Darker shade on hover */
-  border-color: #383838; /* Change border color on hover */
-}
-
-.add-btn{
-  cursor: pointer;
-  padding: 10px 20px;
-  background-color: #383838f1;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  height: 40px; /* Consistent height */
-  display: flex;
-  align-items: center; /* Vertically center align text */
-  justify-content: center; /* Horizontally center align text */
-  border: 2px solid #a8a8a8bd;
-}
-.add-btn:hover{
-  background-color: #383838;
-  border-color: 1px solid rgba(0, 0, 0, 0.716);
-}
-.input-wrapper {
-  position: relative; /* Relative positioning for the label */
-  margin-bottom: 20px; /* Space below each input */
-}
-
-
-.input-wrapper input {
-  width: 100%; /* Full width of container */
-  padding: 10px;
-  border: none; /* Remove default border */
-  border-bottom: 2px solid #383838; /* Border only at the bottom */
-  border-radius: 0; /* No rounded corners */
-  background-color: #383838; /* Background color */
-  color: #fff; /* Text color */
-  height: 40px; /* Consistent height */
-  font-size: 16px;
-  box-sizing: border-box; /* Include padding in element's total width and height */
-  outline: none; /* Remove default outline */
-}
 
 .input-wrapper label {
   position: absolute;

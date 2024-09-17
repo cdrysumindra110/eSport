@@ -671,3 +671,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 </body>
 </html>
+
+
+
+<!-- Hidden input to hold streams data before submitting -->
+<input type="hidden" id="streams-data" name="streams" />
