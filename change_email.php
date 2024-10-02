@@ -225,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
                         </span>
                         <span>Change Profile</span>
                     </label>
-                    <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
+                    <img src="./img/dash-logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
                 </div>
             </div>
         </form>

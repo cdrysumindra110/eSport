@@ -478,7 +478,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                   <br>
                                   <div class="row justify-content-center">
                                       <div class="col-7 text-center">
-                                        <a href="tournament-details.php" class="button-custom">View Tournament</a>
+                                        <a href="mytournaments.php" class="button-custom">View Tournament</a>
                                       </div>
                                   </div>
                                 </div>

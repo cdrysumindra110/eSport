@@ -1,64 +1,69 @@
 <?php
-// Include the config file
 require_once 'config.php';
-
-// Start the session
 session_start();
 
-// Initialize messages
-$error_message = '';
-$success_message = '';
-
-$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
-
-
-// Check if the user is logged in
+// Check if the user is signed in
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     header('Location: signin.php');
     exit();
 }
 
-// Get the logged-in user ID
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User ID not set in session.");
+}
+
 $user_id = $_SESSION['user_id'];
+$error_message = '';
+$tournaments = [];
 
-// Check if the form has been submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-// Handle the update email form
-if (isset($_POST['update_email'])) {
-    $newEmail = filter_var($_POST['newEmail'], FILTER_SANITIZE_EMAIL);
-
-    // Validate the new email
-    if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-        // Prepare and execute the update
-        $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
-        $stmt->bind_param('si', $newEmail, $user_id);
-
-        if ($stmt->execute()) {
-            $success_message = 'Email updated successfully.';
-        } else {
-            $error_message = 'Error updating email: ' . $stmt->error;
-        }
-        $stmt->close();
+// Fetch username
+$stmt_uname = $conn->prepare("SELECT uname FROM users WHERE id = ?");
+if ($stmt_uname) {
+    $stmt_uname->bind_param("i", $user_id);
+    $stmt_uname->execute();
+    $stmt_uname->bind_result($uname);
+    if ($stmt_uname->fetch()) {
+        $_SESSION['uname'] = $uname;
     } else {
-        $error_message = 'Invalid email format.';
+        $error_message = "Error: Username not found for the user ID.";
     }
+    $stmt_uname->close();
+} else {
+    $error_message = "Error preparing the statement: " . $conn->error;
 }
 
-// Prepare query string for redirect
-$query_string = '';
-if (!empty($success_message)) {
-    $query_string .= 'success_message=' . urlencode($success_message);
-}
-if (!empty($error_message)) {
-    if (!empty($query_string)) $query_string .= '&';
-    $query_string .= 'error_message=' . urlencode($error_message);
+// Fetch tournament data
+$sql = "SELECT 
+            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
+            b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
+            b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
+            s.provider, s.channel_name, s.social_media, s.social_media_input
+        FROM tournaments t
+        LEFT JOIN brackets b ON t.id = b.tournament_id
+        LEFT JOIN streams s ON t.id = s.tournament_id
+        WHERE t.user_id = ? 
+        ORDER BY t.id";
+
+$stmt = $conn->prepare($sql);
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();  // Use get_result for multiple rows
+
+    if ($result->num_rows > 0) {
+        // Fetch all tournaments into an array
+        while ($row = $result->fetch_assoc()) {
+            $tournaments[] = $row;
+        }
+    } else {
+        $error_message = "No tournament data found.";
+    }
+    $stmt->close();
+} else {
+    $error_message = "Error preparing the tournament statement: " . $conn->error;
 }
 
-// Redirect the user back to the change email page with messages
-header('Location: change_email.php?' . $query_string);
-exit;
-}
+$conn->close();
 ?>
 
 
@@ -185,7 +190,7 @@ exit;
                         </span>
                         <span>Change Profile</span>
                     </label>
-                    <img src="./img/logo/logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
+                    <img src="./img/dash-logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
                 </div>
             </div>
 
@@ -215,23 +220,47 @@ exit;
                           </tr>
                       </thead>
                       <tbody>
-                          <tr class="ut-row">
-                              <td class="ut-table__cell ut-table__cell--first">
-                                  <div class="ut-image">
-                                      <img src="img/contact_bg.jpg" alt="Tournament Image">
-                                  </div>
-                                  <div class="ut-info">
-                                      <div class="ut-info__name">Cod Bracket</div>
-                                      <div class="ut-info__host">Hosted by <span style="color: #00f7ff;">Zesper</span></div>
-                                  </div>
-                              </td>
-                              <td class="ut-table__cell ut-table__cell--status"><div class="ut-status--new">NEW</div></td>
-                              <td class="ut-table__cell">10 Sep 2024</td>
-                              <td class="ut-table__cell ut-table__cell--prize" style="padding-left: 20px;">100 USD</td>
-                              <td class="ut-table__cell">
-                                  <i class='fa fa-eye ut-row__icon-eye'></i>
-                              </td>
-                          </tr>
+                      <?php if (!empty($tournaments)): ?>
+                          <?php foreach ($tournaments as $tournament): ?>
+                              <div class="ut-container">
+                                  <table class="ut-table">
+                                      <tr class="ut-row">
+                                          <td class="ut-table__cell ut-table__cell--first">
+                                          <div class="ut-image">
+                                              <?php if (!empty($tournament['bannerimg'])): ?>
+                                                  <img src="<?php echo htmlspecialchars($tournament['bannerimg']); ?>" alt="Tournament Banner">
+                                              <?php else: ?>
+                                                  <img src="./img/dash-logo.png" alt="Default Tournament Banner">
+                                              <?php endif; ?>
+                                          </div>
+
+                                              <div class="ut-info">
+                                                  <div class="ut-info__name"><?php echo htmlspecialchars($tournament['tname']); ?></div>
+                                                  <div class="ut-info__host">Hosted by 
+                                                      <span style="color: #00f7ff;">
+                                                          <?php echo htmlspecialchars($_SESSION['uname']); ?>
+                                                      </span>
+                                                  </div>
+                                              </div>
+                                          </td>
+                                          <td class="ut-table__cell ut-table__cell--status">
+                                              <div class="ut-status--new">NEW</div>
+                                          </td>
+                                          <td class="ut-table__cell"><?php echo htmlspecialchars($tournament['sdate']); ?></td>
+                                          <td class="ut-table__cell ut-table__cell--prize" style="padding-left: 20px;">
+                                              <?php echo htmlspecialchars($tournament['prizes']); ?>
+                                          </td>
+                                          <td class="ut-table__cell">
+                                              <i class='fa fa-eye ut-row__icon-eye'></i>
+                                          </td>
+                                      </tr>
+                                  </table>
+                              </div>
+                          <?php endforeach; ?>
+                      <?php else: ?>
+                          <tr><td colspan="5"><?php echo htmlspecialchars($error_message); ?></td></tr>
+                      <?php endif; ?>
+
                       </tbody>
                   </table>
               </div>

@@ -1,5 +1,6 @@
 /* Unique prefix 'ut-' (Unique Tournament) for all classes */
 .ut-container {
+    background-color: #282828;
     color: #ffffff;
     font-family: sans-serif;
     margin: 0;
@@ -13,6 +14,7 @@
     border: none; /* Ensure no border is applied */
 }
 
+/* Header section */
 .ut-header {
     display: flex;
     justify-content: flex-start;
@@ -38,6 +40,7 @@
     color: #000000;
 }
 
+/* Table section */
 .ut-table {
     width: 100%;
     max-width: 1200px;
@@ -78,17 +81,24 @@
     text-align: left;
 }
 
+/* Row styles */
+.ut-row {
+    position: relative; /* Set position for hover effect */
+    cursor: pointer; /* Optional: change cursor to pointer */
+}
+
 .ut-row:hover {
     background-color: #00f7ff0b;
     color: #00f7ff;
     cursor: pointer;
 }
 
-.ut-row {
-    position: relative; /* Set position for hover effect */
-    cursor: pointer; /* Optional: change cursor to pointer */
+/* Target the second row and change its background color */
+.ut-row:nth-child(2) {
+    background-color: #3a3a3a;
 }
 
+/* Icon inside row */
 .ut-row .ut-row__icon-eye {
     position: absolute;
     top: 50%;
@@ -102,6 +112,7 @@
     display: block !important; /* Show on hover */
 }
 
+/* Image inside table */
 .ut-image img {
     width: 100px;
     height: 70px;
@@ -109,6 +120,7 @@
     border-radius: 1px;
 }
 
+/* Information section inside row */
 .ut-info {
     display: flex;
     flex-direction: column;
@@ -124,6 +136,7 @@
     color: #ffffff;
 }
 
+/* Status label */
 .ut-status--new {
     background-color: #66ff66;
     color: #000000;
@@ -135,6 +148,7 @@
     width: 30%;
 }
 
+/* Responsive Design */
 @media (max-width: 600px) {
     .ut-table__head,
     .ut-table__cell {
