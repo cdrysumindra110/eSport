@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unique Tournament Table</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+    <style>
+/* Unique prefix 'ut-' (Unique Tournament) for all classes */
+/* Unique prefix 'ut-' (Unique Tournament) for all classes */
+.ut-container {
+    background-color: #181818;
+    color: #ffffff;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.ut-header {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 10px;
+    padding-right: 280px;
+}
+
+.ut-header__button {
+    margin-left: auto;
+    background-color: #38b2d1;
+    border: 0.5px solid white;
+    color: #181818;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.ut-header__button:hover {
+    background-color: #2bd8ff;
+    border: 1px solid white;
+}
+
+.ut-table {
+    width: 100%;
+    max-width: 1200px;
+    border-collapse: collapse;
+    background-color: #282828;
+    margin: 0 auto;
+}
+
+.ut-table__head,
+.ut-table__cell {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #383838;
+    word-break: break-word;
+    position: relative;
+}
+
+.ut-table__head {
+    background-color: #383838;
+}
+
+.ut-table__head--status,
+.ut-table__cell--status {
+    width: 120px;
+    text-align: left;
+}
+
+.ut-table__cell--first {
+    padding-left: 10px;
+    display: flex;
+    align-items: left;
+}
+
+.ut-table__cell--date,
+.ut-table__cell--prize {
+    width: 150px;
+    text-align: left;
+}
+
+.ut-row {
+    position: relative;
+}
+
+.ut-row:hover {
+    background-color: #00f7ff0b;
+    color: #00f7ff;
+    cursor: pointer;
+}
+
+.ut-row__icon-eye {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #00f7ff;
+    display: none;
+}
+
+.ut-row:hover .ut-row__icon-eye {
+    display: block;
+}
+
+.ut-image img {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 1px;
+}
+
+.ut-info {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.ut-info__name {
+    font-weight: bold;
+}
+
+.ut-info__host {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.ut-status--new {
+    background-color: #66ff66;
+    color: #000000;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    width: 30%;
+}
+
+@media (max-width: 600px) {
+    .ut-table__head,
+    .ut-table__cell {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .ut-image img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .ut-header {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .ut-header__button {
+        margin-top: 10px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="ut-container">
+        <div class="ut-header">
+            <a href="#" class="ut-header__button">EXPLORE TOURNAMENTS</a>
+        </div>
+        <table class="ut-table">
+            <thead>
+                <tr>
+                    <th class="ut-table__head">
+                        <i class='fa fa-trophy' style='color:#00d696'></i> TOURNAMENTS
+                    </th>
+                    <th class="ut-table__head ut-table__head--status">
+                        <i class='fa fa-flag-checkered' style='color:#00d696'></i> STATUS
+                    </th>
+                    <th class="ut-table__head ut-table__cell--date">
+                        <i class='fa fa-calendar' style='color:#00d696'></i> DATE
+                    </th>
+                    <th class="ut-table__head ut-table__cell--prize" style="padding-left: 20px;">
+                        <i class='fas fa-medal' style='color:#00d696'></i> PRIZE
+                    </th>
+                    <th class="ut-table__head"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="ut-row">
+                    <td class="ut-table__cell ut-table__cell--first">
+                        <div class="ut-image">
+                            <img src="img/contact_bg.jpg" alt="Tournament Image">
+                        </div>
+                        <div class="ut-info">
+                            <div class="ut-info__name">Cod Bracket</div>
+                            <div class="ut-info__host">Hosted by <span style="color: #00f7ff;">Zesper</span></div>
+                        </div>
+                    </td>
+                    <td class="ut-table__cell ut-table__cell--status"><div class="ut-status--new">NEW</div></td>
+                    <td class="ut-table__cell">10 Sep 2024</td>
+                    <td class="ut-table__cell ut-table__cell--prize" style="padding-left: 20px;">100 USD</td>
+                    <td class="ut-table__cell">
+                        <i class='fa fa-eye ut-row__icon-eye'></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

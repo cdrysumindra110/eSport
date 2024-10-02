@@ -77,6 +77,7 @@ exit;
     <link rel="stylesheet" href="owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
     <link rel="stylesheet" href="css/template-style.css">
+    <link rel="stylesheet" href="css/mytournament.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -146,13 +147,13 @@ exit;
       </nav>
     </header>
     
-
+  
      
     <!-- Popup Message -->
     <div class="popup-message" id="popup-message"></div>
 
     <div class="profile-cont">
-    <div class="btn-container">
+        <div class="btn-container">
             <button id="walletBtn" class="btn-cnt"><i class='fa fa-money'></i>Wallet</button>
             <button id="updateProfileBtn" class="btn-cnt"><i class='fas fa-user-edit'></i>Profile</button>
             <button id="teamProfileBtn" class="btn-cnt"><i class='fa fa-group'></i>Teams</button>
@@ -162,7 +163,7 @@ exit;
             <button id="signoutBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
         </div>
 
-        <div class="profile-container">
+            <div class="profile-container">
                 <div class="cover-photo-container">
                     <div class="cover-photo">
                         <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
@@ -188,18 +189,56 @@ exit;
                 </div>
             </div>
 
-        <div class="unique-container">
-          <div class="wallet-container">
-          <h2 class="unique-header">Wallet</h2>
-            <button class="link-wallet">
-              <span class="link-icon">🔗</span>
-              <span class="link-text">Link Wallet</span>
-            </button>
+            <div id="myTournamentsSection" class="profile-section">
+            <div class="unique-container">
+              <h2 class="unique-header">Organized Tournaments</h2> 
+              <div class="ut-container">
+                  <div class="ut-header">
+                      <a href="#" class="ut-header__button">EXPLORE TOURNAMENTS</a>
+                  </div>
+                  <table class="ut-table">
+                      <thead>
+                          <tr>
+                              <th class="ut-table__head">
+                                  <i class='fa fa-trophy' style='color:#00d696'></i> TOURNAMENTS
+                              </th>
+                              <th class="ut-table__head ut-table__head--status">
+                                  <i class='fa fa-flag-checkered' style='color:#00d696'></i> STATUS
+                              </th>
+                              <th class="ut-table__head ut-table__cell--date">
+                                  <i class='fa fa-calendar' style='color:#00d696'></i> DATE
+                              </th>
+                              <th class="ut-table__head ut-table__cell--prize" style="padding-left: 20px;">
+                                  <i class='fas fa-medal' style='color:#00d696'></i> PRIZE
+                              </th>
+                              <th class="ut-table__head"></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr class="ut-row">
+                              <td class="ut-table__cell ut-table__cell--first">
+                                  <div class="ut-image">
+                                      <img src="img/contact_bg.jpg" alt="Tournament Image">
+                                  </div>
+                                  <div class="ut-info">
+                                      <div class="ut-info__name">Cod Bracket</div>
+                                      <div class="ut-info__host">Hosted by <span style="color: #00f7ff;">Zesper</span></div>
+                                  </div>
+                              </td>
+                              <td class="ut-table__cell ut-table__cell--status"><div class="ut-status--new">NEW</div></td>
+                              <td class="ut-table__cell">10 Sep 2024</td>
+                              <td class="ut-table__cell ut-table__cell--prize" style="padding-left: 20px;">100 USD</td>
+                              <td class="ut-table__cell">
+                                  <i class='fa fa-eye ut-row__icon-eye'></i>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+            </div>
           </div>
-        </div>
     </div>
 
-            
 
     <!-- FOOTER -->
     <footer>
@@ -284,7 +323,7 @@ exit;
     </footer>
     <script type="text/javascript" src="js/responsee.js"></script>
     <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
-    <script type="text/javascript" src="./js/template-scripts.js"></script> 
+    <script type="text/javascript" src="js/template-scripts.js"></script> 
 
     <!-- Popup page Scripts -->
 <script>

@@ -884,7 +884,7 @@ nav.breadcrumb-nav ul li:last-child:after {content:"";}
   .top-nav {
     position:fixed;
     top:0;
-    z-index:10;
+    z-index:100;
     left:-100%;
     width:100%!important;
     bottom:0;

@@ -193,7 +193,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
                 <p>
                   Our team management services help you build and maintain a strong, 
                   competitive team. We offer support in player recruitment, training 
-                  schedules, and performance analysis. Our goal is to help your team 
+                  schedules, and performance analysis. Our goal is to help your team
                   reach its full potential by providing the resources and guidance 
                   needed to succeed in the competitive esports landscape.
                 </p>                                                                                                                                                                                                                                                                                                                                                                                

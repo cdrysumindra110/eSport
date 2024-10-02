@@ -196,6 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
             <button id="walletBtn" class="btn-cnt"><i class='fa fa-money'></i>Wallet</button>
             <button id="updateProfileBtn" class="btn-cnt"><i class='fas fa-user-edit'></i>Profile</button>
             <button id="teamProfileBtn" class="btn-cnt"><i class='fa fa-group'></i>Teams</button>
+            <button id="myTournamentBtn" class="btn-cnt"><i class='fa fa-group'></i>My Tournaments</button>
             <button id="changeEmailBtn" class="btn-cnt"><i class='fa fa-envelope'></i>Change Email</button>
             <button id="changePasswordBtn" class="btn-cnt"><i class='fa fa-key'></i>Change Password</button>
             <button id="signoutBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
@@ -368,6 +369,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
                     break;
                 case 'teamProfileBtn':
                     redirectUrl = 'teams.php';
+                    break;
+                case 'myTournamentBtn':
+                    redirectUrl = 'mytournaments.php';
                     break;
                 case 'changeEmailBtn':
                     redirectUrl = 'change_email.php';
