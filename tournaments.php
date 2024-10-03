@@ -1,21 +1,57 @@
 <?php
-// Include the config file
 require_once 'config.php';
-
-// Start the session
 session_start();
 
-
-$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
+// Check if user is signed in
+$isSignin = isset($_SESSION['isSignin']) && $_SESSION['isSignin'];
 
 if (!$isSignin) {
-  // Set an error message in the session
-  $_SESSION['error_message'] = 'Please login to access this page.';
-  // Redirect to the index page
-  header('Location: index.php');
-  exit();
+    header('Location: signin.php');
+    exit();
 }
+
+// Retrieve user_id from session
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User ID not set in session.");
+}
+$user_id = $_SESSION['user_id']; // Initialize user_id here
+
+$stmt_uname = $conn->prepare("SELECT uname FROM users WHERE id = ?");
+if ($stmt_uname) {
+    $stmt_uname->bind_param("i", $user_id);
+    $stmt_uname->execute();
+    $stmt_uname->bind_result($uname);
+    if ($stmt_uname->fetch()) {
+        $_SESSION['uname'] = $uname;
+    } else {
+        die("Error: Username not found for the user ID."); // Handle error properly
+    }
+    $stmt_uname->close();
+} else {
+    die("Error preparing the statement: " . $conn->error); // Handle error properly
+}
+
+// Fetch all organized tournaments
+$sql = "SELECT t.tname, t.selected_game, t.sdate, b.bracket_type, b.prizes, t.bannerimg, u.uname AS host_username 
+        FROM tournaments t 
+        LEFT JOIN brackets b ON t.id = b.tournament_id 
+        LEFT JOIN users u ON t.user_id = u.id";
+
+$stmt = $conn->prepare($sql);
+if ($stmt) {
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $tournaments = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+} else {
+    die("Error fetching tournaments: " . $conn->error); // Handle error properly
+}
+
+// Close connection
+$conn->close();
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -32,13 +68,14 @@ if (!$isSignin) {
     <!-- CUSTOM STYLE -->      
     <link rel="stylesheet" href="./css/template-style.css">
     <link rel="stylesheet" href="./css/tour_org.css">
+    <link rel="stylesheet" href="css/tournaments.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
-    
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
+
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -111,7 +148,7 @@ if (!$isSignin) {
           <div class="line">
   
             <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-              Our Services
+              Tournaments
             </h1>
           
           </div>
@@ -122,114 +159,80 @@ if (!$isSignin) {
 
     </main>
 
-            <!-- Popup Message -->
-            <div class="popup-message" id="popup-message"></div>
+    <!-- Popup Message -->
+    <div class="popup-message" id="popup-message"></div>
 
-  <div class="game-tournament">
-      <h2 class="section-heading">Select a Game</h2>
-      <div id="search">
-        <svg viewBox="0 0 420 60" xmlns="http://www.w3.org/2000/svg">
-          <rect class="bar"/>
-          
-          <g class="magnifier">
-            <circle class="glass"/>
-            <line class="handle" x1="32" y1="32" x2="44" y2="44"></line>
-          </g>
-      
-          <g class="sparks">
-            <circle class="spark"/>
-            <circle class="spark"/>
-            <circle class="spark"/>
-          </g>
-      
-          <g class="burst pattern-one">
-            <circle class="particle circle"/>
-            <path class="particle triangle"/>
-            <circle class="particle circle"/>
-            <path class="particle plus"/>
-            <rect class="particle rect"/>
-            <path class="particle triangle"/>
-          </g>
-          <g class="burst pattern-two">
-            <path class="particle plus"/>
-            <circle class="particle circle"/>
-            <path class="particle triangle"/>
-            <rect class="particle rect"/>
-            <circle class="particle circle"/>
-            <path class="particle plus"/>
-          </g>
-          <g class="burst pattern-three">
-            <circle class="particle circle"/>
-            <rect class="particle rect"/>
-            <path class="particle plus"/>
-            <path class="particle triangle"/>
-            <rect class="particle rect"/>
-            <path class="particle plus"/>
-          </g>
-        </svg>
-        <input type=search name=q aria-label="Search for inspiration"/>
-      </div>
-      
-      <div id="results">
-        
-      </div>
-      
-        <div class="games-container">
-          <div class="game-card available" id="game-pubg">
-              <img src="img/game/pubg.png" alt="PUBG">
-              <h3>PUBG</h3>
-          </div>
-          <div class="game-card available" id="game-cod">
-              <img src="img/game/csGo.png" alt="Call of Duty: Mobile">
-              <h3>Call of Duty: Mobile</h3>
-          </div>
-          <div class="game-card available" id="game-freefire">
-              <img src="img/game/ff_game.jpg" alt="Free Fire">
-              <h3>Free Fire</h3>
-          </div>
-      </div>
-      
-      <div class="games-container">
-        <!-- Featured Games -->
-        <div class="game-card featured">
-          <img src="img/game/lol.png" alt="League of Legends">
-          <div class="featured-tag">FEATURED</div>
-          <h3>League of Legends</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/dota.png" alt="Dota 2">
-          <div class="featured-tag">FEATURED</div>
-          <h3>Dota 2</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/valorant.png" alt="VALORANT">
-          <div class="featured-tag">FEATURED</div>
-          <h3>VALORANT</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/overwatch.png" alt="Overwatch">
-          <div class="featured-tag">FEATURED</div>
-          <h3>Overwatch</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/fortnite.png" alt="Fortnite">
-          <div class="featured-tag">FEATURED</div>
-          <h3>Fortnite</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-      <div class="game-card featured">
-          <img src="img/game/eFootball.jpg" alt="eFootball">
-          <div class="featured-tag">FEATURED</div>
-          <h3>eFootball</h3>
-          <div class="overlay">Available Soon</div>
-      </div>
-        <!-- Add other featured games similarly -->
+    <div id="myTournamentsSection" class="profile-section">
+        <h2 class="unique-header">Organized Tournaments</h2>
+        <div class="ut-container">
+            <div class="ut-header">
+                <a href="#" class="ut-header__button">EXPLORE TOURNAMENTS</a>
+            </div>
+            <table class="ut-table">
+                <thead>
+                    <tr>
+                        <th class="ut-table__head">
+                            <i class='fa fa-trophy' style='color:#00d696'></i> TOURNAMENTS
+                        </th>
+                        <th class="ut-table__head ut-table__head--game">
+                            <i class='fa fa-flag-checkered' style='color:#00d696'></i> GAME
+                        </th>
+                        <th class="ut-table__head ut-table__cell--brackets">
+                            <i class='fa fa-calendar' style='color:#00d696'></i> Brackets
+                        </th>
+                        <th class="ut-table__head ut-table__cell--date">
+                            <i class='fa fa-calendar' style='color:#00d696'></i> DATE
+                        </th>
+                        <th class="ut-table__head ut-table__cell--prize" style="padding-left: 20px;">
+                            <i class='fas fa-medal' style='color:#00d696'></i> PRIZE
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($tournaments)): ?>
+                        <?php foreach ($tournaments as $tournament): ?>
+                        <tr class="ut-row">
+                            <td class="ut-table__cell ut-table__cell--first">
+                                <div class="ut-image">
+                                    <?php if (!empty($tournament['bannerimg'])): ?>
+                                        <img src="data:image/jpeg;base64,<?php echo base64_encode($tournament['bannerimg']); ?>" alt="Tournament Banner">
+                                    <?php else: ?>
+                                        <img src="./img/dash-logo.png" alt="Default Tournament Banner">
+                                    <?php endif; ?>
+                                </div>
+                                <div class="ut-info">
+                                    <div class="ut-info__name"><?php echo htmlspecialchars($tournament['tname']); ?></div>
+                                    <div class="ut-info__host">Hosted by 
+                                        <span style="color: #00d696;">
+                                            <?php echo htmlspecialchars($tournament['host_username']); ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="ut-table__cell ut-table__cell--game">
+                                <?php echo htmlspecialchars($tournament['selected_game']); ?>
+                            </td>
+                            <td class="ut-table__cell ut-table__cell--brackets">
+                                <?php echo htmlspecialchars($tournament['bracket_type']); ?>
+                            </td>
+                            <td class="ut-table__cell ut-table__cell--date">
+                                <?php echo htmlspecialchars($tournament['sdate']); ?>
+                            </td>
+                            <td class="ut-table__cell ut-table__cell--prize">
+                                <?php echo htmlspecialchars($tournament['prizes']); ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No tournaments found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
+   
 
 
 

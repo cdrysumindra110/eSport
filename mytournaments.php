@@ -118,14 +118,14 @@ $conn->close();
         <div class="top-nav s-12 l-10">
           <ul class="right chevron">
             <li><a href="index.php">Home</a></li>
-           <li><a href="#">Tournaments</a>
+           <li><a href="tournaments.php">Tournaments</a>
               <ul>
                 <li><a href="#">Upcoming Tournaments</a>
                   <ul class="game_container">
                     <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
                     <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
-                    <a href="tour_reg.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
+                    <a href="tournaments.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
                   </ul>
               </li>
                 <li><a>Ongoing Tournaments</a></li>
@@ -138,15 +138,15 @@ $conn->close();
             <li><a href="about-us.php">About</a></li>
             <li><a href="#"><i class="fas fa-user"></i><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?></a>
               <ul>
-                  <?php if ($isSignin): ?>
-                      <li><a href="dashboard.php">Profile</a></li>
-                      <li><a href="logout.php">Signout</a></li>
-                  <?php else: ?>
-                      <li><a href="signin.php">Signin</a></li>
-                      <li><a href="signup.php">Signup</a></li>
-                  <?php endif; ?>
+                <?php if (isset($_SESSION['isSignin']) && $_SESSION['isSignin']): ?>
+                  <li><a href="dashboard.php">Profile</a></li>
+                  <li><a href="logout.php">Signout</a></li>
+                <?php else: ?>
+                  <li><a href="signin.php">Signin</a></li>
+                  <li><a href="signup.php">Signup</a></li>
+                <?php endif; ?>
               </ul>
-          </li>
+            </li>
           </li>
         </div>
       </nav>
