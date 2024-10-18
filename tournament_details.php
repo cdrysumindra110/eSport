@@ -14,21 +14,28 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $error_message = '';
 
-$stmt_uname = $conn->prepare("SELECT uname FROM users WHERE id = ?");
-if ($stmt_uname) {
-    $stmt_uname->bind_param("i", $user_id);
-    $stmt_uname->execute();
-    $stmt_uname->bind_result($uname);
-    if ($stmt_uname->fetch()) {
-        $_SESSION['uname'] = $uname;
+// Fetch the username and store it in session if not already set
+if (!isset($_SESSION['uname'])) {
+    $stmt_uname = $conn->prepare("SELECT uname FROM users WHERE id = ?");
+    if ($stmt_uname) {
+        $stmt_uname->bind_param("i", $user_id);
+        $stmt_uname->execute();
+        $stmt_uname->bind_result($uname);
+        if ($stmt_uname->fetch()) {
+            $_SESSION['uname'] = $uname;
+        } else {
+            $error_message = "Error: Username not found for the user ID.";
+        }
+        $stmt_uname->close();
     } else {
-        $error_message = "Error: Username not found for the user ID.";
+        $error_message = "Error preparing the username statement: " . $conn->error;
     }
-    $stmt_uname->close();
-} else {
-    $error_message = "Error preparing the statement: " . $conn->error;
 }
 
+// Initialize variables to avoid undefined variable warnings
+$selected_game = $sdate = $stime = $bracket_type = $about = $rules = $prizes = $social_media_input = $bannerimg = $tournament_id = null;
+
+// Fetch tournament data for the user
 $sql = "SELECT 
             t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
             b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
@@ -41,22 +48,42 @@ $sql = "SELECT
         ORDER BY t.id";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($tournament_id, $selected_game, $tname, $sdate, $stime, $about, $bannerimg, 
-                   $bracket_type, $match_type, $solo_players, $duo_teams, $duo_players_per_team, 
-                   $squad_teams, $squad_players_per_team, $rounds, $placement, $rules, $prizes,
-                   $provider, $channel_name, $social_media, $social_media_input);
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-if ($stmt->fetch()) {
-    // Data fetched successfully
+    if ($result->num_rows > 0) {
+        while ($tournament = $result->fetch_assoc()) {
+            $selected_game = $tournament['selected_game'];
+            $sdate = $tournament['sdate'];
+            $stime = $tournament['stime'];
+            $bracket_type = $tournament['bracket_type'];
+            $about = $tournament['about'];
+            $rules = $tournament['rules'];
+            $prizes = $tournament['prizes'];
+            $social_media_input = $tournament['social_media_input'];
+            $bannerimg = $tournament['bannerimg'];
+            $tournament_id = $tournament['id'];
+
+            // Optional: Debugging line to verify data fetching
+            // echo '<pre>'; print_r($tournament); echo '</pre>';
+        }
+    } else {
+        $error_message = "No tournament data found.";
+    }
+    $stmt->close();
 } else {
-    $error_message = "No tournament data found.";
+    $error_message = "Error preparing the tournament statement: " . $conn->error;
 }
 
-$stmt->close();
 $conn->close();
+
+if ($error_message) {
+    echo $error_message;
+}
 ?>
+
 
 
 <!DOCTYPE html>
@@ -355,107 +382,103 @@ $conn->close();
   
      
     <!-- Popup Message -->
-    <div class="popup-message" id="popup-message"></div>
-          <div class="banner-cont">
-            <div class="banner-container">
-                <div class="banner-img-container">
-                    <div class="banner-img">
-                    <?php if (!empty($bannerimg)): ?>
+    <div class="popup-message" id="popup-message">
+      
+    </div><div class="banner-cont">
+    <div class="banner-container">
+        <div class="banner-img-container">
+            <div class="banner-img">
+                <?php if (!empty($bannerimg)): ?>
                     <img id="bannerimg" name="bannerimg" src="image.php?tournament_id=<?php echo urlencode($tournament_id); ?>" alt="Banner Image" class="banner-photo-img" />
                 <?php else: ?>
                     <p>No banner image available.</p>
                 <?php endif; ?>
-                    </div>
-                </div>
             </div>
+        </div>
+    </div>
 
-            <div class="tournament">
-
-              <div class="tournament-operation">
-                  <div class="operation-btn">
-                      <button class="organizer-actions">
-                          <i class='fa fa-gears'></i> Organizer Actions
-                          <ul class="dropdown-menu">
-                              <li><i class='fa fa-edit'></i> Edit Tournament</li>
-                              <li><i class='fa fa-trash'></i> Delete Tournament</li>
-                          </ul>
-                      </button>
-                      <button class="options"><i class="fas fa-cog"></i> Options</button>
-                  </div>
-              </div>
-            
-
-              <div class="gameuser">
-                  <p class="titlename"><?php echo htmlspecialchars($selected_game); ?></p>
-                  Tournament By: 
-                  <p class="titlename"><?php echo htmlspecialchars($uname); ?></p>  
-              </div>
+    <div class="tournament">
+        <div class="tournament-operation">
+            <div class="operation-btn">
+                <button class="organizer-actions">
+                    <i class='fa fa-gears'></i> Organizer Actions
+                    <ul class="dropdown-menu">
+                        <li><i class='fa fa-edit'></i> Edit Tournament</li>
+                        <li><i class='fa fa-trash'></i> Delete Tournament</li>
+                    </ul>
+                </button>
+                <button class="options"><i class="fas fa-cog"></i> Options</button>
             </div>
-
-            <div class="tournament-details" id="tournament-details">
-              <div id="details" class="details" onclick="showContent('details')">
-                  <span class="tour-title">Details</span>
-              </div>
-          
-              <div id="rules" class="rules" onclick="showContent('rules')">
-                  <span class="tour-title">Rules</span>
-              </div>
-          
-              <div id="prizes" class="prizes" onclick="showContent('prizes')">
-                  <span class="tour-title">Prizes</span>
-              </div>
-          
-              <div id="schedule" class="schedule" onclick="showContent('schedule')">
-                  <span class="tour-title">Schedule</span>
-              </div>
-          
-              <div id="contact" class="contact" onclick="showContent('contact')">
-                  <span class="tour-title">Contact</span>
-              </div>
-          </div>
-          
-          <div class="container-row">
-              <div class="content-container details-container" id="details-container">
-                  <p class="content-title">Game Name</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($selected_game); ?></p>
-                  
-                  <p class="content-title">Start Date</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($sdate); ?></p>
-                  
-                  <p class="content-title">Start Time</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($stime); ?></p>
-                  
-                  <p class="content-title">Bracket Type</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($bracket_type); ?></p>
-                  
-                  <p class="content-title">About Game</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($about); ?></p>
-              </div>
-          
-              <div class="content-container rules-container" id="rules-container">
-                  <p class="content-title">Game Critical Rules</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($rules); ?></p>
-
-              </div>
-          
-              <div class="content-container prizes-container" id="prizes-container">
-                  <p class="content-title">Prize Details</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($prizes); ?></p>
-              </div>
-          
-              <div class="content-container schedule-container" id="schedule-container">
-                  <p class="content-title">Match Schedule</p>
-                      <p class="cont-title"> </p>
-              </div>
-          
-              <div class="content-container contact-container" id="contact-container">
-                  <p class="content-title">Contact Info</p>
-                      <p class="cont-title"><?php echo htmlspecialchars($social_media_input); ?></p>
-              </div>
-          </div>
-     
         </div>
 
+        <div class="gameuser">
+            <p class="titlename"><?php echo htmlspecialchars($selected_game); ?></p>
+            Tournament By: 
+            <p class="titlename"><?php echo htmlspecialchars($_SESSION['uname']); ?></p>
+        </div>
+    </div>
+
+    <div class="tournament-details" id="tournament-details">
+        <div id="details" class="details" onclick="showContent('details')">
+            <span class="tour-title">Details</span>
+        </div>
+
+        <div id="rules" class="rules" onclick="showContent('rules')">
+            <span class="tour-title">Rules</span>
+        </div>
+
+        <div id="prizes" class="prizes" onclick="showContent('prizes')">
+            <span class="tour-title">Prizes</span>
+        </div>
+
+        <div id="schedule" class="schedule" onclick="showContent('schedule')">
+            <span class="tour-title">Schedule</span>
+        </div>
+
+        <div id="contact" class="contact" onclick="showContent('contact')">
+            <span class="tour-title">Contact</span>
+        </div>
+    </div>
+
+    <div class="container-row">
+        <div class="content-container details-container" id="details-container">
+            <p class="content-title">Game Name</p>
+            <p class="cont-title"><?php echo htmlspecialchars($selected_game); ?></p>
+
+            <p class="content-title">Start Date</p>
+            <p class="cont-title"><?php echo htmlspecialchars($sdate); ?></p>
+
+            <p class="content-title">Start Time</p>
+            <p class="cont-title"><?php echo htmlspecialchars($stime); ?></p>
+
+            <p class="content-title">Bracket Type</p>
+            <p class="cont-title"><?php echo htmlspecialchars($bracket_type); ?></p>
+
+            <p class="content-title">About Game</p>
+            <p class="cont-title"><?php echo htmlspecialchars($about); ?></p>
+        </div>
+
+        <div class="content-container rules-container" id="rules-container">
+            <p class="content-title">Game Critical Rules</p>
+            <p class="cont-title"><?php echo htmlspecialchars($rules); ?></p>
+        </div>
+
+        <div class="content-container prizes-container" id="prizes-container">
+            <p class="content-title">Prize Details</p>
+            <p class="cont-title"><?php echo htmlspecialchars($prizes); ?></p>
+        </div>
+
+        <div class="content-container schedule-container" id="schedule-container">
+            <p class="content-title">Match Schedule</p>
+            <p class="cont-title"> </p>
+        </div>
+
+        <div class="content-container contact-container" id="contact-container">
+            <p class="content-title">Contact Info</p>
+            <p class="cont-title"><?php echo htmlspecialchars($social_media_input); ?></p>
+        </div>
+    </div>
+</div>
 
             
 
@@ -587,5 +610,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 
-  </body>
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+after clicking on table data such as tournaments created by user it should redirect towards the tournment_details.php page with its all originaldetails
+  -->

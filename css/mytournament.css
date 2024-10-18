@@ -4,12 +4,11 @@
     color: #ffffff;
     font-family: sans-serif;
     margin: 0;
-    padding: 0;
+    padding: 20px; /* Keep padding for consistency */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    overflow-x: auto;
+    overflow-x: auto; /* Allow horizontal scrolling */
     width: 100%;
     border: none; /* Ensure no border is applied */
 }
@@ -25,28 +24,28 @@
 .ut-header__button {
     margin-left: auto;
     background-color: #38b2d1;
-    border: 0.5px solid white;
+    border: 0.5px solid white; /* Border styling */
     color: #181818;
     padding: 10px 20px;
     border-radius: 5px;
     text-decoration: none;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, border 0.3s ease; /* Transition for border */
 }
 
 .ut-header__button:hover {
     background-color: #2bd8ff;
-    border: 1px solid white;
+    border: 1px solid white; /* Hover border */
     color: #000000;
 }
 
 /* Table section */
 .ut-table {
     width: 100%;
-    max-width: 1200px;
-    border-collapse: collapse;
+    max-width: 1200px; /* Limit table width */
+    border-collapse: collapse; /* Ensure borders are collapsed */
     background-color: #282828;
-    margin: 0 auto;
+    margin: 0 auto; /* Center table */
     border: none; /* Remove border */
 }
 
@@ -55,14 +54,14 @@
     padding: 10px;
     text-align: left;
     word-break: break-word;
-    position: relative;
     border: none; /* Remove border */
 }
 
 .ut-table__head {
-    background-color: #383838;
+    background-color: #383838; /* Header background color */
 }
 
+/* Column Styles */
 .ut-table__head--status,
 .ut-table__cell--status {
     width: 12rem;
@@ -72,7 +71,7 @@
 .ut-table__cell--first {
     padding-left: 10px;
     display: flex;
-    align-items: left;
+    align-items: flex-start; /* Align items at the start */
 }
 
 .ut-table__cell--date,
@@ -84,18 +83,17 @@
 /* Row styles */
 .ut-row {
     position: relative; /* Set position for hover effect */
-    cursor: pointer; /* Optional: change cursor to pointer */
+    cursor: pointer; /* Change cursor to pointer */
 }
 
 .ut-row:hover {
-    background-color: #00f7ff0b;
-    color: #00f7ff;
-    cursor: pointer;
+    background-color: #00f7ff0b; /* Hover background color */
+    color: #00f7ff; /* Text color on hover */
 }
 
-/* Target the second row and change its background color */
+/* Specific styles for second row */
 .ut-row:nth-child(2) {
-    background-color: #3a3a3a;
+    background-color: #3a3a3a; /* Different background for second row */
 }
 
 /* Icon inside row */
@@ -105,11 +103,11 @@
     transform: translateY(-50%);
     font-size: 18px;
     color: #00f7ff;
-    display: none !important; /* Start hidden */
+    display: none; /* Start hidden */
 }
 
 .ut-row:hover .ut-row__icon-eye {
-    display: block !important; /* Show on hover */
+    display: block; /* Show on hover */
 }
 
 /* Image inside table */
@@ -117,7 +115,7 @@
     width: 100px;
     height: 70px;
     object-fit: cover;
-    border-radius: 1px;
+    border-radius: 1px; /* Rounded corners */
 }
 
 /* Information section inside row */
@@ -153,20 +151,20 @@
     .ut-table__head,
     .ut-table__cell {
         padding: 8px;
-        font-size: 14px;
+        font-size: 14px; /* Adjust font size */
     }
 
     .ut-image img {
-        width: 50px;
-        height: 50px;
+        width: 50px; /* Smaller image size */
+        height: 50px; /* Smaller image size */
     }
 
     .ut-header {
-        flex-direction: column;
+        flex-direction: column; /* Stack header elements */
         align-items: flex-end;
     }
 
     .ut-header__button {
-        margin-top: 10px;
+        margin-top: 10px; /* Space above button */
     }
 }

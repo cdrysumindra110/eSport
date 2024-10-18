@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         // User does not exist
-        $error_message = "Invalid email or password. Please try again.";
+        $error_message = "User Not Registered, Please Signup.";
     }
 
     // Close the statement

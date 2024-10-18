@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     $stmt3->bind_param("issss", $tournament_id, $provider, $channel_name, $social_media, $social_media_input);
                                     if ($stmt3->execute()) {
                                         $success_message = "Tournament, brackets, and related data successfully inserted!";
-                                        header('Location: tournament_details.php');
+                                        header('Location: mytournaments.php');
                                         exit();
                                     } else {
                                         $error_message = "Error inserting stream: " . $stmt3->error;
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 }
                             } else {
                                 $success_message = "Tournament and brackets successfully inserted!";
-                                header('Location: tournament_details.php');
+                                header('Location: mytournaments.php');
                                 exit();
                             }
                         } else {
