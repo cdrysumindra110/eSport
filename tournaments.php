@@ -2,8 +2,11 @@
 require_once 'config.php';
 session_start();
 
+// Define $isSignin based on the session variable
+$isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
+
 // Check if the user is signed in
-if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
+if (!$isSignin) {
     header('Location: signin.php');
     exit();
 }
@@ -65,7 +68,7 @@ if ($stmt) {
 }
 
 $conn->close();
-?>  
+?>
 
 
 <!DOCTYPE html>
@@ -238,7 +241,7 @@ $conn->close();
                 <?php echo htmlspecialchars($tournament['prizes']); ?>
             </td>
             <td class="ut-table__cell">
-                <a href="tournament_details.php?tournament_id=<?php echo $tournament['id']; ?>">
+                <a href="tour_freg.php?tournament_id=<?php echo $tournament['id']; ?>">
                     <i class='fa fa-eye ut-row__icon-eye'></i>
                 </a>
             </td>
