@@ -81,7 +81,9 @@ $conn->close();
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
 
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
 
     <style>
@@ -375,11 +377,7 @@ $conn->close();
         <div class="tournament-operation">
             <div class="operation-btn">
                 <button class="organizer-actions">
-                    <i class='fa fa-gears'></i> Organizer Actions
-                    <ul class="dropdown-menu">
-                        <li><i class='fa fa-edit'></i> Edit Tournament</li>
-                        <li><i class='fa fa-trash'></i> Delete Tournament</li>
-                    </ul>
+                <i class="fas fa-gamepad"></i> Join Tournament
                 </button>
                 <button class="options"><i class="fas fa-cog"></i> Options</button>
             </div>
