@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Registration</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .team-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mt-5">
+                    <div class="card-header text-center">
+                        <h2>Tournament Registration</h2>
+                        <p>Fill in your details to register for the tournament</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="registrationForm" action="register_tournament.php" method="POST">
+                            <!-- Basic Player Information -->
+                            <div class="form-group">
+                                <label for="playerName">Player Name</label>
+                                <input type="text" class="form-control" id="playerName" name="playerName" placeholder="Enter your name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gameType">Game Type</label>
+                                <select class="form-control" id="gameType" name="gameType" required>
+                                    <option value="">Select Game Type</option>
+                                    <option value="solo">Solo</option>
+                                    <option value="duo">Duo</option>
+                                    <option value="squad">Squad</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Solo Game Container -->
+                            <div id="soloContainer" class="team-container">
+                                <p>Solo game selected. No additional details required.</p>
+                            </div>
+
+                            <!-- Duo Game Container -->
+                            <div id="duoContainer" class="team-container">
+                                <div class="form-group">
+                                    <label for="partnerName">Partner's Name</label>
+                                    <input type="text" class="form-control" id="partnerName" name="partnerName" placeholder="Enter your partner's name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="partnerEmail">Partner's Email</label>
+                                    <input type="email" class="form-control" id="partnerEmail" name="partnerEmail" placeholder="Enter your partner's email">
+                                </div>
+                            </div>
+
+                            <!-- Squad Game Container -->
+                            <div id="squadContainer" class="team-container">
+                                <div class="form-group">
+                                    <label for="teamName">Team Name</label>
+                                    <input type="text" class="form-control" id="teamName" name="teamName" placeholder="Enter your team name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="numPlayers">Number of Players (including yourself)</label>
+                                    <input type="number" class="form-control" id="numPlayers" name="numPlayers" min="3" max="5" placeholder="Enter the number of players (3-5)" required>
+                                </div>
+                                <div id="squadMembersContainer"></div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-block">Register</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Show/hide team containers based on game type selection
+            $('#gameType').on('change', function () {
+                var selectedType = $(this).val();
+                $('.team-container').hide(); // Hide all team containers
+                if (selectedType === 'solo') {
+                    $('#soloContainer').show();
+                } else if (selectedType === 'duo') {
+                    $('#duoContainer').show();
+                } else if (selectedType === 'squad') {
+                    $('#squadContainer').show();
+                    addSquadMembers();
+                }
+            });
+
+            // Dynamically add squad member fields based on number of players
+            $('#numPlayers').on('change', function () {
+                addSquadMembers();
+            });
+
+            function addSquadMembers() {
+                var numPlayers = parseInt($('#numPlayers').val()) || 0;
+                var container = $('#squadMembersContainer');
+                container.empty(); // Clear existing fields
+
+                for (var i = 2; i <= numPlayers; i++) { // Start from player 2
+                    container.append(
+                        `<div class="form-group">
+                            <label for="member${i}Name">Player ${i} Name</label>
+                            <input type="text" class="form-control" id="member${i}Name" name="member${i}Name" placeholder="Enter player ${i} name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="member${i}Email">Player ${i} Email</label>
+                            <input type="email" class="form-control" id="member${i}Email" name="member${i}Email" placeholder="Enter player ${i} email" required>
+                        </div>`
+                    );
+                }
+            }
+        });
+    </script>
+</body>
+</html>

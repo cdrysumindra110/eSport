@@ -2,20 +2,21 @@
 require_once 'config.php';
 session_start();
 
-// Check if user is signed in
-$isSignin = isset($_SESSION['isSignin']) && $_SESSION['isSignin'];
-
-if (!$isSignin) {
+// Check if the user is signed in
+if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     header('Location: signin.php');
     exit();
 }
 
-// Retrieve user_id from session
 if (!isset($_SESSION['user_id'])) {
     die("Error: User ID not set in session.");
 }
-$user_id = $_SESSION['user_id']; // Initialize user_id here
 
+$user_id = $_SESSION['user_id'];
+$error_message = '';
+$tournaments = [];
+
+// Fetch username
 $stmt_uname = $conn->prepare("SELECT uname FROM users WHERE id = ?");
 if ($stmt_uname) {
     $stmt_uname->bind_param("i", $user_id);
@@ -24,32 +25,47 @@ if ($stmt_uname) {
     if ($stmt_uname->fetch()) {
         $_SESSION['uname'] = $uname;
     } else {
-        die("Error: Username not found for the user ID."); // Handle error properly
+        $error_message = "Error: Username not found for the user ID.";
     }
     $stmt_uname->close();
 } else {
-    die("Error preparing the statement: " . $conn->error); // Handle error properly
+    $error_message = "Error preparing the statement: " . $conn->error;
 }
 
-// Fetch all organized tournaments
-$sql = "SELECT t.tname, t.selected_game, t.sdate, b.bracket_type, b.prizes, t.bannerimg, u.uname AS host_username 
-        FROM tournaments t 
-        LEFT JOIN brackets b ON t.id = b.tournament_id 
-        LEFT JOIN users u ON t.user_id = u.id";
+// Fetch tournament data
+$sql = "SELECT 
+            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
+            b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
+            b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
+            s.provider, s.channel_name, s.social_media, s.social_media_input,
+            u.uname AS host_username  -- Fetching host username
+        FROM tournaments t
+        LEFT JOIN brackets b ON t.id = b.tournament_id
+        LEFT JOIN streams s ON t.id = s.tournament_id
+        LEFT JOIN users u ON t.user_id = u.id  -- Joining users to get the host username
+        ORDER BY t.id";  // Removed the WHERE clause
 
 $stmt = $conn->prepare($sql);
 if ($stmt) {
+    // No need to bind user_id since we are fetching all tournaments
     $stmt->execute();
-    $result = $stmt->get_result();
-    $tournaments = $result->fetch_all(MYSQLI_ASSOC);
+    $result = $stmt->get_result();  // Use get_result for multiple rows
+
+    if ($result->num_rows > 0) {
+        // Fetch all tournaments into an array
+        while ($row = $result->fetch_assoc()) {
+            $tournaments[] = $row;
+        }
+    } else {
+        $error_message = "No tournament data found.";
+    }
     $stmt->close();
 } else {
-    die("Error fetching tournaments: " . $conn->error); // Handle error properly
+    $error_message = "Error preparing the tournament statement: " . $conn->error;
 }
 
-// Close connection
 $conn->close();
-?>
+?>  
 
 
 <!DOCTYPE html>
@@ -185,49 +201,55 @@ $conn->close();
                         <th class="ut-table__head ut-table__cell--prize" style="padding-left: 20px;">
                             <i class='fas fa-medal' style='color:#00d696'></i> PRIZE
                         </th>
+                        <th class="ut-table__head"></th>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($tournaments)): ?>
-                        <?php foreach ($tournaments as $tournament): ?>
-                        <tr class="ut-row">
-                            <td class="ut-table__cell ut-table__cell--first">
-                                <div class="ut-image">
-                                    <?php if (!empty($tournament['bannerimg'])): ?>
-                                        <img src="data:image/jpeg;base64,<?php echo base64_encode($tournament['bannerimg']); ?>" alt="Tournament Banner">
-                                    <?php else: ?>
-                                        <img src="./img/dash-logo.png" alt="Default Tournament Banner">
-                                    <?php endif; ?>
-                                </div>
-                                <div class="ut-info">
-                                    <div class="ut-info__name"><?php echo htmlspecialchars($tournament['tname']); ?></div>
-                                    <div class="ut-info__host">Hosted by 
-                                        <span style="color: #00d696;">
-                                            <?php echo htmlspecialchars($tournament['host_username']); ?>
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="ut-table__cell ut-table__cell--game">
-                                <?php echo htmlspecialchars($tournament['selected_game']); ?>
-                            </td>
-                            <td class="ut-table__cell ut-table__cell--brackets">
-                                <?php echo htmlspecialchars($tournament['bracket_type']); ?>
-                            </td>
-                            <td class="ut-table__cell ut-table__cell--date">
-                                <?php echo htmlspecialchars($tournament['sdate']); ?>
-                            </td>
-                            <td class="ut-table__cell ut-table__cell--prize">
-                                <?php echo htmlspecialchars($tournament['prizes']); ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                </thead>           
+<tbody>
+    <?php if (!empty($tournaments)): ?>
+        <?php foreach ($tournaments as $tournament): ?>
+        <tr class="ut-row">
+            <td class="ut-table__cell ut-table__cell--first">
+                <div class="ut-image">
+                    <?php if (!empty($tournament['bannerimg'])): ?>
+                        <img src="data:image/jpeg;base64,<?php echo base64_encode($tournament['bannerimg']); ?>" alt="Tournament Banner">
                     <?php else: ?>
-                        <tr>
-                            <td colspan="5">No tournaments found.</td>
-                        </tr>
+                        <img src="./img/dash-logo.png" alt="Default Tournament Banner">
                     <?php endif; ?>
-                </tbody>
+                </div>
+                <div class="ut-info">
+                    <div class="ut-info__name"><?php echo htmlspecialchars($tournament['tname']); ?></div>
+                    <div class="ut-info__host">Hosted by 
+                        <span style="color: #00d696;">
+                            <?php echo htmlspecialchars($tournament['host_username']); ?>
+                        </span>
+                    </div>
+                </div>
+            </td>
+            <td class="ut-table__cell ut-table__cell--game">
+                <?php echo htmlspecialchars($tournament['selected_game']); ?>
+            </td>
+            <td class="ut-table__cell ut-table__cell--brackets">
+                <?php echo htmlspecialchars($tournament['bracket_type']); ?>
+            </td>
+            <td class="ut-table__cell ut-table__cell--date">
+                <?php echo htmlspecialchars($tournament['sdate']); ?>
+            </td>
+            <td class="ut-table__cell ut-table__cell--prize">
+                <?php echo htmlspecialchars($tournament['prizes']); ?>
+            </td>
+            <td class="ut-table__cell">
+                <a href="tournament_details.php?tournament_id=<?php echo $tournament['id']; ?>">
+                    <i class='fa fa-eye ut-row__icon-eye'></i>
+                </a>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="6">No tournaments found.</td>
+        </tr>
+    <?php endif; ?>
+</tbody>
             </table>
         </div>
     </div>

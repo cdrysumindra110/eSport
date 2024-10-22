@@ -7,35 +7,15 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     exit();
 }
 
-if (!isset($_SESSION['user_id'])) {
-    die("Error: User ID not set in session.");
+if (!isset($_GET['tournament_id'])) {
+    die("Error: Tournament ID not provided.");
 }
 
-$user_id = $_SESSION['user_id'];
+$tournament_id = intval($_GET['tournament_id']); // Validate the tournament ID
+$tournament = []; // Initialize an empty array to hold tournament details
 $error_message = '';
 
-// Fetch the username and store it in session if not already set
-if (!isset($_SESSION['uname'])) {
-    $stmt_uname = $conn->prepare("SELECT uname FROM users WHERE id = ?");
-    if ($stmt_uname) {
-        $stmt_uname->bind_param("i", $user_id);
-        $stmt_uname->execute();
-        $stmt_uname->bind_result($uname);
-        if ($stmt_uname->fetch()) {
-            $_SESSION['uname'] = $uname;
-        } else {
-            $error_message = "Error: Username not found for the user ID.";
-        }
-        $stmt_uname->close();
-    } else {
-        $error_message = "Error preparing the username statement: " . $conn->error;
-    }
-}
-
-// Initialize variables to avoid undefined variable warnings
-$selected_game = $sdate = $stime = $bracket_type = $about = $rules = $prizes = $social_media_input = $bannerimg = $tournament_id = null;
-
-// Fetch tournament data for the user
+// Fetch tournament details
 $sql = "SELECT 
             t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
             b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
@@ -44,44 +24,36 @@ $sql = "SELECT
         FROM tournaments t
         LEFT JOIN brackets b ON t.id = b.tournament_id
         LEFT JOIN streams s ON t.id = s.tournament_id
-        WHERE t.user_id = ? 
-        ORDER BY t.id";
+        WHERE t.id = ?"; // Filter by tournament ID
 
 $stmt = $conn->prepare($sql);
 if ($stmt) {
-    $stmt->bind_param("i", $user_id);
+    $stmt->bind_param("i", $tournament_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        while ($tournament = $result->fetch_assoc()) {
-            $selected_game = $tournament['selected_game'];
-            $sdate = $tournament['sdate'];
-            $stime = $tournament['stime'];
-            $bracket_type = $tournament['bracket_type'];
-            $about = $tournament['about'];
-            $rules = $tournament['rules'];
-            $prizes = $tournament['prizes'];
-            $social_media_input = $tournament['social_media_input'];
-            $bannerimg = $tournament['bannerimg'];
-            $tournament_id = $tournament['id'];
+        $tournament = $result->fetch_assoc(); // Fetch the specific tournament details
 
-            // Optional: Debugging line to verify data fetching
-            // echo '<pre>'; print_r($tournament); echo '</pre>';
-        }
+        // Assign variables from the $tournament array
+        $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
+        $sdate = $tournament['sdate'] ?? '';
+        $stime = $tournament['stime'] ?? '';
+        $bracket_type = $tournament['bracket_type'] ?? '';
+        $about = $tournament['about'] ?? '';
+        $rules = $tournament['rules'] ?? '';
+        $prizes = $tournament['prizes'] ?? '';
+        $social_media_input = $tournament['social_media_input'] ?? '';
+        $bannerimg = $tournament['bannerimg'] ?? '';
     } else {
-        $error_message = "No tournament data found.";
+        $error_message = "No tournament found with that ID.";
     }
     $stmt->close();
 } else {
-    $error_message = "Error preparing the tournament statement: " . $conn->error;
+    $error_message = "Error preparing the tournament detail statement: " . $conn->error;
 }
 
 $conn->close();
-
-if ($error_message) {
-    echo $error_message;
-}
 ?>
 
 
@@ -383,7 +355,7 @@ if ($error_message) {
      
     <!-- Popup Message -->
     <div class="popup-message" id="popup-message">
-      
+
     </div><div class="banner-cont">
     <div class="banner-container">
         <div class="banner-img-container">

@@ -452,6 +452,12 @@ function loadProfilePic(event) {
     <?php endif; ?>
     
 </script>
+<script>
+function redirectToDetails(row) {
+    var tournamentId = row.getAttribute('data-id');
+    window.location.href = 'tournament_details.php?tournament_id=' + tournamentId;
+}
+</script>
 
   </body>
 </html>
