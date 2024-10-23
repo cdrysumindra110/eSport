@@ -391,7 +391,7 @@ $conn->close();
         </div>
     </div>
 
-    <div class="tournament-details" id="tournament-details">
+    <div class="tournament-details active" id="tournament-details">
         <div id="details" class="details" onclick="showContent('details')">
             <span class="tour-title">Details</span>
         </div>
@@ -404,17 +404,17 @@ $conn->close();
             <span class="tour-title">Prizes</span>
         </div>
 
-        <div id="schedule" class="schedule" onclick="showContent('schedule')">
-            <span class="tour-title">Schedule</span>
-        </div>
-
         <div id="contact" class="contact" onclick="showContent('contact')">
             <span class="tour-title">Contact</span>
+        </div>
+
+        <div id="schedule" class="schedule" onclick="showContent('schedule')">
+            <span class="tour-title">Participants</span>
         </div>
     </div>
 
     <div class="container-row">
-        <div class="content-container details-container" id="details-container">
+        <div class="content-container details-container active" id="details-container">
             <p class="content-title">Game Name</p>
             <p class="cont-title"><?php echo htmlspecialchars($selected_game); ?></p>
 
@@ -441,14 +441,14 @@ $conn->close();
             <p class="cont-title"><?php echo htmlspecialchars($prizes); ?></p>
         </div>
 
-        <div class="content-container schedule-container" id="schedule-container">
-            <p class="content-title">Match Schedule</p>
-            <p class="cont-title"> </p>
-        </div>
-
         <div class="content-container contact-container" id="contact-container">
             <p class="content-title">Contact Info</p>
             <p class="cont-title"><?php echo htmlspecialchars($social_media_input); ?></p>
+        </div>
+
+        <div class="content-container schedule-container" id="schedule-container">
+            <p class="content-title">Participants</p>
+            <p class="cont-title"> </p>
         </div>
     </div>
 </div>
@@ -580,6 +580,25 @@ document.addEventListener('DOMContentLoaded', function() {
     showPopupMessage("<?php echo $error_message; ?>", 'error');
   <?php endif; ?>
 });
+
+
+function showContent(section) {
+    // Get all tabs and content containers
+    var tabs = document.querySelectorAll('.tournament-details > div');
+    var containers = document.querySelectorAll('.content-container');
+
+    // Remove the 'active' class and hide all containers
+    tabs.forEach(function(tab) {
+        tab.classList.remove('active');
+    });
+    containers.forEach(function(container) {
+        container.style.display = 'none';
+    });
+
+    // Add the 'active' class to the clicked tab and show the corresponding container
+    document.getElementById(section).classList.add('active');
+    document.getElementById(section + '-container').style.display = 'block';
+}
 
 </script>
 

@@ -379,6 +379,7 @@ $conn->close();
                         <li><i class='fa fa-trash'></i> Delete Tournament</li>
                     </ul>
                 </button>
+                <button class="options"><i class='fa fa-share-alt'></i> Share</button>
                 <button class="options"><i class="fas fa-cog"></i> Options</button>
             </div>
         </div>
@@ -391,7 +392,7 @@ $conn->close();
     </div>
 
     <div class="tournament-details" id="tournament-details">
-        <div id="details" class="details" onclick="showContent('details')">
+        <div id="details" class="details active" onclick="showContent('details')">
             <span class="tour-title">Details</span>
         </div>
 
@@ -413,7 +414,7 @@ $conn->close();
     </div>
 
     <div class="container-row">
-        <div class="content-container details-container" id="details-container">
+        <div class="content-container details-container active" id="details-container">
             <p class="content-title">Game Name</p>
             <p class="cont-title"><?php echo htmlspecialchars($selected_game); ?></p>
 
@@ -579,6 +580,26 @@ document.addEventListener('DOMContentLoaded', function() {
     showPopupMessage("<?php echo $error_message; ?>", 'error');
   <?php endif; ?>
 });
+
+
+
+function showContent(section) {
+    // Get all tabs and content containers
+    var tabs = document.querySelectorAll('.tournament-details > div');
+    var containers = document.querySelectorAll('.content-container');
+
+    // Remove the 'active' class and hide all containers
+    tabs.forEach(function(tab) {
+        tab.classList.remove('active');
+    });
+    containers.forEach(function(container) {
+        container.style.display = 'none';
+    });
+
+    // Add the 'active' class to the clicked tab and show the corresponding container
+    document.getElementById(section).classList.add('active');
+    document.getElementById(section + '-container').style.display = 'block';
+}
 
 </script>
 
