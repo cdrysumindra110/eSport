@@ -229,105 +229,180 @@ a {
       </div>
     <div class="container">
         <h2>Tournament Registration</h2>
-        <form id="registration-form">
-            <div id="players">
+        <form id="registration-form" action="registration.php" method="post" enctype="multipart/form-data">
+          <!-- Solo Registration  -->
+          <div id="solo-reg">
+                <div class="form-group">
+                  <label for="solo_name">Player Name:</label>
+                  <input type="text" id="solo_name" name="solo_name" required>
+              </div>
+              
+              <div class="form-group">
+                  <label for="solo_email">Email:</label>
+                  <input type="tel" id="solo_email" name="solo_email" required>
+              </div>
+              
+              <div class="form-group">
+                  <label for="solo_logo">Upload Logo (Optional):</label>
+                  <input type="file" id="solo_logo" name="solo_logo" accept="image/*" onchange="showPreview(event);" required />
+                  <div class="preview">
+                    <img id="bannerimg-preview">
+                  </div>
+              </div>
+          </div>          
+
+          <!-- Duo Registration  -->
+          <div id="duo-reg">
+              <div class="form-group">
+                  <label for="duo_name">Team Name:</label>
+                  <input type="text" id="duo_name" name="duo_name" required>
+              </div>
+              
+              <div class="form-group">
+                  <label for="duo_mentor">Team Mentor:</label>
+                  <input type="text" id="duo_mentor" name="duo_mentor" required>
+              </div>
+              
+              <div class="form-group">
+                  <label for="duo_email">Email:</label>
+                  <input type="tel" id="duo_email" name="duo_email" required>
+              </div>
+              
+              <div class="form-group">
+                  <label for="duo_logo">Upload Team Logo:</label>
+                  <input type="file" id="duo_logo" name="duo_logo" accept="image/*" onchange="showPreview(event);" required />
+                  <div class="preview">
+                    <img id="bannerimg-preview">
+                  </div>
+              </div>
+            </div>
+              
+              <div id="players">
                 <div class="player">
                     <h3>Player 1</h3>
-                    <label for="player1-name">Name:</label>
-                    <input type="text" id="player1-name" name="player1-name" required>
+                    <label for="duop1_name">Name:</label>
+                    <input type="text" id="duop1_name" name="duop1_name" required>
 
-                    <label for="player1-email">Email:</label>
-                    <input type="email" id="player1-email" name="player1-email" required>
+                    <label for="duop1_email">Email:</label>
+                    <input type="email" id="duop1_email" name="duop1_email" required>
 
-                    <label for="player1-role">Role:</label>
-                    <input type="text" id="player1-role" name="player1-role" required>
+                    <label for="duop1_role">Role:</label>
+                    <input type="text" id="duop1_role" name="duop1_role" required>
 
-                    <label for="player1-ign">Player1 IGN:</label>
-                    <input type="text" id="player1-ign" name="player1-ign" required>
+                    <label for="duop1_ign">Player IGN:</label>
+                    <input type="text" id="duop1_ign" name="duop1_ign" required>
                 </div>
                 <div class="player">
                     <h3>Player 2</h3>
-                    <label for="player2-name">Name:</label>
-                    <input type="text" id="player2-name" name="player2-name" required>
+                    <label for="duop2_name">Name:</label>
+                    <input type="text" id="duop2_name" name="duop2_name" required>
 
-                    <label for="player2-email">Email:</label>
-                    <input type="email" id="player2-email" name="player2-email" required>
+                    <label for="duop2_email">Email:</label>
+                    <input type="email" id="duop2_email" name="duop2_email" required>
 
-                    <label for="player2-role">Role:</label>
-                    <input type="text" id="player2-role" name="player2-role" required>
+                    <label for="duop2_role">Role:</label>
+                    <input type="text" id="duop2_role" name="duop2_role" required>
 
-                    <label for="player2-ign">Player2 IGN:</label>
-                    <input type="text" id="player2-ign" name="player2-ign" required>
+                    <label for="duop2_ign">Player IGN:</label>
+                    <input type="text" id="duop2_ign" name="duop2_ign" required>
+                </div>
+              </div>
+          </div>    
+
+          <!-- Squad Registration  -->
+            <div id="sqd-reg">
+                <div class="form-group">
+                  <label for="sqd_name">Team Name:</label>
+                  <input type="text" id="sqd_name" name="sqd_name" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="sqd_captain">Team Mentor:</label>
+                  <input type="text" id="sqd_captain" name="sqd_captain" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="sqd_logo">Upload Team Logo:</label>
+                  <input type="file" id="sqd_logo" name="sqd_logo" accept="image/*">
+              </div>
+
+              <div class="form-group">
+                  <label for="sqd_email">Email:</label>
+                  <input type="tel" id="sqd_email" name="sqd_email" required>
+              </div>
+
+              <div id="players">
+                <div class="player">
+                    <h3>Player 1</h3>
+                    <label for="sqdp1_name">Name:</label>
+                    <input type="text" id="sqdp1_name" name="sqdp1_name" required>
+
+                    <label for="sqdp1_email">Email:</label>
+                    <input type="email" id="sqdp1_email" name="sqdp1_email" required>
+
+                    <label for="sqdp1_role">Role:</label>
+                    <input type="text" id="sqdp1_role" name="sqdp1_role" required>
+
+                    <label for="sqdp1_ign">Player IGN:</label>
+                    <input type="text" id="sqdp1_ign" name="sqdp1_ign" required>
+                </div>
+                <div class="player">
+                    <h3>Player 2</h3>
+                    <label for="sqdp2_name">Name:</label>
+                    <input type="text" id="sqdp2_name" name="sqdp2_name" required>
+
+                    <label for="sqdp2_email">Email:</label>
+                    <input type="email" id="sqdp2_email" name="sqdp2_email" required>
+
+                    <label for="sqdp2_role">Role:</label>
+                    <input type="text" id="sqdp2_role" name="sqdp2_role" required>
+
+                    <label for="sqdp2_ign">Player IGN:</label>
+                    <input type="text" id="sqdp2_ign" name="sqdp2_ign" required>
                 </div>
                 <div class="player">
                     <h3>Player 3</h3>
-                    <label for="player3-name">Name:</label>
-                    <input type="text" id="player3-name" name="player3-name" required>
+                    <label for="sqdp3_name">Name:</label>
+                    <input type="text" id="sqdp3_name" name="sqdp3_name" required>
 
-                    <label for="player3-email">Email:</label>
-                    <input type="email" id="player3-email" name="player3-email" required>
+                    <label for="sqdp3_email">Email:</label>
+                    <input type="email" id="sqdp3_email" name="sqdp3_email" required>
 
-                    <label for="player3-role">Role:</label>
-                    <input type="text" id="player3-role" name="player3-role" required>
+                    <label for="sqdp3_role">Role:</label>
+                    <input type="text" id="sqdp3_role" name="sqdp3_role" required>
 
-                    <label for="player3-ign">Player3 IGN:</label>
-                    <input type="text" id="player3-ign" name="player3-ign" required>
+                    <label for="sqdp3_ign">Player3 IGN:</label>
+                    <input type="text" id="sqdp3_ign" name="sqdp3_ign" required>
                 </div>
                 <div class="player">
                     <h3>Player 4</h3>
-                    <label for="player4-name">Name:</label>
-                    <input type="text" id="player4-name" name="player4-name" required>
+                    <label for="sqdp4_name">Name:</label>
+                    <input type="text" id="sqdp4_name" name="sqdp4_name" required>
 
-                    <label for="player4-email">Email:</label>
-                    <input type="email" id="player4-email" name="player4-email" required>
+                    <label for="sqdp4_email">Email:</label>
+                    <input type="email" id="sqdp4_email" name="sqdp4_email" required>
 
-                    <label for="player4-role">Role:</label>
-                    <input type="text" id="player4-role" name="player4-role" required>
+                    <label for="sqdp4_role">Role:</label>
+                    <input type="text" id="sqdp4_role" name="sqdp4_role" required>
 
-                    <label for="player4-ign">Player4 IGN:</label>
-                    <input type="text" id="player4-ign" name="player4-ign" required>
+                    <label for="sqdp4_ign">Player4 IGN:</label>
+                    <input type="text" id="sqdp4_ign" name="sqdp4_ign" required>
                 </div>
                 <div class="player">
                     <h3>Substitute</h3>
-                    <label for="substitute-name">Name:</label>
-                    <input type="text" id="substitute-name" name="substitute-name">
+                    <label for="substitute_name">Name:</label>
+                    <input type="text" id="substitute_name" name="substitute_name">
 
-                    <label for="substitute-email">Email:</label>
-                    <input type="email" id="substitute-email" name="substitute-email">
+                    <label for="substitute_email">Email:</label>
+                    <input type="email" id="substitute_email" name="substitute_email">
 
-                    <label for="substitute-role">Role:</label>
-                    <input type="text" id="substitute-role" name="substitute-role">
+                    <label for="substitute_role">Role:</label>
+                    <input type="text" id="substitute_role" name="substitute_role">
 
-                    <label for="substitute-ign">substitute IGN:</label>
-                    <input type="text" id="substitute-ign" name="substitute-ign">
+                    <label for="substitute_ign">Substitute IGN:</label>
+                    <input type="text" id="substitute_ign" name="substitute_ign">
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label for="team-name">Team Name:</label>
-                <input type="text" id="team-name" name="team-name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="team-captain">Team Mentor:</label>
-                <input type="text" id="team-captain" name="team-captain" required>
-            </div>
-
-            <div class="form-group">
-                <label for="contact-number">Contact Number:</label>
-                <input type="tel" id="contact-number" name="contact-number" required>
-            </div>
-
-            <div class="form-group">
-                <label for="team-logo">Upload Team Logo:</label>
-                <input type="file" id="team-logo" name="team-logo" accept="image/*">
-            </div>
-
-            <div class="form-group">
-                <label for="agreement">
-                    <input type="checkbox" id="agreement" name="agreement" required>
-                    I agree to the <a href="#terms" target="_blank">Terms and Conditions</a>
-                </label>
+              </div>
             </div>
 
             <button type="submit">Submit Registration</button>

@@ -42,6 +42,7 @@ if ($stmt) {
         $sdate = $tournament['sdate'] ?? '';
         $stime = $tournament['stime'] ?? '';
         $bracket_type = $tournament['bracket_type'] ?? '';
+        $match_type = $tournament['match_type'] ?? '';
         $about = $tournament['about'] ?? '';
         $rules = $tournament['rules'] ?? '';
         $prizes = $tournament['prizes'] ?? '';
@@ -377,7 +378,7 @@ $conn->close();
         <div class="tournament-operation">
             <div class="operation-btn">
                 <button class="organizer-actions">
-                <i class="fas fa-gamepad"></i> Join Tournament
+                <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
                 </button>
                 <button class="options"><i class="fas fa-cog"></i> Options</button>
                 <button class="options"><i class='fa fa-share-alt'></i> Share</button>
@@ -426,6 +427,9 @@ $conn->close();
 
             <p class="content-title">Bracket Type</p>
             <p class="cont-title"><?php echo htmlspecialchars($bracket_type); ?></p>
+
+            <p class="content-title">Match Type</p>
+            <p class="cont-title"><?php echo htmlspecialchars($match_type); ?></p>
 
             <p class="content-title">About Game</p>
             <p class="cont-title"><?php echo htmlspecialchars($about); ?></p>

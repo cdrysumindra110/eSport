@@ -40,6 +40,7 @@ if ($stmt) {
         $sdate = $tournament['sdate'] ?? '';
         $stime = $tournament['stime'] ?? '';
         $bracket_type = $tournament['bracket_type'] ?? '';
+        $match_type = $tournament['match_type'] ?? '';
         $about = $tournament['about'] ?? '';
         $rules = $tournament['rules'] ?? '';
         $prizes = $tournament['prizes'] ?? '';
@@ -426,6 +427,9 @@ $conn->close();
 
             <p class="content-title">Bracket Type</p>
             <p class="cont-title"><?php echo htmlspecialchars($bracket_type); ?></p>
+
+            <p class="content-title">Match Type</p>
+            <p class="cont-title"><?php echo htmlspecialchars($match_type); ?></p>
 
             <p class="content-title">About Game</p>
             <p class="cont-title"><?php echo htmlspecialchars($about); ?></p>
