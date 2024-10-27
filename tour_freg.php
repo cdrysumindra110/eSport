@@ -377,9 +377,10 @@ $conn->close();
     <div class="tournament">
         <div class="tournament-operation">
             <div class="operation-btn">
-                <button class="organizer-actions">
-                <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
-                </button>
+            <button class="organizer-actions" onclick="joinTournament(<?php echo $tournament_id; ?>, '<?php echo htmlspecialchars($selected_game); ?>', '<?php echo htmlspecialchars($sdate); ?>', '<?php echo htmlspecialchars($stime); ?>', '<?php echo htmlspecialchars($match_type); ?>')">
+              <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
+            </button>
+
                 <button class="options"><i class="fas fa-cog"></i> Options</button>
                 <button class="options"><i class='fa fa-share-alt'></i> Share</button>
             </div>
@@ -602,6 +603,16 @@ function showContent(section) {
     // Add the 'active' class to the clicked tab and show the corresponding container
     document.getElementById(section).classList.add('active');
     document.getElementById(section + '-container').style.display = 'block';
+}
+
+function joinTournament(tournamentId, gameName, startDate, startTime, matchType) {
+    try {
+        // Redirect to register.php with tournament details as query parameters
+        window.location.href = `register.php?tournament_id=${tournamentId}&game_name=${encodeURIComponent(gameName)}&sdate=${encodeURIComponent(startDate)}&stime=${encodeURIComponent(startTime)}&match_type=${encodeURIComponent(matchType)}`;
+    } catch (error) {
+        console.error("Error joining the tournament: ", error);
+        alert("An error occurred while trying to join the tournament. Please try again.");
+    }
 }
 
 </script>
