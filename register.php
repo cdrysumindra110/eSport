@@ -21,17 +21,15 @@ if (!$tournament_id || !$match_type) {
     die("Error: Missing tournament ID or match type.");
 }
 
-// Only process form submission if the request is POST
+// Process form submission if request method is POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Fetch the logged-in user ID
+    // Fetch logged-in user ID
     $user_id = $_SESSION['user_id'] ?? null;
     if (!$user_id) {
         die("Error: User ID not set in session.");
     }
 
     // Initialize prepared statements and variables
-    $player_stmt = null;
-
     try {
         // Start a transaction
         $conn->begin_transaction();
@@ -57,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Insert into registration table
         $stmt = $conn->prepare("INSERT INTO registration (tournament_id, user_id, match_type, team_name, mentor_name, email, logo_path) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-        // Set fields based on match type
+        // Bind fields based on match type
         if ($match_type === 'solo') {
             $mentor_name = null;
             $stmt->bind_param("iisssss", $tournament_id, $user_id, $match_type, $_POST['solo_name'], $mentor_name, $_POST['solo_email'], $logo_path);
@@ -118,19 +116,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } finally {
         // Close statements and connection
-        if (isset($stmt)) {
-            $stmt->close();
-        }
-        if ($player_stmt) {
-            $player_stmt->close();
-        }
-        if (isset($conn)) {
-            $conn->close();
-        }
+        $stmt->close();
+        $player_stmt->close();
+        $conn->close();
     }
 }
 
-// Fetch tournament details (run this outside of form submission check to display on page load)
+// Fetch tournament details
 $sql = "SELECT 
             t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
             b.bracket_type, b.match_type, u.uname AS creator_name 
@@ -164,7 +156,7 @@ if ($stmt) {
 } else {
     $error_message = "Error preparing the tournament detail statement: " . $conn->error;
 }
-?> 
+?>
 
 
 
@@ -561,7 +553,11 @@ button {
                     <input type="email" id="solo_email" name="solo_email" required>
                 </div>
                 <div class="form-group">
-                    <label for="solo_logo">Upload Logo:</label>
+                    <label for="solo_ign">Player IGN:</label>
+                    <input type="text" id="solo_ign" name="solo_ign" required>
+                </div>
+                <div class="form-group">
+                    <label for="solo_logo">Upload Logo(Optional):</label>
                     <input type="file" id="solo_logo" name="logo">
                 </div>
             </div>
@@ -585,16 +581,17 @@ button {
                 
                 <div id="players">
                     <div class="player">
+                    <h3>Player 1</h3>
                         <div class="form-group">
-                            <label for="duop1_name">Player Name:</label>
+                            <label for="duop1_name">Name:</label>
                             <input type="text" id="duop1_name" name="duop1_name" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop1_email">Player Email:</label>
+                            <label for="duop1_email">Email:</label>
                             <input type="email" id="duop1_email" name="duop1_email" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop1_role">Player Role:</label>
+                            <label for="duop1_role">Role:</label>
                             <input type="text" id="duop1_role" name="duop1_role">
                         </div>
                         <div class="form-group">
@@ -604,15 +601,16 @@ button {
                     </div>
                     <div class="player">
                         <div class="form-group">
-                            <label for="duop2_name">Player Name:</label>
+                        <h3>Player 2</h3>
+                            <label for="duop2_name">Name:</label>
                             <input type="text" id="duop2_name" name="duop2_name" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop2_email">Player Email:</label>
+                            <label for="duop2_email">Email:</label>
                             <input type="email" id="duop2_email" name="duop2_email" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop2_role">Player Role:</label>
+                            <label for="duop2_role">Role:</label>
                             <input type="text" id="duop2_role" name="duop2_role">
                         </div>
                         <div class="form-group">
@@ -636,7 +634,7 @@ button {
                     <input type="text" id="sqd_name" name="sqd_name" required>
                 </div>
                 <div class="form-group">
-                    <label for="sqd_captain">Captain Name:</label>
+                    <label for="sqd_captain">Mentor Name:</label>
                     <input type="text" id="sqd_captain" name="sqd_captain" required>
                 </div>
                 <div class="form-group">
@@ -718,17 +716,10 @@ button {
               </div>
         <?php endif; ?>
 
-        <input type="hidden" name="match_type" value="<?= htmlspecialchars($match_type) ?>">
+        <input type="hidden" name="match_type" value="<?= htmlsp ecialchars($match_type) ?>">
         <input type="hidden" name="tournament_id" value="<?= htmlspecialchars($tournament_id) ?>">
         <button type="submit">Register</button>
     </form>
-
-    <?php if (!empty($error_message)): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error_message) ?></div>
-    <?php endif; ?>
-    <?php if (!empty($success_message)): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($success_message) ?></div>
-    <?php endif; ?>
 </div>
 
     
