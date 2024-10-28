@@ -39,6 +39,7 @@ if ($stmt) {
 
         // Assign variables from the $tournament array
         $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
+        $tname = $tournament['tname'] ?? 'Unknown Game';
         $sdate = $tournament['sdate'] ?? '';
         $stime = $tournament['stime'] ?? '';
         $bracket_type = $tournament['bracket_type'] ?? '';

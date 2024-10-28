@@ -150,6 +150,7 @@ if ($stmt) {
 
         // Assign variables from the $tournament array
         $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
+        $tname = $tournament['tname'] ?? 'Unknown Game';
         $sdate = $tournament['sdate'] ?? '';
         $stime = $tournament['stime'] ?? '';
         $match_type = $tournament['match_type'] ?? '';
@@ -526,7 +527,7 @@ button {
 <div class="tournament-reg_container">
     <div class="content">
         <h1>GET READY FOR THE ULTIMATE eSPORTS TOURNAMENT</h1>
-        <h2><?php echo htmlspecialchars($selected_game); ?></h2>
+        <h2><?php echo htmlspecialchars($tname); ?></h2>
         <h3>THE WORLD OF COMPETITIVE GAMING</h3>
         <br>
         <h2>JOIN US FOR THIS EXCLUSIVE LIVE EVENT</h2>
@@ -582,40 +583,40 @@ button {
                     <input type="email" id="duo_email" name="duo_email" required>
                 </div>
                 
-                <div class="players">
+                <div id="players">
                     <div class="player">
                         <div class="form-group">
-                            <label for="duop1_name">Player 1 Name:</label>
+                            <label for="duop1_name">Player Name:</label>
                             <input type="text" id="duop1_name" name="duop1_name" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop1_email">Player 1 Email:</label>
+                            <label for="duop1_email">Player Email:</label>
                             <input type="email" id="duop1_email" name="duop1_email" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop1_role">Player 1 Role:</label>
+                            <label for="duop1_role">Player Role:</label>
                             <input type="text" id="duop1_role" name="duop1_role">
                         </div>
                         <div class="form-group">
-                            <label for="duop1_ign">Player 1 IGN:</label>
+                            <label for="duop1_ign">Player IGN:</label>
                             <input type="text" id="duop1_ign" name="duop1_ign">
                         </div>
                     </div>
                     <div class="player">
                         <div class="form-group">
-                            <label for="duop2_name">Player 2 Name:</label>
+                            <label for="duop2_name">Player Name:</label>
                             <input type="text" id="duop2_name" name="duop2_name" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop2_email">Player 2 Email:</label>
+                            <label for="duop2_email">Player Email:</label>
                             <input type="email" id="duop2_email" name="duop2_email" required>
                         </div>
                         <div class="form-group">
-                            <label for="duop2_role">Player 2 Role:</label>
+                            <label for="duop2_role">Player Role:</label>
                             <input type="text" id="duop2_role" name="duop2_role">
                         </div>
                         <div class="form-group">
-                            <label for="duop2_ign">Player 2 IGN:</label>
+                            <label for="duop2_ign">Player IGN:</label>
                             <input type="text" id="duop2_ign" name="duop2_ign">
                         </div>
                     </div>
@@ -642,46 +643,79 @@ button {
                     <label for="sqd_email">Email:</label>
                     <input type="email" id="sqd_email" name="sqd_email" required>
                 </div>
-                <!-- Player details -->
-                <?php for ($i = 1; $i <= 5; $i++): ?>
-                <div class="form-group">
-                    <label for="sqdp<?= $i ?>_name">Player <?= $i ?> Name:</label>
-                    <input type="text" id="sqdp<?= $i ?>_name" name="sqdp<?= $i ?>_name" required>
+
+                <div id="players">
+                <div class="player">
+                    <h3>Player</h3>
+                    <label for="sqdp1_name">Name:</label>
+                    <input type="text" id="sqdp1_name" name="sqdp1_name" required>
+
+                    <label for="sqdp1_email">Email:</label>
+                    <input type="email" id="sqdp1_email" name="sqdp1_email" required>
+
+                    <label for="sqdp1_role">Role:</label>
+                    <input type="text" id="sqdp1_role" name="sqdp1_role" required>
+
+                    <label for="sqdp1_ign">Player IGN:</label>
+                    <input type="text" id="sqdp1_ign" name="sqdp1_ign" required>
                 </div>
-                <div class="form-group">
-                    <label for="sqdp<?= $i ?>_email">Player <?= $i ?> Email:</label>
-                    <input type="email" id="sqdp<?= $i ?>_email" name="sqdp<?= $i ?>_email" required>
+                <div class="player">
+                    <h3>Player</h3>
+                    <label for="sqdp2_name">Name:</label>
+                    <input type="text" id="sqdp2_name" name="sqdp2_name" required>
+
+                    <label for="sqdp2_email">Email:</label>
+                    <input type="email" id="sqdp2_email" name="sqdp2_email" required>
+
+                    <label for="sqdp2_role">Role:</label>
+                    <input type="text" id="sqdp2_role" name="sqdp2_role" required>
+
+                    <label for="sqdp2_ign">Player IGN:</label>
+                    <input type="text" id="sqdp2_ign" name="sqdp2_ign" required>
                 </div>
-                <div class="form-group">
-                    <label for="sqdp<?= $i ?>_role">Player <?= $i ?> Role:</label>
-                    <input type="text" id="sqdp<?= $i ?>_role" name="sqdp<?= $i ?>_role">
+                <div class="player">
+                    <h3>Player 3</h3>
+                    <label for="sqdp3_name">Name:</label>
+                    <input type="text" id="sqdp3_name" name="sqdp3_name" required>
+
+                    <label for="sqdp3_email">Email:</label>
+                    <input type="email" id="sqdp3_email" name="sqdp3_email" required>
+
+                    <label for="sqdp3_role">Role:</label>
+                    <input type="text" id="sqdp3_role" name="sqdp3_role" required>
+
+                    <label for="sqdp3_ign">Player IGN:</label>
+                    <input type="text" id="sqdp3_ign" name="sqdp3_ign" required>
                 </div>
-                <div class="form-group">
-                    <label for="sqdp<?= $i ?>_ign">Player <?= $i ?> IGN:</label>
-                    <input type="text" id="sqdp<?= $i ?>_ign" name="sqdp<?= $i ?>_ign">
+                <div class="player">
+                    <h3>Player 4</h3>
+                    <label for="sqdp4_name">Name:</label>
+                    <input type="text" id="sqdp4_name" name="sqdp4_name" required>
+
+                    <label for="sqdp4_email">Email:</label>
+                    <input type="email" id="sqdp4_email" name="sqdp4_email" required>
+
+                    <label for="sqdp4_role">Role:</label>
+                    <input type="text" id="sqdp4_role" name="sqdp4_role" required>
+
+                    <label for="sqdp4_ign">Player IGN:</label>
+                    <input type="text" id="sqdp4_ign" name="sqdp4_ign" required>
                 </div>
-                <?php endfor; ?>
-                <div class="form-group">
-                    <label for="sqdsb_name">Substitute Player Name:</label>
+                <div class="player">
+                    <h3>Substitute</h3>
+                    <label for="sqdsb_name">Name:</label>
                     <input type="text" id="sqdsb_name" name="sqdsb_name">
-                </div>
-                <div class="form-group">
-                    <label for="sqdsb_email">Substitute Player Email:</label>
+
+                    <label for="sqdsb_email">Email:</label>
                     <input type="email" id="sqdsb_email" name="sqdsb_email">
-                </div>
-                <div class="form-group">
-                    <label for="sqdsb_role">Substitute Player Role:</label>
+
+                    <label for="sqdsb_role">Role:</label>
                     <input type="text" id="sqdsb_role" name="sqdsb_role">
-                </div>
-                <div class="form-group">
-                    <label for="sqdsb_ign">Substitute Player IGN:</label>
+
+                    <label for="sqdsb_ign">Substitute IGN:</label>
                     <input type="text" id="sqdsb_ign" name="sqdsb_ign">
                 </div>
-                <div class="form-group">
-                    <label for="sqd_logo">Upload Logo:</label>
-                    <input type="file" id="sqd_logo" name="logo">
-                </div>
-            </div>
+              </div>
         <?php endif; ?>
 
         <input type="hidden" name="match_type" value="<?= htmlspecialchars($match_type) ?>">
