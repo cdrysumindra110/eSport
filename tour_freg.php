@@ -14,7 +14,7 @@ if (!isset($_GET['tournament_id'])) {
 $tournament_id = intval($_GET['tournament_id']);
 $tournament = [];
 $error_message = '';
-
+$slots_full_message = ''; // Variable to hold the slots full message
 
 // Fetch tournament details including creator name
 $sql = "SELECT 
@@ -51,6 +51,55 @@ if ($stmt) {
         $social_media_input = $tournament['social_media_input'] ?? '';
         $bannerimg = $tournament['bannerimg'] ?? '';
         $creator_name = $tournament['creator_name'] ?? 'Unknown Creator'; // Get creator's name
+
+        // Initialize registered count variable
+        $registered_count = 0;
+
+        // Calculate registered teams/players based on match type
+        if ($match_type == 'solo') {
+            $sql = "SELECT COUNT(*) AS registered FROM solo_registration WHERE tournament_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $tournament_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $registered_count = $row['registered']; // Number of solo players registered
+            $total_teams = $tournament['solo_players']; // Total players allowed for solo
+            $registration_message = "Players Registered"; // Message for solo
+        } elseif ($match_type == 'duo') {
+            $sql = "SELECT COUNT(*) AS registered FROM duo_registration WHERE tournament_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $tournament_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $registered_count = $row['registered']; // Number of duo teams registered
+            $total_teams = $tournament['duo_teams']; // Total teams allowed for duo
+            $registration_message = "Teams Registered"; // Message for duo
+        } elseif ($match_type == 'squad') {
+            $sql = "SELECT COUNT(*) AS registered FROM squad_registration WHERE tournament_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $tournament_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $registered_count = $row['registered']; // Number of squad teams registered
+            $total_teams = $tournament['squad_teams']; // Total teams allowed for squad
+            $registration_message = "Teams Registered"; // Message for squad
+        } else {
+            $registered_count = 0; // Default to 0 if the match type is invalid
+            $total_teams = 0; // Default total to 0
+            $registration_message = "Unknown Registration Type"; // Default message
+        }
+
+        // Check if the slots are full
+        if ($registered_count >= $total_teams) {
+            $slots_full_message = "Slots Full"; // Show this message if slots are full
+        }
+
+        // Display the teams/players-registered message
+        $teams_registered_message = "$registered_count / $total_teams $registration_message";
+
     } else {
         $error_message = "No tournament found with that ID.";
     }
@@ -61,6 +110,8 @@ if ($stmt) {
 
 $conn->close();
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -221,6 +272,14 @@ $conn->close();
     font-size: 24px;
 }
 
+
+.teams-registered {
+    font-size: 20px; /* You can adjust the font size as needed */
+    color: #fff; /* Set the color to white for contrast */
+    margin-top: 15px; /* Add some space above the text */
+    font-weight: bold; /* Make the text stand out more */
+    text-align: center; /* Center the text horizontally */
+}
 .tournament-details {
     display: flex;
     justify-content: space-around; /* Spreads the items evenly */
@@ -298,6 +357,10 @@ $conn->close();
   padding:10px 5px;
   border-bottom: 0.5px solid grey;
 }
+
+
+
+
     </style>
   </head>
 
@@ -393,6 +456,9 @@ $conn->close();
             Tournament By:
             <p class="titlename"><?php echo htmlspecialchars($creator_name); ?></p>
         </div>
+        
+        <p class="teams-registered"><?php echo $teams_registered_message; ?></p>
+
     </div>
 
     <div class="tournament-details active" id="tournament-details">

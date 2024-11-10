@@ -470,6 +470,7 @@ button {
     opacity: 0;     /* Ensure it's fully invisible */
     pointer-events: none;  /* Prevent clicks when hidden */
     visibility: hidden;    /* Ensure visibility is set to hidden */
+    margin-top: 20px;
 }
 
 #reg-btn:hover {
@@ -484,6 +485,21 @@ button {
 /* For smooth transition */
 .hidden {
     display: none !important;
+}
+
+/* Add margin-bottom to the last input or div element before the submit button */
+form > div:last-child {
+    margin-bottom: 10px; /* Adjust this value for more or less gap */
+}
+
+/* Optionally, add some space directly to the submit button */
+button[type="submit"] {
+    margin-top: 10px; /* Adjust this value for desired space between the form and button */
+}
+
+/* Optional: add space between form fields */
+form > div {
+    margin-bottom: 7px; /* Adds gap between form fields if needed */
 }
 
     </style>
