@@ -376,7 +376,9 @@ $conn->close();
                 <button class="organizer-actions">
                     <i class='fa fa-gears'></i> Organizer Actions
                     <ul class="dropdown-menu">
+                    <a href="edit_tour.php?tournament_id=<?php echo urlencode($tournament_id); ?>">
                         <li><i class='fa fa-edit'></i> Edit Tournament</li>
+                    </a>
                         <li><i class='fa fa-trash'></i> Delete Tournament</li>
                     </ul>
                 </button>

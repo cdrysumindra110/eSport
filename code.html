@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Registration Form</title>
+    <style>
+        /* General Styles for Form */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        form {
+            width: 80%;
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        fieldset {
+            display: none;
+        }
+
+        fieldset:first-of-type {
+            display: block;
+        }
+
+        .progress {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 10px;
+            background-color: #4caf50;
+        }
+
+        .form-card {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 8px 0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="file"],
+        select,
+        textarea,
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        input[type="button"],
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="button"]:hover,
+        input[type="submit"]:hover {
+            background-color: #4b00b3;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 5px;
+        }
+
+        .match-container {
+            margin-top: 10px;
+        }
+
+        #progressbar {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #progressbar li {
+            width: 24%;
+            text-align: center;
+            padding: 8px;
+            background-color: #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #progressbar li.active {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .steps {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<form id="msform" action="register_players.php" method="post" enctype="multipart/form-data">
+    <!-- Progress Bar -->
+    <ul id="progressbar">
+        <li class="active" id="step1"><strong>Player Info</strong></li>
+        <li id="step2"><strong>Team Info</strong></li>
+        <li id="step3"><strong>Match Details</strong></li>
+        <li id="step4"><strong>Review</strong></li>
+    </ul>
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+
+    <!-- Fieldsets -->
+    <fieldset id="step1-form">
+        <div class="form-card">
+            <h2>Player Information</h2>
+            <label for="player_name">Player Name</label>
+            <input type="text" id="player_name" name="player_name" placeholder="Enter Player Name" required>
+
+            <label for="player_email">Email</label>
+            <input type="email" id="player_email" name="player_email" placeholder="Enter Email" required>
+
+            <label for="player_contact">Contact Number</label>
+            <input type="tel" id="player_contact" name="player_contact" placeholder="Enter Contact Number" required>
+
+            <label for="player_image">Upload Profile Image</label>
+            <input type="file" id="player_image" name="player_image" accept="image/*" onchange="showPreview(event);" required>
+
+            <div class="preview">
+                <img id="player_image-preview" alt="Profile Image Preview">
+            </div>
+
+            <input type="button" name="next" class="next action-button" value="Next" onclick="nextStep()">
+        </div>
+    </fieldset>
+
+    <fieldset id="step2-form">
+        <div class="form-card">
+            <h2>Team Information</h2>
+            <label for="team_name">Team Name</label>
+            <input type="text" id="team_name" name="team_name" placeholder="Enter Team Name" required>
+
+            <!-- Match Type Selection -->
+            <label for="match_type">Match Type</label>
+            <select id="match_type" name="match_type" onchange="handleMatchTypeChange()" required>
+                <option value="solo">Solo</option>
+                <option value="duo">Duo</option>
+                <option value="squad">Squad</option>
+            </select>
+
+            <!-- Solo Player Count -->
+            <div id="solo-container" class="match-container" style="display: none;">
+                <label for="solo_players">Number of Solo Players</label>
+                <input type="number" id="solo_players" name="solo_players" placeholder="Enter Number of Players" required>
+            </div>
+
+            <!-- Duo Player Count -->
+            <div id="duo-container" class="match-container" style="display: none;">
+                <label for="duo_players">Number of Players per Duo</label>
+                <input type="number" id="duo_players" name="duo_players" placeholder="Enter Number of Players per Duo" required>
+            </div>
+
+            <!-- Squad Player Count -->
+            <div id="squad-container" class="match-container" style="display: none;">
+                <label for="squad_players">Number of Players per Squad</label>
+                <input type="number" id="squad_players" name="squad_players" placeholder="Enter Number of Players per Squad" required>
+            </div>
+
+            <input type="button" name="next" class="next action-button" value="Next" onclick="nextStep()">
+            <input type="button" name="previous" class="previous action-button-previous" value="Previous" onclick="prevStep()">
+        </div>
+    </fieldset>
+
+    <fieldset id="step3-form">
+        <div class="form-card">
+            <h2>Match Details</h2>
+            <label for="rounds">Number of Rounds</label>
+            <select id="rounds" name="rounds" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+
+            <label for="advancement">Advancement</label>
+            <select id="advancement" name="advancement" required>
+                <option value="random">Random</option>
+                <option value="elimination">Elimination</option>
+            </select>
+
+            <input type="button" name="next" class="next action-button" value="Next" onclick="nextStep()">
+            <input type="button" name="previous" class="previous action-button-previous" value="Previous" onclick="prevStep()">
+        </div>
+    </fieldset>
+
+    <fieldset id="step4-form">
+        <div class="form-card">
+            <h2>Review</h2>
+            <p>Review your team and match details here.</p>
+            <input type="submit" name="submit" class="submit action-button" value="Submit">
+            <input type="button" name="previous" class="previous action-button-previous" value="Previous" onclick="prevStep()">
+        </div>
+    </fieldset>
+</form>
+
+<script>
+    // Function to move to the next step
+    function nextStep() {
+        const currentStep = document.querySelector('fieldset:visible');
+        const nextStep = currentStep.nextElementSibling;
+
+        currentStep.style.display = 'none';
+        nextStep.style.display = 'block';
+
+        // Update progress bar
+        updateProgressBar();
+    }
+
+    // Function to move to the previous step
+    function prevStep() {
+        const currentStep = document.querySelector('fieldset:visible');
+        const prevStep = currentStep.previousElementSibling;
+
+        currentStep.style.display = 'none';
+        prevStep.style.display = 'block';
+
+        // Update progress bar
+        updateProgressBar();
+    }
+
+    // Update the progress bar
+    function updateProgressBar() {
+        const visibleStepIndex = [...document.querySelectorAll('fieldset')].indexOf(document.querySelector('fieldset:visible'));
+        const progress = (visibleStepIndex / (document.querySelectorAll('fieldset').length - 1)) * 100;
+        document.querySelector('.progress-bar').style.width = progress + '%';
+
+        // Update progress bar steps
+        const steps = document.querySelectorAll('#progressbar li');
+        steps.forEach((step, index) => {
+            if (index <= visibleStepIndex) {
+                step.classList.add('active');
+            } else {
+                step.classList.remove('active');
+            }
+        });
+    }
+
+    // Handle match type change and adjust inputs
+    function handleMatchTypeChange() {
+        const matchType = document.getElementById('match_type').value;
+
+        document.getElementById('solo-container').style.display = 'none';
+        document.getElementById('duo-container').style.display = 'none';
+        document.getElementById('squad-container').style.display = 'none';
+
+        if (matchType === 'solo') {
+            document.getElementById('solo-container').style.display = 'block';
+        } else if (matchType === 'duo') {
+            document.getElementById('duo-container').style.display = 'block';
+        } else if (matchType === 'squad') {
+            document.getElementById('squad-container').style.display = 'block';
+        }
+    }
+
+    // Show image preview
+    function showPreview(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById('player_image-preview').src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+
+</body>
+</html>

@@ -119,10 +119,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 
-
-
-
-
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -671,9 +667,8 @@ document.addEventListener('DOMContentLoaded', function() {
     showPopupMessage("<?php echo $error_message; ?>", 'error');
   <?php endif; ?>
 });
-
-
 </script>
+
 <!-- Accordian jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>

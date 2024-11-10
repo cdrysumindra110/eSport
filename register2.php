@@ -56,117 +56,128 @@ if ($stmt) {
     $error_message = "Error preparing the tournament detail statement: " . $conn->error;
 }
 
-
-$match_type = isset($_GET['match_type']) ? $_GET['match_type'] : 'solo'; // Default to 'solo' if not provided
 // Handle form data when the form is submitted via POST
 
-// Check if the form is submitted via POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve form data
-    $tournament_id = $_POST['tournament_id'];
-    $match_type = $_POST['match_type'];
+    // Get the tournament ID and match type from the form data
+    $tournament_id = isset($_POST['tournament_id']) ? $_POST['tournament_id'] : null;
+    $match_type = isset($_POST['match_type']) ? $_POST['match_type'] : null;
 
-    try {
-        // Handle solo registration
-        if ($match_type == "solo") {
-            $player_name = $_POST['solo_name'];
-            $email = $_POST['solo_email'];
-            $ign = $_POST['solo_ign'];
-            $logo_path = uploadFile('solo_logo');
-
-            $sql = "INSERT INTO solo_registration (tournament_id, player_name, email, ign, logo_path)
-                    VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issss", $tournament_id, $player_name, $email, $ign, $logo_path);
-            $stmt->execute();
-            $stmt->close();
-            $success_message = "Solo registration successful.";
-
-        // Handle duo registration
-        } elseif ($match_type == "duo") {
-            $team_name = $_POST['duo_name'];
-            $mentor_name = $_POST['duo_mentor'];
-            $email = $_POST['duo_email'];
-            $logo_path = uploadFile('duo_logo');
-
-            $sql = "INSERT INTO duo_registration (tournament_id, team_name, mentor_name, email, logo_path)
-                    VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issss", $tournament_id, $team_name, $mentor_name, $email, $logo_path);
-            $stmt->execute();
-            
-            $duo_id = $stmt->insert_id;
-            $stmt->close();
-
-            // Insert players for duo match type
-            $players = [
-                ['name' => $_POST['duop1_name'], 'email' => $_POST['duop1_email'], 'role' => $_POST['duop1_role'], 'ign' => $_POST['duop1_ign']],
-                ['name' => $_POST['duop2_name'], 'email' => $_POST['duop2_email'], 'role' => $_POST['duop2_role'], 'ign' => $_POST['duop2_ign']]
-            ];
-
-            foreach ($players as $player) {
-                $sql = "INSERT INTO duo_players (duo_id, name, email, role, ign) VALUES (?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issss", $duo_id, $player['name'], $player['email'], $player['role'], $player['ign']);
-                $stmt->execute();
-                $stmt->close();
-            }
-            $success_message = "Duo registration successful.";
-
-        // Handle squad registration
-        } elseif ($match_type == "squad") {
-            $team_name = $_POST['sqd_name'];
-            $mentor_name = $_POST['sqd_mentor'];
-            $email = $_POST['sqd_email'];
-            $logo_path = uploadFile('sqd_logo');
-
-            $sql = "INSERT INTO squad_registration (tournament_id, team_name, mentor_name, email, logo_path)
-                    VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issss", $tournament_id, $team_name, $mentor_name, $email, $logo_path);
-            $stmt->execute();
-
-            $squad_id = $stmt->insert_id;
-            $stmt->close();
-
-            // Insert players for squad match type
-            $players = [
-                ['name' => $_POST['sqdp1_name'], 'email' => $_POST['sqdp1_email'], 'role' => $_POST['sqdp1_role'], 'ign' => $_POST['sqdp1_ign']],
-                ['name' => $_POST['sqdp2_name'], 'email' => $_POST['sqdp2_email'], 'role' => $_POST['sqdp2_role'], 'ign' => $_POST['sqdp2_ign']],
-                ['name' => $_POST['sqdp3_name'], 'email' => $_POST['sqdp3_email'], 'role' => $_POST['sqdp3_role'], 'ign' => $_POST['sqdp3_ign']],
-                ['name' => $_POST['sqdp4_name'], 'email' => $_POST['sqdp4_email'], 'role' => $_POST['sqdp4_role'], 'ign' => $_POST['sqdp4_ign']],
-                ['name' => $_POST['sqdsb_name'], 'email' => $_POST['sqdsb_email'], 'role' => $_POST['sqdsb_role'], 'ign' => $_POST['sqdsb_ign']]
-            ];
-
-            foreach ($players as $player) {
-                $sql = "INSERT INTO squad_players (squad_id, name, email, role, ign) VALUES (?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issss", $squad_id, $player['name'], $player['email'], $player['role'], $player['ign']);
-                $stmt->execute();
-                $stmt->close();
-            }
-            $success_message = "Squad registration successful.";
-        }
-
-        // Redirect to success page if no errors occurred
-        header("Location: success.php");
-        exit;
-
-    } catch (Exception $e) {
-        $error_message = "Registration failed: " . $e->getMessage();
+    // Ensure both are set
+    if (!$tournament_id || !$match_type) {
+        die("Error: Missing tournament ID or match type.");
     }
-}
 
-// Function to handle file upload
-function uploadFile($input_name) {
-    if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] == 0) {
+    // Validate if the tournament exists in the tournaments table
+    $sql_check_tournament = "SELECT id FROM tournaments WHERE id = '$tournament_id'";
+    $result = $conn->query($sql_check_tournament);
+    if ($result->num_rows == 0) {
+        die("Tournament ID is invalid.");
+    }
+
+    // Initialize variables for form data
+    if ($match_type === 'solo') {
+        $team_name = isset($_POST['solo_name']) ? $_POST['solo_name'] : null;
+        $mentor_name = null; // Solo has no mentor
+        $email = isset($_POST['solo_email']) ? $_POST['solo_email'] : null;
+        $logo_file = isset($_FILES['solo_logo']['name']) ? $_FILES['solo_logo']['name'] : null;
+    } elseif ($match_type === 'duo') {
+        $team_name = isset($_POST['duo_name']) ? $_POST['duo_name'] : null;
+        $mentor_name = isset($_POST['duo_mentor']) ? $_POST['duo_mentor'] : null;
+        $email = isset($_POST['duo_email']) ? $_POST['duo_email'] : null;
+        $logo_file = isset($_FILES['duo_logo']['name']) ? $_FILES['duo_logo']['name'] : null;
+    } elseif ($match_type === 'squad') {
+        $team_name = isset($_POST['sqd_name']) ? $_POST['sqd_name'] : null;
+        $mentor_name = isset($_POST['sqd_mentor']) ? $_POST['sqd_mentor'] : null;
+        $email = isset($_POST['sqd_email']) ? $_POST['sqd_email'] : null;
+        $logo_file = isset($_FILES['sqd_logo']['name']) ? $_FILES['sqd_logo']['name'] : null;
+    } else {
+        die("Invalid match type.");
+    }
+
+    // Handle file upload for logo
+    if ($logo_file) {
         $target_dir = "uploads/";
-        $file_path = $target_dir . basename($_FILES[$input_name]["name"]);
-        if (move_uploaded_file($_FILES[$input_name]["tmp_name"], $file_path)) {
-            return $file_path;
+        $target_file = $target_dir . basename($logo_file);
+        if (!move_uploaded_file($_FILES['solo_logo']['tmp_name'], $target_file)) {
+            echo "Sorry, there was an error uploading the file.";
         }
     }
-    return null;
+
+    // Insert into the registrations table
+    $sql_registration = "INSERT INTO registrations (tournament_id, match_type, team_name, mentor_name, email, logo_file)
+                         VALUES ('$tournament_id', '$match_type', '$team_name', '$mentor_name', '$email', '$logo_file')";
+
+    if ($conn->query($sql_registration) === TRUE) {
+        // Get the last inserted registration ID
+        $registration_id = $conn->insert_id;
+
+        // Insert players based on match type
+        if ($match_type === 'solo') {
+            $solo_name = isset($_POST['solo_name']) ? $_POST['solo_name'] : null;
+            $solo_email = isset($_POST['solo_email']) ? $_POST['solo_email'] : null;
+            $solo_ign = isset($_POST['solo_ign']) ? $_POST['solo_ign'] : null;
+
+            // Insert the solo player into the players table
+            $sql_player = "INSERT INTO players (registration_id, player_name, email, ign, match_type) 
+                           VALUES ('$registration_id', '$solo_name', '$solo_email', '$solo_ign', 'solo')";
+            $conn->query($sql_player);
+        } elseif ($match_type === 'duo') {
+            // Insert Player 1
+            $duop1_name = isset($_POST['duop1_name']) ? $_POST['duop1_name'] : null;
+            $duop1_email = isset($_POST['duop1_email']) ? $_POST['duop1_email'] : null;
+            $duop1_ign = isset($_POST['duop1_ign']) ? $_POST['duop1_ign'] : null;
+
+            $sql_player1 = "INSERT INTO players (registration_id, player_name, email, ign, match_type) 
+                            VALUES ('$registration_id', '$duop1_name', '$duop1_email', '$duop1_ign', 'duo')";
+            $conn->query($sql_player1);
+
+            // Insert Player 2
+            $duop2_name = isset($_POST['duop2_name']) ? $_POST['duop2_name'] : null;
+            $duop2_email = isset($_POST['duop2_email']) ? $_POST['duop2_email'] : null;
+            $duop2_ign = isset($_POST['duop2_ign']) ? $_POST['duop2_ign'] : null;
+
+            $sql_player2 = "INSERT INTO players (registration_id, player_name, email, ign, match_type) 
+                            VALUES ('$registration_id', '$duop2_name', '$duop2_email', '$duop2_ign', 'duo')";
+            $conn->query($sql_player2);
+        } elseif ($match_type === 'squad') {
+            // Insert Player 1
+            $sqdp1_name = isset($_POST['sqdp1_name']) ? $_POST['sqdp1_name'] : null;
+            $sqdp1_email = isset($_POST['sqdp1_email']) ? $_POST['sqdp1_email'] : null;
+            $sqdp1_ign = isset($_POST['sqdp1_ign']) ? $_POST['sqdp1_ign'] : null;
+            $sqdp1_role = isset($_POST['sqdp1_role']) ? $_POST['sqdp1_role'] : null;
+
+            $sql_player1 = "INSERT INTO players (registration_id, player_name, email, ign, role, match_type) 
+                            VALUES ('$registration_id', '$sqdp1_name', '$sqdp1_email', '$sqdp1_ign', '$sqdp1_role', 'squad')";
+            $conn->query($sql_player1);
+
+            // Insert Player 2
+            $sqdp2_name = isset($_POST['sqdp2_name']) ? $_POST['sqdp2_name'] : null;
+            $sqdp2_email = isset($_POST['sqdp2_email']) ? $_POST['sqdp2_email'] : null;
+            $sqdp2_ign = isset($_POST['sqdp2_ign']) ? $_POST['sqdp2_ign'] : null;
+            $sqdp2_role = isset($_POST['sqdp2_role']) ? $_POST['sqdp2_role'] : null;
+
+            $sql_player2 = "INSERT INTO players (registration_id, player_name, email, ign, role, match_type) 
+                            VALUES ('$registration_id', '$sqdp2_name', '$sqdp2_email', '$sqdp2_ign', '$sqdp2_role', 'squad')";
+            $conn->query($sql_player2);
+
+            // Insert Player 3
+            $sqdp3_name = isset($_POST['sqdp3_name']) ? $_POST['sqdp3_name'] : null;
+            $sqdp3_email = isset($_POST['sqdp3_email']) ? $_POST['sqdp3_email'] : null;
+            $sqdp3_ign = isset($_POST['sqdp3_ign']) ? $_POST['sqdp3_ign'] : null;
+            $sqdp3_role = isset($_POST['sqdp3_role']) ? $_POST['sqdp3_role'] : null;
+
+            $sql_player3 = "INSERT INTO players (registration_id, player_name, email, ign, role, match_type) 
+                            VALUES ('$registration_id', '$sqdp3_name', '$sqdp3_email', '$sqdp3_ign', '$sqdp3_role', 'squad')";
+            $conn->query($sql_player3);
+        }
+
+        // Redirect to success.php after successful registration
+        header("Location: success.php");
+        exit();
+    } else {
+        $error_message = "Error registering for the tournament: " . $conn->error;
+    }
 }
 
 // Close the database connection
@@ -456,36 +467,9 @@ button {
     transition: all 0.3s ease;
 }
 
-/* Button Styles for Registration */
-#reg-btn {
-    background-color: #6200ea;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    display: none;  /* Hide button by default */
-    opacity: 0;     /* Ensure it's fully invisible */
-    pointer-events: none;  /* Prevent clicks when hidden */
-    visibility: hidden;    /* Ensure visibility is set to hidden */
-}
-
-#reg-btn:hover {
-    background-color: #4b00b3;
-}
-
-/* Hide Sections by Default */
-#solo_reg, #duo_reg, #squad_reg {
-    display: none;  /* Sections are hidden initially */
-}
-
-/* For smooth transition */
 .hidden {
-    display: none !important;
+    display: none;
 }
-
     </style>
   </head>
 
@@ -582,181 +566,196 @@ button {
     </div>
 </div>
 
+
 <div class="container">
-        <h1>Register for <?php echo $tname; ?></h1>
-        
-        <?php if ($error_message): ?>
-            <div class="error"><?php echo $error_message; ?></div>
-        <?php endif; ?>
-
-        <?php if ($success_message): ?>
-            <div class="success"><?php echo $success_message; ?></div>
-        <?php endif; ?>
-
-        <form action="" method="POST" enctype="multipart/form-data">
+    <h2>Tournament Registration</h2>
+    <form id="registration_form" action="register.php" method="post" enctype="multipart/form-data">
             <input type="hidden" name="tournament_id" value="<?php echo $tournament_id; ?>">
             <input type="hidden" name="match_type" value="<?php echo $match_type; ?>">
-
-            <h2><?php echo ucfirst($match_type); ?> Registration</h2>
-            <p>Tournament: <?php echo $tname; ?> | Game: <?php echo $selected_game; ?></p>
-
-            <!-- Solo Registration Form -->
-            <?php if ($match_type == 'solo'): ?>
-                <div>
+        <!-- Solo Registration  -->
+        <?php if ($match_type === 'solo'): ?>
+            <div id="solo_reg">
+                <h3>Solo Registration</h3>
+                <div class="form-group">
                     <label for="solo_name">Player Name:</label>
-                    <input type="text" name="solo_name" id="solo_name" required>
-
+                    <input type="text" id="solo_name" name="solo_name" required>
+                </div>
+                <div class="form-group">
                     <label for="solo_email">Email:</label>
-                    <input type="email" name="solo_email" id="solo_email" required>
-
-                    <label for="solo_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="solo_ign" id="solo_ign" required>
-
-                    <label for="solo_logo">Upload Logo:</label>
-                    <input type="file" name="solo_logo" id="solo_logo">
+                    <input type="email" id="solo_email" name="solo_email" required>
                 </div>
-            <!-- Duo Registration Form -->
-            <?php elseif ($match_type == 'duo'): ?>
-                <div>
+                <div class="form-group">
+                    <label for="solo_ign">Player IGN:</label>
+                    <input type="text" id="solo_ign" name="solo_ign" required>
+                </div>
+                <div class="form-group">
+                    <label for="solo_logo">Upload Logo (Optional):</label>
+                    <input type="file" id="solo_logo" name="solo_logo">
+                </div>
+            </div>
+
+        <!-- Duo Registration  -->
+        <?php elseif ($match_type === 'duo'): ?>
+            <div id="duo_reg">
+                <h3>Duo Registration</h3>
+                <div class="form-group">
                     <label for="duo_name">Team Name:</label>
-                    <input type="text" name="duo_name" id="duo_name" required>
-
+                    <input type="text" id="duo_name" name="duo_name" required>
+                </div>
+                <div class="form-group">
                     <label for="duo_mentor">Mentor Name:</label>
-                    <input type="text" name="duo_mentor" id="duo_mentor" required>
-
+                    <input type="text" id="duo_mentor" name="duo_mentor" required>
+                </div>
+                <div class="form-group">
                     <label for="duo_email">Email:</label>
-                    <input type="email" name="duo_email" id="duo_email" required>
-
+                    <input type="email" id="duo_email" name="duo_email" required>
+                </div>
+                
+                <div id="players">
+                    <div class="player">
+                    <h3>Player 1</h3>
+                        <div class="form-group">
+                            <label for="duop1_name">Name:</label>
+                            <input type="text" id="duop1_name" name="duop1_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="duop1_email">Email:</label>
+                            <input type="email" id="duop1_email" name="duop1_email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="duop1_role">Role:</label>
+                            <input type="text" id="duop1_role" name="duop1_role">
+                        </div>
+                        <div class="form-group">
+                            <label for="duop1_ign">Player IGN:</label>
+                            <input type="text" id="duop1_ign" name="duop1_ign">
+                        </div>
+                    </div>
+                    <div class="player">
+                        <div class="form-group">
+                        <h3>Player 2</h3>
+                            <label for="duop2_name">Name:</label>
+                            <input type="text" id="duop2_name" name="duop2_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="duop2_email">Email:</label>
+                            <input type="email" id="duop2_email" name="duop2_email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="duop2_role">Role:</label>
+                            <input type="text" id="duop2_role" name="duop2_role">
+                        </div>
+                        <div class="form-group">
+                            <label for="duop2_ign">Player IGN:</label>
+                            <input type="text" id="duop2_ign" name="duop2_ign">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="duo_logo">Upload Logo:</label>
-                    <input type="file" name="duo_logo" id="duo_logo">
+                    <input type="file" id="duo_logo" name="duo_logo">
                 </div>
+            </div>
 
-                <h3>Player 1</h3>
-                <div>
-                    <label for="duop1_name">Name:</label>
-                    <input type="text" name="duop1_name" required>
-
-                    <label for="duop1_email">Email:</label>
-                    <input type="email" name="duop1_email" required>
-
-                    <label for="duop1_role">Role:</label>
-                    <input type="text" name="duop1_role" required>
-
-                    <label for="duop1_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="duop1_ign" required>
-                </div>
-
-                <h3>Player 2</h3>
-                <div>
-                    <label for="duop2_name">Name:</label>
-                    <input type="text" name="duop2_name" required>
-
-                    <label for="duop2_email">Email:</label>
-                    <input type="email" name="duop2_email" required>
-
-                    <label for="duop2_role">Role:</label>
-                    <input type="text" name="duop2_role" required>
-
-                    <label for="duop2_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="duop2_ign" required>
-                </div>
-            <!-- Squad Registration Form -->
-            <?php elseif ($match_type == 'squad'): ?>
-                <div>
+        <!-- Squad Registration  -->
+        <?php elseif ($match_type === 'squad'): ?>
+            <div id="squad_reg">
+                <h3>Squad Registration</h3>
+                <div class="form-group">
                     <label for="sqd_name">Team Name:</label>
-                    <input type="text" name="sqd_name" id="sqd_name" required>
-
-                    <label for="sqd_mentor">Mentor Name:</label>
-                    <input type="text" name="sqd_mentor" id="sqd_mentor" required>
-
+                    <input type="text" id="sqd_name" name="sqd_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="sqd_captain">Mentor Name:</label>
+                    <input type="text" id="sqd_mentor" name="sqd_mentor" required>
+                </div>
+                <div class="form-group">
                     <label for="sqd_email">Email:</label>
-                    <input type="email" name="sqd_email" id="sqd_email" required>
-
-                    <label for="sqd_logo">Upload Logo:</label>
-                    <input type="file" name="sqd_logo" id="sqd_logo">
+                    <input type="email" id="sqd_email" name="sqd_email" required>
                 </div>
 
-                <h3>Player 1</h3>
-                <div>
+                <div id="players">
+                <div class="player">
+                    <h3>Player 1</h3>
                     <label for="sqdp1_name">Name:</label>
-                    <input type="text" name="sqdp1_name" required>
+                    <input type="text" id="sqdp1_name" name="sqdp1_name" required>
 
                     <label for="sqdp1_email">Email:</label>
-                    <input type="email" name="sqdp1_email" required>
+                    <input type="email" id="sqdp1_email" name="sqdp1_email" required>
 
                     <label for="sqdp1_role">Role:</label>
-                    <input type="text" name="sqdp1_role" required>
+                    <input type="text" id="sqdp1_role" name="sqdp1_role" required>
 
-                    <label for="sqdp1_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="sqdp1_ign" required>
+                    <label for="sqdp1_ign">Player IGN:</label>
+                    <input type="text" id="sqdp1_ign" name="sqdp1_ign" required>
                 </div>
-
-                <h3>Player 2</h3>
-                <div>
+                <div class="player">
+                    <h3>Player 2</h3>
                     <label for="sqdp2_name">Name:</label>
-                    <input type="text" name="sqdp2_name" required>
+                    <input type="text" id="sqdp2_name" name="sqdp2_name" required>
 
                     <label for="sqdp2_email">Email:</label>
-                    <input type="email" name="sqdp2_email" required>
+                    <input type="email" id="sqdp2_email" name="sqdp2_email" required>
 
                     <label for="sqdp2_role">Role:</label>
-                    <input type="text" name="sqdp2_role" required>
+                    <input type="text" id="sqdp2_role" name="sqdp2_role" required>
 
-                    <label for="sqdp2_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="sqdp2_ign" required>
+                    <label for="sqdp2_ign">Player IGN:</label>
+                    <input type="text" id="sqdp2_ign" name="sqdp2_ign" required>
                 </div>
-
-                <h3>Player 3</h3>
-                <div>
+                <div class="player">
+                    <h3>Player 3</h3>
                     <label for="sqdp3_name">Name:</label>
-                    <input type="text" name="sqdp3_name" required>
+                    <input type="text" id="sqdp3_name" name="sqdp3_name" required>
 
                     <label for="sqdp3_email">Email:</label>
-                    <input type="email" name="sqdp3_email" required>
+                    <input type="email" id="sqdp3_email" name="sqdp3_email" required>
 
                     <label for="sqdp3_role">Role:</label>
-                    <input type="text" name="sqdp3_role" required>
+                    <input type="text" id="sqdp3_role" name="sqdp3_role" required>
 
-                    <label for="sqdp3_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="sqdp3_ign" required>
+                    <label for="sqdp3_ign">Player IGN:</label>
+                    <input type="text" id="sqdp3_ign" name="sqdp3_ign" required>
                 </div>
-
-                <h3>Player 4</h3>
-                <div>
+                <div class="player">
+                    <h3>Player 4</h3>
                     <label for="sqdp4_name">Name:</label>
-                    <input type="text" name="sqdp4_name" required>
+                    <input type="text" id="sqdp4_name" name="sqdp4_name" required>
 
                     <label for="sqdp4_email">Email:</label>
-                    <input type="email" name="sqdp4_email" required>
+                    <input type="email" id="sqdp4_email" name="sqdp4_email" required>
 
                     <label for="sqdp4_role">Role:</label>
-                    <input type="text" name="sqdp4_role" required>
+                    <input type="text" id="sqdp4_role" name="sqdp4_role" required>
 
-                    <label for="sqdp4_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="sqdp4_ign" required>
+                    <label for="sqdp4_ign">Player IGN:</label>
+                    <input type="text" id="sqdp4_ign" name="sqdp4_ign" required>
                 </div>
-
-                <h3>Substitute Player</h3>
-                <div>
+                <div class="player">
+                    <h3>Substitute</h3>
                     <label for="sqdsb_name">Name:</label>
-                    <input type="text" name="sqdsb_name" required>
+                    <input type="text" id="sqdsb_name" name="sqdsb_name">
 
                     <label for="sqdsb_email">Email:</label>
-                    <input type="email" name="sqdsb_email" required>
+                    <input type="email" id="sqdsb_email" name="sqdsb_email">
 
                     <label for="sqdsb_role">Role:</label>
-                    <input type="text" name="sqdsb_role" required>
+                    <input type="text" id="sqdsb_role" name="sqdsb_role">
 
-                    <label for="sqdsb_ign">In-Game Name (IGN):</label>
-                    <input type="text" name="sqdsb_ign" required>
+                    <label for="sqdsb_ign">Player IGN:</label>
+                    <input type="text" id="sqdsb_ign" name="sqdsb_ign">
                 </div>
-            <?php endif; ?>
-
-            <div>
-                <button type="submit">Register</button>
+                
+                <div class="form-group">
+                    <label for="sqd_logo">Upload Logo:</label>
+                    <input type="file" id="sqd_logo" name="sqd_logo">
+                </div>
             </div>
-        </form>
-    </div>
+        <?php endif; ?>
+        <button type="submit" value="submit">Register</button>
+    </form>
+</div>
+
     
 
 
@@ -904,77 +903,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.readAsDataURL(input.files[0]);
             }
         }
-</script>
 
+    function toggleRegistrationForms(matchType) {
+    // Convert matchType to lowercase for case-insensitive comparison
+    const normalizedMatchType = matchType.toLowerCase();
+    document.getElementById('solo_reg').style.display = normalizedMatchType === 'solo' ? 'block' : 'none';
+    document.getElementById('duo_reg').style.display = normalizedMatchType === 'duo' ? 'block' : 'none';
+    document.getElementById('sqd_reg').style.display = normalizedMatchType === 'squad' ? 'block' : 'none';
+}
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Initially hide all registration sections and the submit button
-    const soloReg = document.getElementById("solo_reg");
-    const duoReg = document.getElementById("duo_reg");
-    const squadReg = document.getElementById("squad_reg");
-    const regButton = document.getElementById("reg-btn");
-
-    soloReg.style.display = "none";
-    duoReg.style.display = "none";
-    squadReg.style.display = "none";
-    regButton.style.display = "none"; // Hide submit button initially
-
-    // Get the match_type from PHP (this is dynamically set in PHP)
-    const matchType = "<?php echo $match_type; ?>";
-
-    // Show the correct form section based on match_type
-    if (matchType === "solo") {
-        soloReg.style.display = "block";
-    } else if (matchType === "duo") {
-        duoReg.style.display = "block";
-    } else if (matchType === "squad") {
-        squadReg.style.display = "block";
-    }
-
-    // Only show the submit button if a section is displayed
-    if (soloReg.style.display === "block" || duoReg.style.display === "block" || squadReg.style.display === "block") {
-        regButton.style.display = "inline-block"; // Show the submit button
-        regButton.style.opacity = 1;  // Ensure the button is fully visible
-        regButton.style.visibility = "visible";  // Make button visible
-        regButton.style.pointerEvents = "auto";  // Enable clickability
-    }
+// Call the function after the page has fully loaded
+window.addEventListener('DOMContentLoaded', function() {
+    const matchType = '<?php echo htmlspecialchars($match_type); ?>';
+    console.log("Match Type:", matchType); // Debugging: Check if matchType is set correctly
+    toggleRegistrationForms(matchType);
 });
 
 </script>
-<!-- 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Get match_type from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const matchType = urlParams.get('match_type'); // Fetch match_type from the URL query string
 
-    if (!matchType) {
-        console.error('match_type is missing from the URL');
-        return; // Exit if match_type is not present
-    }
-
-    // Hide all sections initially
-    document.getElementById("solo_reg").style.display = "none";
-    document.getElementById("duo_reg").style.display = "none";
-    document.getElementById("squad_reg").style.display = "none";
-
-    // Show the appropriate section based on match_type
-    if (matchType === "solo") {
-        document.getElementById("solo_reg").style.display = "block";
-    } else if (matchType === "duo") {
-        document.getElementById("duo_reg").style.display = "block";
-    } else if (matchType === "squad") {
-        document.getElementById("squad_reg").style.display = "block";
-    }
-});
-
-</script> -->
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-
-<!-- Bootstrap JS -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <!-- Accordian jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
