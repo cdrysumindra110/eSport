@@ -99,6 +99,46 @@ if ($stmt) {
 
         // Display the teams/players-registered message
         $teams_registered_message = "$registered_count / $total_teams $registration_message";
+// Fetch registered participants' usernames and profile images based on match type
+$registered_usernames = [];
+if ($match_type == 'solo') {
+    // Get username and profile picture from solo_registration and users table
+    $sql = "SELECT u.uname, u.profile_pic
+            FROM solo_registration sr
+            JOIN users u ON sr.email = u.email
+            WHERE sr.tournament_id = ?";
+} elseif ($match_type == 'duo') {
+    // Get username and profile picture from duo_registration and users table
+    $sql = "SELECT u.uname, u.profile_pic
+            FROM duo_registration dr
+            JOIN users u ON dr.email = u.email
+            WHERE dr.tournament_id = ?";
+} elseif ($match_type == 'squad') {
+    // Get username and profile picture from squad_registration and users table
+    $sql = "SELECT u.uname, u.profile_pic
+            FROM squad_registration sr
+            JOIN users u ON sr.email = u.email
+            WHERE sr.tournament_id = ?";
+} else {
+    $registered_usernames = []; // Default to empty array if match type is invalid
+}
+
+if (!empty($sql)) {
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $tournament_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Collect usernames and profile pictures in an array
+    while ($row = $result->fetch_assoc()) {
+        $registered_usernames[] = [
+            'uname' => $row['uname'],
+            'profile_pic' => $row['profile_pic']
+        ];  // Collect actual signed-in usernames and their profile pics
+    }
+}
+
+
 
     } else {
         $error_message = "No tournament found with that ID.";
@@ -520,8 +560,36 @@ $conn->close();
         </div>
 
         <div class="content-container schedule-container" id="schedule-container">
-            <p class="content-title">Participants</p>
-            <p class="cont-title"> </p>
+            <p class="content-title"><i class="fas fa-user"></i>Usernames</p>
+            <p class="cont-title" style="display: flex; flex-direction: column;">
+    <?php
+    // Check if there are any registered usernames
+    if (!empty($registered_usernames)) {
+        $counter = 1; // Initialize the counter
+        // Display usernames with their profile images
+        foreach ($registered_usernames as $user) {
+            ?>
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <!-- Display user profile image dynamically -->
+                <div class="small-banner" style="width: 40px; height: 40px; margin-right: 10px; overflow: hidden; border-radius: 50%;">
+                    <?php if (!empty($user['profile_pic'])): ?>
+                        <img src="uploads/<?php echo htmlspecialchars($user['profile_pic']); ?>" alt="User Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                    <?php else: ?>
+                        <img src="uploads/default-profile.jpg" alt="Default Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                    <?php endif; ?>
+                </div>
+                <!-- Display the username with the counter -->
+                <span><?php echo $counter . ". " . htmlspecialchars($user['uname']); ?></span>
+            </div>
+            <?php
+            $counter++; // Increment the counter
+        }
+    } else {
+        echo "No participants registered yet.";
+    }
+    ?>
+</p>
+
         </div>
     </div>
 </div>
