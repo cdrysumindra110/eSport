@@ -191,7 +191,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
           </div>            
           <div class="line">  
             <div class="s-12 m-12 l-3 center">
-              <a href="our-services.html" class="s-12 button border-radius background-primary text-size-20 text-white">Contact Us</a>
+              <a href="our-services.php" class="s-12 button border-radius background-primary text-size-20 text-white">Contact Us</a>
             </div>
           </div>
             
