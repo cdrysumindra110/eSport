@@ -1,177 +1,177 @@
-<?php
-// Include the config file for database connection
-require_once 'config.php';
-session_start();
+    <?php
+    // Include the config file for database connection
+    require_once 'config.php';
+    session_start();
 
-// Initialize messages
-$error_message = '';
-$success_message = '';
+    // Initialize messages
+    $error_message = '';
+    $success_message = '';
 
-// Check if the user is logged in
-if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
-    header('Location: signin.php');
-    exit();
-}
+    // Check if the user is logged in
+    if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
+        header('Location: signin.php');
+        exit();
+    }
 
-// Initialize variables for tournament and match type (for form display purposes)
-$tournament_id = isset($_GET['tournament_id']) ? $_GET['tournament_id'] : null;
-$match_type = isset($_GET['match_type']) ? $_GET['match_type'] : null;
+    // Initialize variables for tournament and match type (for form display purposes)
+    $tournament_id = isset($_GET['tournament_id']) ? $_GET['tournament_id'] : null;
+    $match_type = isset($_GET['match_type']) ? $_GET['match_type'] : null;
 
-// Check if tournament ID or match type is missing in the URL
-if (!$tournament_id || !$match_type) {
-    die("Error: Missing tournament ID or match type.");
-}
+    // Check if tournament ID or match type is missing in the URL
+    if (!$tournament_id || !$match_type) {
+        die("Error: Missing tournament ID or match type.");
+    }
 
-// Fetch tournament details from the database
-$sql = "SELECT 
-            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
-            b.bracket_type, b.match_type, u.uname AS creator_name 
-        FROM tournaments t
-        LEFT JOIN brackets b ON t.id = b.tournament_id
-        LEFT JOIN users u ON t.user_id = u.id  
-        WHERE t.id = ?";
+    // Fetch tournament details from the database
+    $sql = "SELECT 
+                t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
+                b.bracket_type, b.match_type, u.uname AS creator_name 
+            FROM tournaments t
+            LEFT JOIN brackets b ON t.id = b.tournament_id
+            LEFT JOIN users u ON t.user_id = u.id  
+            WHERE t.id = ?";
 
-$stmt = $conn->prepare($sql);
-if ($stmt) {
-    $stmt->bind_param("i", $tournament_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $conn->prepare($sql);
+    if ($stmt) {
+        $stmt->bind_param("i", $tournament_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $tournament = $result->fetch_assoc();
+        if ($result->num_rows > 0) {
+            $tournament = $result->fetch_assoc();
 
-        // Assign variables from the $tournament array
-        $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
-        $tname = $tournament['tname'] ?? 'Unknown Game';
-        $sdate = $tournament['sdate'] ?? '';
-        $stime = $tournament['stime'] ?? '';
-        $about = $tournament['about'] ?? '';
-        $bannerimg = $tournament['bannerimg'] ?? '';
-        $creator_name = $tournament['creator_name'] ?? 'Unknown Creator';
+            // Assign variables from the $tournament array
+            $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
+            $tname = $tournament['tname'] ?? 'Unknown Game';
+            $sdate = $tournament['sdate'] ?? '';
+            $stime = $tournament['stime'] ?? '';
+            $about = $tournament['about'] ?? '';
+            $bannerimg = $tournament['bannerimg'] ?? '';
+            $creator_name = $tournament['creator_name'] ?? 'Unknown Creator';
+        } else {
+            $error_message = "No tournament found with that ID.";
+        }
+        $stmt->close();
     } else {
-        $error_message = "No tournament found with that ID.";
+        $error_message = "Error preparing the tournament detail statement: " . $conn->error;
     }
-    $stmt->close();
-} else {
-    $error_message = "Error preparing the tournament detail statement: " . $conn->error;
-}
 
 
-$match_type = isset($_GET['match_type']) ? $_GET['match_type'] : 'solo'; // Default to 'solo' if not provided
-// Handle form data when the form is submitted via POST
+    $match_type = isset($_GET['match_type']) ? $_GET['match_type'] : 'solo'; // Default to 'solo' if not provided
+    // Handle form data when the form is submitted via POST
 
-// Check if the form is submitted via POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve form data
-    $tournament_id = $_POST['tournament_id'];
-    $match_type = $_POST['match_type'];
+    // Check if the form is submitted via POST
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Retrieve form data
+        $tournament_id = $_POST['tournament_id'];
+        $match_type = $_POST['match_type'];
 
-    try {
-        // Handle solo registration
-        if ($match_type == "solo") {
-            $player_name = $_POST['solo_name'];
-            $email = $_POST['solo_email'];
-            $ign = $_POST['solo_ign'];
-            $logo_path = uploadFile('solo_logo');
+        try {
+            // Handle solo registration
+            if ($match_type == "solo") {
+                $player_name = $_POST['solo_name'];
+                $email = $_POST['solo_email'];
+                $ign = $_POST['solo_ign'];
+                $logo_path = uploadFile('solo_logo');
 
-            $sql = "INSERT INTO solo_registration (tournament_id, player_name, email, ign, logo_path)
-                    VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issss", $tournament_id, $player_name, $email, $ign, $logo_path);
-            $stmt->execute();
-            $stmt->close();
-            $success_message = "Solo registration successful.";
-
-        // Handle duo registration
-        } elseif ($match_type == "duo") {
-            $team_name = $_POST['duo_name'];
-            $mentor_name = $_POST['duo_mentor'];
-            $email = $_POST['duo_email'];
-            $logo_path = uploadFile('duo_logo');
-
-            $sql = "INSERT INTO duo_registration (tournament_id, team_name, mentor_name, email, logo_path)
-                    VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issss", $tournament_id, $team_name, $mentor_name, $email, $logo_path);
-            $stmt->execute();
-            
-            $duo_id = $stmt->insert_id;
-            $stmt->close();
-
-            // Insert players for duo match type
-            $players = [
-                ['name' => $_POST['duop1_name'], 'email' => $_POST['duop1_email'], 'role' => $_POST['duop1_role'], 'ign' => $_POST['duop1_ign']],
-                ['name' => $_POST['duop2_name'], 'email' => $_POST['duop2_email'], 'role' => $_POST['duop2_role'], 'ign' => $_POST['duop2_ign']]
-            ];
-
-            foreach ($players as $player) {
-                $sql = "INSERT INTO duo_players (duo_id, name, email, role, ign) VALUES (?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO solo_registration (tournament_id, player_name, email, ign, logo_path)
+                        VALUES (?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issss", $duo_id, $player['name'], $player['email'], $player['role'], $player['ign']);
+                $stmt->bind_param("issss", $tournament_id, $player_name, $email, $ign, $logo_path);
                 $stmt->execute();
                 $stmt->close();
-            }
-            $success_message = "Duo registration successful.";
+                $success_message = "Solo registration successful.";
 
-        // Handle squad registration
-        } elseif ($match_type == "squad") {
-            $team_name = $_POST['sqd_name'];
-            $mentor_name = $_POST['sqd_mentor'];
-            $email = $_POST['sqd_email'];
-            $logo_path = uploadFile('sqd_logo');
+            // Handle duo registration
+            } elseif ($match_type == "duo") {
+                $team_name = $_POST['duo_name'];
+                $mentor_name = $_POST['duo_mentor'];
+                $email = $_POST['duo_email'];
+                $logo_path = uploadFile('duo_logo');
 
-            $sql = "INSERT INTO squad_registration (tournament_id, team_name, mentor_name, email, logo_path)
-                    VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issss", $tournament_id, $team_name, $mentor_name, $email, $logo_path);
-            $stmt->execute();
-
-            $squad_id = $stmt->insert_id;
-            $stmt->close();
-
-            // Insert players for squad match type
-            $players = [
-                ['name' => $_POST['sqdp1_name'], 'email' => $_POST['sqdp1_email'], 'role' => $_POST['sqdp1_role'], 'ign' => $_POST['sqdp1_ign']],
-                ['name' => $_POST['sqdp2_name'], 'email' => $_POST['sqdp2_email'], 'role' => $_POST['sqdp2_role'], 'ign' => $_POST['sqdp2_ign']],
-                ['name' => $_POST['sqdp3_name'], 'email' => $_POST['sqdp3_email'], 'role' => $_POST['sqdp3_role'], 'ign' => $_POST['sqdp3_ign']],
-                ['name' => $_POST['sqdp4_name'], 'email' => $_POST['sqdp4_email'], 'role' => $_POST['sqdp4_role'], 'ign' => $_POST['sqdp4_ign']],
-                ['name' => $_POST['sqdsb_name'], 'email' => $_POST['sqdsb_email'], 'role' => $_POST['sqdsb_role'], 'ign' => $_POST['sqdsb_ign']]
-            ];
-
-            foreach ($players as $player) {
-                $sql = "INSERT INTO squad_players (squad_id, name, email, role, ign) VALUES (?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO duo_registration (tournament_id, team_name, mentor_name, email, logo_path)
+                        VALUES (?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issss", $squad_id, $player['name'], $player['email'], $player['role'], $player['ign']);
+                $stmt->bind_param("issss", $tournament_id, $team_name, $mentor_name, $email, $logo_path);
                 $stmt->execute();
+                
+                $duo_id = $stmt->insert_id;
                 $stmt->close();
+
+                // Insert players for duo match type
+                $players = [
+                    ['name' => $_POST['duop1_name'], 'email' => $_POST['duop1_email'], 'role' => $_POST['duop1_role'], 'ign' => $_POST['duop1_ign']],
+                    ['name' => $_POST['duop2_name'], 'email' => $_POST['duop2_email'], 'role' => $_POST['duop2_role'], 'ign' => $_POST['duop2_ign']]
+                ];
+
+                foreach ($players as $player) {
+                    $sql = "INSERT INTO duo_players (duo_id, name, email, role, ign) VALUES (?, ?, ?, ?, ?)";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("issss", $duo_id, $player['name'], $player['email'], $player['role'], $player['ign']);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+                $success_message = "Duo registration successful.";
+
+            // Handle squad registration
+            } elseif ($match_type == "squad") {
+                $team_name = $_POST['sqd_name'];
+                $mentor_name = $_POST['sqd_mentor'];
+                $email = $_POST['sqd_email'];
+                $logo_path = uploadFile('sqd_logo');
+
+                $sql = "INSERT INTO squad_registration (tournament_id, team_name, mentor_name, email, logo_path)
+                        VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("issss", $tournament_id, $team_name, $mentor_name, $email, $logo_path);
+                $stmt->execute();
+
+                $squad_id = $stmt->insert_id;
+                $stmt->close();
+
+                // Insert players for squad match type
+                $players = [
+                    ['name' => $_POST['sqdp1_name'], 'email' => $_POST['sqdp1_email'], 'role' => $_POST['sqdp1_role'], 'ign' => $_POST['sqdp1_ign']],
+                    ['name' => $_POST['sqdp2_name'], 'email' => $_POST['sqdp2_email'], 'role' => $_POST['sqdp2_role'], 'ign' => $_POST['sqdp2_ign']],
+                    ['name' => $_POST['sqdp3_name'], 'email' => $_POST['sqdp3_email'], 'role' => $_POST['sqdp3_role'], 'ign' => $_POST['sqdp3_ign']],
+                    ['name' => $_POST['sqdp4_name'], 'email' => $_POST['sqdp4_email'], 'role' => $_POST['sqdp4_role'], 'ign' => $_POST['sqdp4_ign']],
+                    ['name' => $_POST['sqdsb_name'], 'email' => $_POST['sqdsb_email'], 'role' => $_POST['sqdsb_role'], 'ign' => $_POST['sqdsb_ign']]
+                ];
+
+                foreach ($players as $player) {
+                    $sql = "INSERT INTO squad_players (squad_id, name, email, role, ign) VALUES (?, ?, ?, ?, ?)";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("issss", $squad_id, $player['name'], $player['email'], $player['role'], $player['ign']);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+                $success_message = "Squad registration successful.";
             }
-            $success_message = "Squad registration successful.";
-        }
 
-        // Redirect to success page if no errors occurred
-        header("Location: success.php");
-        exit;
+            // Redirect to success page if no errors occurred
+            header("Location: tournments.php");
+            exit;
 
-    } catch (Exception $e) {
-        $error_message = "Registration failed: " . $e->getMessage();
-    }
-}
-
-// Function to handle file upload
-function uploadFile($input_name) {
-    if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] == 0) {
-        $target_dir = "uploads/";
-        $file_path = $target_dir . basename($_FILES[$input_name]["name"]);
-        if (move_uploaded_file($_FILES[$input_name]["tmp_name"], $file_path)) {
-            return $file_path;
+        } catch (Exception $e) {
+            $error_message = "Registration failed: " . $e->getMessage();
         }
     }
-    return null;
-}
 
-// Close the database connection
-$conn->close();
-?>
+    // Function to handle file upload
+    function uploadFile($input_name) {
+        if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] == 0) {
+            $target_dir = "uploads/";
+            $file_path = $target_dir . basename($_FILES[$input_name]["name"]);
+            if (move_uploaded_file($_FILES[$input_name]["tmp_name"], $file_path)) {
+                return $file_path;
+            }
+        }
+        return null;
+    }
+
+    // Close the database connection
+    $conn->close();
+    ?>
 
 
 
@@ -550,7 +550,7 @@ form > div {
               <ul>
                 <?php if (isset($_SESSION['isSignin']) && $_SESSION['isSignin']): ?>
                   <li><a href="dashboard.php">Profile</a></li>
-                  <li><a href="logout.php">Signout</a></li>
+                  <li><a href="logout.php"><i class='fa fa-sign-out'></i>Signout</a></li>
                 <?php else: ?>
                   <li><a href="signin.php">Signin</a></li>
                   <li><a href="signup.php">Signup</a></li>

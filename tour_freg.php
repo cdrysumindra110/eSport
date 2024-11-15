@@ -99,22 +99,24 @@ if ($stmt) {
 
         // Display the teams/players-registered message
         $teams_registered_message = "$registered_count / $total_teams $registration_message";
+
+        // Fetch registered participants' usernames and profile images based on match type
 // Fetch registered participants' usernames and profile images based on match type
 $registered_usernames = [];
 if ($match_type == 'solo') {
-    // Get username and profile picture from solo_registration and users table
+    // Get username and logos from solo_registration and users table
     $sql = "SELECT u.uname, u.profile_pic
             FROM solo_registration sr
             JOIN users u ON sr.email = u.email
             WHERE sr.tournament_id = ?";
 } elseif ($match_type == 'duo') {
-    // Get username and profile picture from duo_registration and users table
+    // Get username and logos from duo_registration and users table
     $sql = "SELECT u.uname, u.profile_pic
             FROM duo_registration dr
             JOIN users u ON dr.email = u.email
             WHERE dr.tournament_id = ?";
 } elseif ($match_type == 'squad') {
-    // Get username and profile picture from squad_registration and users table
+    // Get username and logos from squad_registration and users table
     $sql = "SELECT u.uname, u.profile_pic
             FROM squad_registration sr
             JOIN users u ON sr.email = u.email
@@ -123,21 +125,21 @@ if ($match_type == 'solo') {
     $registered_usernames = []; // Default to empty array if match type is invalid
 }
 
+// If there is a valid SQL statement, fetch results
 if (!empty($sql)) {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $tournament_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Collect usernames and profile pictures in an array
+    // Collect usernames and profile images in an array
     while ($row = $result->fetch_assoc()) {
         $registered_usernames[] = [
             'uname' => $row['uname'],
-            'profile_pic' => $row['profile_pic']
-        ];  // Collect actual signed-in usernames and their profile pics
+            'logo_path' => $row['profile_pic'] ?: 'default-logo.jpg' // Use 'profile_pic' and set a default logo if empty
+        ];
     }
 }
-
 
 
     } else {
@@ -150,8 +152,6 @@ if (!empty($sql)) {
 
 $conn->close();
 ?>
-
-
 
 
 <!DOCTYPE html>
@@ -449,7 +449,7 @@ $conn->close();
               <ul>
                 <?php if (isset($_SESSION['isSignin']) && $_SESSION['isSignin']): ?>
                   <li><a href="dashboard.php">Profile</a></li>
-                  <li><a href="logout.php">Signout</a></li>
+                  <li><a href="logout.php"><i class='fa fa-sign-out'></i>Signout</a></li>
                 <?php else: ?>
                   <li><a href="signin.php">Signin</a></li>
                   <li><a href="signup.php">Signup</a></li>
@@ -560,36 +560,37 @@ $conn->close();
         </div>
 
         <div class="content-container schedule-container" id="schedule-container">
-            <p class="content-title"><i class="fas fa-user"></i>Usernames</p>
+            <p class="content-title"><i class="fas fa-user"></i>&nbsp;&nbsp;Usernames</p>
             <p class="cont-title" style="display: flex; flex-direction: column;">
-    <?php
-    // Check if there are any registered usernames
-    if (!empty($registered_usernames)) {
-        $counter = 1; // Initialize the counter
-        // Display usernames with their profile images
-        foreach ($registered_usernames as $user) {
-            ?>
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <!-- Display user profile image dynamically -->
-                <div class="small-banner" style="width: 40px; height: 40px; margin-right: 10px; overflow: hidden; border-radius: 50%;">
-                    <?php if (!empty($user['profile_pic'])): ?>
-                        <img src="uploads/<?php echo htmlspecialchars($user['profile_pic']); ?>" alt="User Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                    <?php else: ?>
-                        <img src="uploads/default-profile.jpg" alt="Default Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                    <?php endif; ?>
-                </div>
-                <!-- Display the username with the counter -->
-                <span><?php echo $counter . ". " . htmlspecialchars($user['uname']); ?></span>
-            </div>
-            <?php
-            $counter++; // Increment the counter
-        }
-    } else {
-        echo "No participants registered yet.";
-    }
-    ?>
-</p>
-
+              <?php
+                if (!empty($registered_usernames)) {
+                    $counter = 1; // Initialize the counter
+                    foreach ($registered_usernames as $user) {
+                        ?>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <!-- Display user logo dynamically -->
+                            <div class="small-banner" style="width: 40px; height: 40px; margin-right: 10px; overflow: hidden; border-radius: 50%;">
+                                <?php
+                                // Check if the logo exists and display it, otherwise show default logo
+                                $logo_path = 'uploads/' . htmlspecialchars($user['logo_path']);
+                                if (file_exists($logo_path)) {
+                                    echo '<img src="' . $logo_path . '" alt="User Logo" style="width: 100%; height: 100%; object-fit: cover;">';
+                                } else {
+                                    echo '<img src="uploads/dash-logo.png" alt="Default Logo" style="width: 100%; height: 100%; object-fit: cover;">';
+                                }
+                                ?>
+                            </div>
+                            <!-- Display the username with the counter -->
+                            <span><?php echo $counter . ". " . htmlspecialchars($user['uname']); ?></span>
+                        </div>
+                        <?php
+                        $counter++; // Increment the counter
+                    }
+                } else {
+                    echo "No participants registered yet.";
+                }
+              ?>
+            </p>
         </div>
     </div>
 </div>

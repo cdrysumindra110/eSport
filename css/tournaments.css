@@ -146,6 +146,19 @@
     width: 30%;
 }
 
+/* Eye icon should be hidden by default */
+.ut-row__icon-eye {
+    display: none; /* Initially hide the eye icon */
+    opacity: 0; /* Make it transparent */
+    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+}
+
+/* Show the eye icon when the row is hovered */
+.ut-row:hover .ut-row__icon-eye {
+    display: inline-block; /* Make the eye icon visible */
+    opacity: 1; /* Fade in effect */
+}
+
 /* Responsive Design */
 @media (max-width: 600px) {
     .ut-table__head,

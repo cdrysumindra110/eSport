@@ -174,7 +174,7 @@ $conn->close();
               <ul>
                 <?php if (isset($_SESSION['isSignin']) && $_SESSION['isSignin']): ?>
                   <li><a href="dashboard.php">Profile</a></li>
-                  <li><a href="logout.php">Signout</a></li>
+                  <li><a href="logout.php"><i class='fa fa-sign-out'></i>Signout</a></li>
                 <?php else: ?>
                   <li><a href="signin.php">Signin</a></li>
                   <li><a href="signup.php">Signup</a></li>

@@ -1,44 +1,3 @@
-/* Unique prefix 'ut-' (Unique Tournament) for all classes */
-.ut-container {
-    background-color: #282828;
-    color: #ffffff;
-    font-family: sans-serif;
-    margin: 0;
-    padding: 20px; /* Keep padding for consistency */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-x: auto; /* Allow horizontal scrolling */
-    width: 100%;
-    border: none; /* Ensure no border is applied */
-}
-
-/* Header section */
-.ut-header {
-    display: flex;
-    justify-content: flex-start;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-.ut-header__button {
-    margin-left: auto;
-    background-color: #38b2d1;
-    border: 0.5px solid white; /* Border styling */
-    color: #181818;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease, border 0.3s ease; /* Transition for border */
-}
-
-.ut-header__button:hover {
-    background-color: #2bd8ff;
-    border: 1px solid white; /* Hover border */
-    color: #000000;
-}
-
 /* Table section */
 .ut-table {
     width: 100%;
@@ -47,53 +6,49 @@
     background-color: #282828;
     margin: 0 auto; /* Center table */
     border: none; /* Remove border */
+    table-layout: fixed; /* Ensure all columns have the same width */
 }
 
+/* Table header and cell styling */
 .ut-table__head,
 .ut-table__cell {
     padding: 10px;
     text-align: left;
     word-break: break-word;
-    border: none; /* Remove border */
-}
-
-.ut-table__head {
-    background-color: #383838; /* Header background color */
+    border: none; /* Remove border from all cells */
+    vertical-align: middle; /* Ensure vertical alignment is consistent */
 }
 
 /* Column Styles */
 .ut-table__head--status,
 .ut-table__cell--status {
-    width: 12rem;
-    text-align: left;
+    width: 12rem; /* Fixed width for status column */
 }
 
-.ut-table__cell--first {
-    padding-left: 10px;
-    display: flex;
-    align-items: flex-start; /* Align items at the start */
-}
-
-.ut-table__cell--date,
-.ut-table__cell--prize {
-    width: 150px;
-    text-align: left;
+/* Status label */
+.ut-status--new {
+    background-color: #66ff66;
+    color: #000000;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    width: 100%; /* Ensure the label occupies full available width */
+    box-sizing: border-box; /* Prevent overflow of padding */
 }
 
 /* Row styles */
 .ut-row {
     position: relative; /* Set position for hover effect */
     cursor: pointer; /* Change cursor to pointer */
+    background-color: #383838; /* Same background for all rows */
 }
 
+/* Hover effect for all rows */
 .ut-row:hover {
     background-color: #00f7ff0b; /* Hover background color */
     color: #00f7ff; /* Text color on hover */
-}
-
-/* Specific styles for second row */
-.ut-row:nth-child(2) {
-    background-color: #3a3a3a; /* Different background for second row */
 }
 
 /* Icon inside row */
@@ -132,18 +87,6 @@
 .ut-info__host {
     font-size: 14px;
     color: #ffffff;
-}
-
-/* Status label */
-.ut-status--new {
-    background-color: #66ff66;
-    color: #000000;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 12px;
-    text-align: center;
-    width: 30%;
 }
 
 /* Responsive Design */
