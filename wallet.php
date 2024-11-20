@@ -196,6 +196,22 @@ exit;
               <span class="link-text">Link Wallet</span>
             </button>
           </div>
+                      
+          <h2 class="unique-header">Wallet</h2>
+          
+          <h2 class="unique-header">Wallet</h2>
+                      
+          <h2 class="unique-header">Wallet</h2>
+          
+          <h2 class="unique-header">Wallet</h2>
+                      
+          <h2 class="unique-header">Wallet</h2>
+          
+          <h2 class="unique-header">Wallet</h2>
+                      
+          <h2 class="unique-header">Wallet</h2>
+          
+          <h2 class="unique-header">Wallet</h2>
         </div>
     </div>
 

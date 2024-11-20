@@ -1,45 +1,41 @@
 <?php
-// Include config to connect to the database
-include('config.php'); // Make sure this is the correct path
 
-// Initialize an empty array to store user data
+include('config.php'); 
+
 $users = [];
 
 if ($conn) {
-    // Prepare and execute the query to fetch users from the database
-    $query = "SELECT * FROM users"; // Replace with actual table name
+
+    $query = "SELECT * FROM users"; 
     $result = mysqli_query($conn, $query);
 
-    // Check if query executed successfully
+
     if ($result) {
-        // Fetch each user and add them to the $users array
         while ($user = mysqli_fetch_assoc($result)) {
             $users[] = $user;
         }
     } else {
-        // If the query fails, output the error
+
         echo "Error fetching users: " . mysqli_error($conn);
     }
 } else {
-    // If the connection fails, output the error
+
     echo "Error connecting to the database: " . mysqli_connect_error();
 }
 
-// Handle user deletion
 if (isset($_GET['delete_id'])) {
-    // Sanitize the delete_id to prevent SQL injection
+
     $delete_id = mysqli_real_escape_string($conn, $_GET['delete_id']);
 
-    // Prepare the delete query
-    $delete_query = "DELETE FROM users WHERE id = $delete_id"; // Replace with actual table name
 
-    // Execute the delete query
+    $delete_query = "DELETE FROM users WHERE id = $delete_id"; 
+
     if (mysqli_query($conn, $delete_query)) {
-        // Redirect to the admin dashboard after deletion
-        header('Location: admin_dashboard.php'); // Adjust the redirect path if needed
+
+        header('Location: admin_dashboard.php'); 
         exit;
     } else {
-        // If the delete query fails, output the error
+
         echo "Error deleting user: " . mysqli_error($conn);
     }
 }

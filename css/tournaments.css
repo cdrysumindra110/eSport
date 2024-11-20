@@ -2,10 +2,10 @@
     background-color: #282828;
     color: #ffffff;
     font-family: sans-serif;
-    margin: 0 auto; /* Center the container */
-    padding: 20px; /* Keep padding for consistency */
-    box-sizing: border-box; /* Ensure padding is included in width calculation */
-    overflow-x: hidden; /* Prevent horizontal overflow */
+    margin: 0 auto; 
+    padding: 20px; 
+    box-sizing: border-box; 
+    overflow-x: hidden; 
     width: 100%;
 }
 
@@ -37,7 +37,7 @@
 /* Table section */
 .ut-table {
     width: 100%;
-    border-collapse: collapse; /* Ensure borders are collapsed */
+    border-collapse: collapse;
     background-color: #282828;
     margin: 0 auto;
 }
@@ -47,7 +47,7 @@
     text-align: left;
     word-break: break-word;
     background-color: #282828;
-    border: none !important; /* Ensure no borders */
+    border: none !important;
 }
 
 /* Header and Cell Styles */
@@ -55,13 +55,13 @@
 .ut-table__cell {
     padding: 10px;
     text-align: left;
-    word-break: break-word; /* Allow breaking words */
-    background-color: #282828; /* Ensure consistent background for cells */
-    border: none !important; /* Remove all borders from cells */
+    word-break: break-word; 
+    background-color: #282828; 
+    border: none !important; 
 }
 
 .ut-table__head {
-    background-color: #383838; /* Header background color */
+    background-color: #383838; 
 }
 
 /* Column Styles */
@@ -74,7 +74,7 @@
 .ut-table__cell--first {
     padding-left: 10px;
     display: flex;
-    align-items: center; /* Center align the items vertically */
+    align-items: center; 
 }
 
 .ut-table__cell--date,
@@ -86,31 +86,30 @@
 
 /* Row styles */
 .ut-row {
-    position: relative; /* Set position for hover effect */
-    cursor: pointer; /* Change cursor to pointer */
-    background-color: #282828; /* Ensure consistent background */
-    padding: 10px; /* Add padding for consistency */
+    position: relative; 
+    cursor: pointer; 
+    background-color: #282828; 
+    padding: 10px; 
 }
 
-/* Remove bottom border from all rows */
+
 .ut-row {
-    border-bottom: none !important; /* Remove border for all rows */
+    border-bottom: none !important; 
     border: none !important;
 }
 
-/* Hover effect for all rows */
+
 .ut-row:hover {
-    background-color: #00f7ff0b; /* Use a subtle background on hover */
+    background-color: #00f7ff0b; 
     color: #00f7ff;
 }
 
-/* Ensure all rows have consistent styles */
-.ut-row:nth-child(n) { /* Apply to all rows */
-    background-color: #282828; /* Default background */
+
+.ut-row:nth-child(n) { 
+    background-color: #282828;
     border: none !important;
 }
 
-/* Image inside table */
 .ut-image img {
     width: 100px;
     height: 70px;
@@ -118,7 +117,6 @@
     border-radius: 1px;
 }
 
-/* Information section inside row */
 .ut-info {
     display: flex;
     flex-direction: column;
@@ -134,7 +132,6 @@
     color: #ffffff;
 }
 
-/* Game label */
 .ut-game--new {
     background-color: #66ff66;
     color: #000000;
@@ -146,17 +143,17 @@
     width: 30%;
 }
 
-/* Eye icon should be hidden by default */
+
 .ut-row__icon-eye {
-    display: none; /* Initially hide the eye icon */
-    opacity: 0; /* Make it transparent */
-    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    display: none; 
+    opacity: 0; 
+    transition: opacity 0.3s ease-in-out; 
 }
 
-/* Show the eye icon when the row is hovered */
 .ut-row:hover .ut-row__icon-eye {
-    display: inline-block; /* Make the eye icon visible */
-    opacity: 1; /* Fade in effect */
+    display: inline-block; 
+    opacity: 1; 
+    color: #00f7ff;
 }
 
 /* Responsive Design */
@@ -183,12 +180,12 @@
 
     .ut-table__head--game,
     .ut-table__cell--game {
-        width: auto; /* Allow game column to adjust */
+        width: auto; 
     }
 
     .ut-table__cell--date,
     .ut-table__cell--brackets,
     .ut-table__cell--prize {
-        width: auto; /* Allow other columns to adjust */
+        width: auto; 
     }
 }

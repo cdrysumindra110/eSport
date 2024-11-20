@@ -1,8 +1,7 @@
 <?php
-// Include the config file
 require_once 'config.php';
 
-// Start the session
+
 session_start();
 
 // Initialize messages
@@ -21,16 +20,15 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
 // Get the logged-in user ID
 $user_id = $_SESSION['user_id'];
 
-// Check if the form has been submitted
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-// Handle the update email form
+
 if (isset($_POST['update_email'])) {
     $newEmail = filter_var($_POST['newEmail'], FILTER_SANITIZE_EMAIL);
 
-    // Validate the new email
     if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-        // Prepare and execute the update
+
         $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
         $stmt->bind_param('si', $newEmail, $user_id);
 
@@ -45,7 +43,7 @@ if (isset($_POST['update_email'])) {
     }
 }
 
-// Prepare query string for redirect
+
 $query_string = '';
 if (!empty($success_message)) {
     $query_string .= 'success_message=' . urlencode($success_message);
@@ -55,7 +53,7 @@ if (!empty($error_message)) {
     $query_string .= 'error_message=' . urlencode($error_message);
 }
 
-// Redirect the user back to the change email page with messages
+
 header('Location: change_email.php?' . $query_string);
 exit;
 }
@@ -195,6 +193,18 @@ exit;
               <span class="team-text">Create Team</span>
             </button>
           </div>
+          
+          <h2 class="unique-header">Team</h2>
+          
+          <h2 class="unique-header">Team</h2>
+          
+          <h2 class="unique-header">Team</h2>
+          
+          <h2 class="unique-header">Team</h2>
+          
+          <h2 class="unique-header">Team</h2>
+          
+          <h2 class="unique-header">Team</h2>
         </div>
     </div>
 

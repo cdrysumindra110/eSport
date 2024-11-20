@@ -598,7 +598,7 @@ form > div {
     </div>
 </div>
 
-<div class="container">
+    <div class="container">
         <h1>Register for <?php echo $tname; ?></h1>
         
         <?php if ($error_message): ?>
