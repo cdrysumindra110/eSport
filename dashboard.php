@@ -1,4 +1,4 @@
-<?php 
+<?php  
 // Include the config file for database connection
 require_once 'config.php';
 
@@ -22,6 +22,22 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Fetch current user data
+$sql = "SELECT role, full_name, dob, country, city, cover_photo, profile_pic FROM users WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($role, $full_name, $dob, $country, $city, $cover_photo, $profile_pic);
+
+// If the user exists, fetch their data
+if ($stmt->num_rows > 0) {
+    $stmt->fetch();
+} else {
+    die("Error: User not found.");
+}
+$stmt->close();
+
 // Check if success or error messages are set in the URL
 if (isset($_GET['success_signin'])) {
     $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
@@ -33,73 +49,76 @@ if (isset($_GET['error_message'])) {
     $error_message = htmlspecialchars(urldecode($_GET['error_message']));
 }
 
-// Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    
-    // Handle the update profile form
-    if (isset($_POST['update_profile'])) {
-        // Collect the form data
-        $role = trim($_POST['role']);
-        $full_name = trim($_POST['full_name']);
-        $dob_month = (int)$_POST['dob-month'];
-        $dob_day = (int)$_POST['dob-day'];
-        $dob_year = (int)$_POST['dob-year'];
-        $country = trim($_POST['country']);
-        $city = trim($_POST['city']);
+  if (isset($_POST['update_profile'])) {
+      $role = trim($_POST['role']);
+      $full_name = trim($_POST['full_name']);
+      $dob_month = (int)$_POST['dob-month'];
+      $dob_day = (int)$_POST['dob-day'];
+      $dob_year = (int)$_POST['dob-year'];
+      $country = trim($_POST['country']);
+      $city = trim($_POST['city']);
 
-        // Validate data
-        if (empty($full_name) || empty($country) || empty($city) || empty($dob_month) || empty($dob_day) || empty($dob_year)) {
-            $error_message = 'Please fill in all required fields.';
-        } elseif (!checkdate($dob_month, $dob_day, $dob_year)) {
-            $error_message = 'Invalid date provided.';
-        } else {
-            // Prepare the date of birth in YYYY-MM-DD format
-            $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
+      // Validate Date of Birth
+      if (!checkdate($dob_month, $dob_day, $dob_year)) {
+          $error_message = 'Invalid date provided.';
+      } else {
+          $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
 
-            // Prepare the SQL query
-            $stmt = $conn->prepare("UPDATE users SET role = ?, full_name = ?, dob = ?, country = ?, city = ? WHERE id = ?");
-            if (!$stmt) {
-                die('Prepare failed: ' . $conn->error);
-            }
+          // Process File Uploads
+          $cover_photo = null;
+          $profile_pic = null;
 
-            // Bind the parameters to the SQL query
-            $stmt->bind_param('sssssi', $role, $full_name, $dob, $country, $city, $user_id);
+          if (isset($_FILES['cover_photo']) && $_FILES['cover_photo']['error'] === UPLOAD_ERR_OK) {
+              $cover_photo_tmp = $_FILES['cover_photo']['tmp_name'];
+              $cover_photo = file_get_contents($cover_photo_tmp); // Storing file as binary
+          }
 
-            // Execute the query and check for errors
-            if ($stmt->execute()) {
-                $success_message = 'Profile updated successfully.';
-            } else {
-                $error_message = 'Error updating profile: ' . $stmt->error;
-            }
+          if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+              $profile_pic_tmp = $_FILES['profile_pic']['tmp_name'];
+              $profile_pic = file_get_contents($profile_pic_tmp); // Storing file as binary
+          }
 
-            // Close the statement
-            $stmt->close();
-        }
+          // Prepare the SQL Query
+          $stmt = $conn->prepare("
+              UPDATE users 
+              SET role = ?, full_name = ?, dob = ?, country = ?, city = ?, cover_photo = ?, profile_pic = ?
+              WHERE id = ?
+          ");
 
-        // Prepare query string for redirect with success or error messages
-        $query_string = '';
-        if (!empty($success_message)) {
-            $query_string .= 'success_message=' . urlencode($success_message);
-        }
-        if (!empty($error_message)) {
-            if (!empty($query_string)) {
-                $query_string .= '&';
-            }
-            $query_string .= 'error_message=' . urlencode($error_message);
-        }
+          if (!$stmt) {
+              die('Prepare failed: ' . $conn->error);
+          }
 
-        // Redirect to the dashboard with messages
-        header('Location: dashboard.php?' . $query_string);
-        exit;
-    }
+          // Bind parameters to the query
+          $stmt->bind_param('sssssbbi', $role, $full_name, $dob, $country, $city, $cover_photo, $profile_pic, $user_id);
+
+          // Execute the query
+          if ($stmt->execute()) {
+              $success_message = 'Profile updated successfully.';
+          } else {
+              $error_message = 'Error updating profile: ' . $stmt->error;
+          }
+
+          $stmt->close();
+      }
+
+      // Redirect with messages
+      $query_string = '';
+      if (!empty($success_message)) {
+          $query_string .= 'success_message=' . urlencode($success_message);
+      }
+      if (!empty($error_message)) {
+          $query_string .= '&error_message=' . urlencode($error_message);
+      }
+      header('Location: dashboard.php?' . $query_string);
+      exit;
+  }
 }
 
 // Close the connection
 $conn->close();
 ?>
-
-
-
 
 
 
@@ -221,12 +240,12 @@ $conn->close();
             <button id="signoutBtn" class="btn-cnt"><i class='fa fa-sign-out'></i>Sign Out</button>
         </div>
 
-        <form id="update_images" action="dashboard.php" method="post" enctype="multipart/form-data">
+        <form id="update_profile" action="dashboard.php" method="post" enctype="multipart/form-data">
             <div class="profile-container">
                 <div class="cover-photo-container">
                     <div class="cover-photo">
-                        <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
-                        <label for="coverPhotoFile" class="cover-photo-label">
+                        <input type="file" name="cover_photo" id="cover_photo" accept="image/*" onchange="loadCoverPhoto(event)" class="file-input" required/>
+                        <label for="cover_photo" class="cover-photo-label">
                             <span class="icon-wrapper">
                                 <i class="fas fa-camera"></i>
                             </span>
@@ -237,8 +256,8 @@ $conn->close();
                     </div>
                 </div>
                 <div class="profile-pic">
-                    <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
-                    <label for="profilePicFile" class="profile-pic-label">
+                    <input type="file" name="profile_pic" id="profile_pic" accept="image/*" onchange="loadProfilePic(event)" class="file-input" required/>
+                    <label for="profile_pic" class="profile-pic-label">
                         <span class="icon-wrapper">
                           <i class="fas fa-camera"></i>
                         </span>
@@ -247,12 +266,11 @@ $conn->close();
                     <img src="./img/dash-logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
                 </div>
             </div>
-        </form>
+
 
 
         <!-- Update Profile -->
-        <div id="profileUpdateSection" class="profile-section">
-            <form id="update_profile" action="dashboard.php" method="post" enctype="multipart/form-data">
+            <div id="profileUpdateSection" class="profile-section">
                 <div class="unique-container">
                     <h2 class="unique-header">Role Selection</h2>
                     <div class="unique-input-field">
@@ -294,8 +312,8 @@ $conn->close();
                     <button type="button" class="unique-button" onclick="showSection('profileUpdateSection')">CANCEL</button>
                     <button type="submit" name="update_profile" value="submit" class="unique-button">SAVE CHANGES</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 
             
@@ -439,16 +457,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-
+// Function to handle cover photo preview
 function loadCoverPhoto(event) {
-    const coverPhoto = document.getElementById('coverPhoto');
-    coverPhoto.src = URL.createObjectURL(event.target.files[0]);
+    var reader = new FileReader();
+    reader.onload = function() {
+        var output = document.getElementById('coverPhoto');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
 }
 
 function loadProfilePic(event) {
-    const profilePic = document.getElementById('profilePic');
-    profilePic.src = URL.createObjectURL(event.target.files[0]);
+    var reader = new FileReader();
+    reader.onload = function() {
+        var output = document.getElementById('profilePic');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
 }
+
 
 // ----------------------Dob Javascript ----------------------------
 document.addEventListener('DOMContentLoaded', function() {

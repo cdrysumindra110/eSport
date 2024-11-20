@@ -32,7 +32,7 @@ if (isset($_GET['delete_id'])) {
 
     if (mysqli_query($conn, $delete_query)) {
 
-        header('Location: admin_dashboard.php'); 
+        header('Location: admin.php'); 
         exit;
     } else {
 
