@@ -1,23 +1,23 @@
 <?php
-// Start the session
+
 session_start();
 
-// Database configuration
+
 include_once('config.php');
 
-// Initialize messages
+
 $error_message = '';
 $success_signup = '';
 
-// Check if form is submitted
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get the form data
+    
     $uname = $_POST['uname'];
     $email = $_POST['email'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    // Validate form data
+    
     if (empty($uname) || empty($email) || empty($password) || empty($confirm_password)) {
         $error_message = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -27,11 +27,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
 
 
-        // Check connection
+        
         if ($conn->connect_error) {
             $error_message = "Connection failed: " . $conn->connect_error;
         } else {
-            // Prepare and bind the query to check if email already exists
+            
             $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
@@ -40,19 +40,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($result->num_rows > 0) {
                 $error_message = "Email already exists.";
             } else {
-                // Hash the password
+                
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-                // Prepare and bind the query to insert new user
+                
                 $stmt = $conn->prepare("INSERT INTO users (uname, email, password) VALUES (?, ?, ?)");
                 $stmt->bind_param("sss", $uname, $email, $hashed_password);
                 $stmt->execute();
 
                 if ($stmt->affected_rows > 0) {
-                    // Set session variable for username
+                    
                     $_SESSION['username'] = $uname;
 
-                    // Success message and redirect
+                    
                     $success_signup = "Account created successfully!";
                     header("Location: signin.php?success_signup=" . urlencode($success_signup));
                     exit();
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
 
-            // Close the connection
+            
             $conn->close();
         }
     }
@@ -75,8 +75,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="utf-8">
   <title>Signup Page</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,800">
+  <link rel="stylesheet" href="https:
+  <link rel="stylesheet" href="https:
   <link rel="stylesheet" href="./css/signup.css">
   <style>
     .popup-message {
@@ -92,10 +92,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       z-index: 1000;
     }
     .popup-message.success {
-      background-color: #4CAF50; /* Green */
+      background-color: #4CAF50;
     }
     .popup-message.error {
-      background-color: #f44336; /* Red */
+      background-color: #f44336;
     }
   </style>
 </head>
@@ -142,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function showPopupMessage(message, type) {
       const popup = document.getElementById('popup-message');
       popup.textContent = message;
-      popup.className = 'popup-message'; // Reset to default
+      popup.className = 'popup-message'; 
       if (type === 'success') {
         popup.classList.add('success');
       } else if (type === 'error') {
@@ -151,14 +151,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       popup.style.display = 'block';
       setTimeout(() => {
         popup.style.display = 'none';
-      }, 3000); // Hide after 3 seconds
+      }, 3000); 
     }
 
-    // Example usage for PHP error and success messages
-    <?php if (!empty($error_message) || !empty($success_signup)): ?>  // Changed here
+    
+    <?php if (!empty($error_message) || !empty($success_signup)): ?>  
       document.addEventListener('DOMContentLoaded', function() {
-        <?php if (!empty($success_signup)): ?>  // Changed here
-          showPopupMessage("<?php echo $success_signup; ?>", 'success');  // Changed here
+        <?php if (!empty($success_signup)): ?>  
+          showPopupMessage("<?php echo $success_signup; ?>", 'success');  
         <?php elseif (!empty($error_message)): ?>
           showPopupMessage("<?php echo $error_message; ?>", 'error');
         <?php endif; ?>
@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     document.getElementById('signIn').addEventListener('click', toggleContainerAndRedirect);
 
-    // Client-side validation
+    
     document.getElementById('signup-form').addEventListener('submit', function(event) {
       const fullName = document.getElementById('uname').value.trim();
       const email = document.getElementById('email').value.trim();

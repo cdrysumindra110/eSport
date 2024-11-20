@@ -4,20 +4,20 @@ require_once 'config.php';
 
 session_start();
 
-// Initialize messages
+
 $error_message = '';
 $success_message = '';
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     header('Location: signin.php');
     exit();
 }
 
-// Get the logged-in user ID
+
 $user_id = $_SESSION['user_id'];
 
 
@@ -75,15 +75,15 @@ exit;
     <link rel="stylesheet" href="owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
     <link rel="stylesheet" href="css/template-style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https:
+    <link href="https:
+    <link rel="stylesheet" href="https:
 
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
 
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+    <link rel='stylesheet' href='https:
 
   </head>
 
@@ -268,7 +268,7 @@ exit;
                <h4 class="text-white text-strong margin-m-top-30">Contact Us</h4>
                 <a class="text-primary-hover" href="tel:+977 8888888888"><i class="icon-sli-screen-smartphone text-primary"></i> +977 8888888888</a><br>
                 <a class="text-primary-hover" href="mailto:contact@InfiKnight.com"><i class="fa-solid fa-envelope text-primary"></i> contact@InfiKnight.com</a><br>
-                <a class="text-primary-hover" href="https://maps.app.goo.gl/QGesNa3t51KtP1Vt7"><i class="fa-solid fa-map-marker-alt text-primary"></i> Pradarshani Marg, Kathmandu 44600</a>
+                <a class="text-primary-hover" href="https:
             </div>
           </div>  
         </div>    
@@ -303,18 +303,18 @@ exit;
   });
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Get all buttons in the button container
+    
     const buttons = document.querySelectorAll('.btn-cnt');
   
     buttons.forEach(button => {
         button.addEventListener('click', function() {
-            // Remove 'active' class from all buttons
+            
             buttons.forEach(btn => btn.classList.remove('active'));
   
-            // Add 'active' class to the clicked button
+            
             this.classList.add('active');
   
-            // Determine the URL to redirect based on button ID
+            
             let redirectUrl = '';
             switch (this.id) {
                 case 'walletBtn':
@@ -339,10 +339,10 @@ exit;
                     redirectUrl = 'logout.php';
                     break;
                 default:
-                    redirectUrl = 'dashboard.php'; // Default fallback URL
+                    redirectUrl = 'dashboard.php'; 
             }
   
-            // Redirect to the appropriate page
+            
             window.location.href = redirectUrl;
         });
     });
@@ -359,11 +359,11 @@ function loadProfilePic(event) {
 }
 
 
-  // Function to show the popup message
+  
   function showPopupMessage(message, type) {
     const popup = document.getElementById('popup-message');
     popup.textContent = message;
-    popup.className = 'popup-message'; // Reset to default
+    popup.className = 'popup-message'; 
     if (type === 'success') {
       popup.classList.add('success');
     } else if (type === 'error') {
@@ -372,10 +372,10 @@ function loadProfilePic(event) {
     popup.style.display = 'block';
     setTimeout(() => {
       popup.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
+    }, 3000); 
   }
 
-  // Example usage for PHP error and success messages
+  
   document.addEventListener('DOMContentLoaded', function() {
     <?php if (!empty($success_message)): ?>
       showPopupMessage("<?php echo $success_message; ?>", 'success');
@@ -384,7 +384,7 @@ function loadProfilePic(event) {
     <?php endif; ?>
   });
 
-    // Check if there's a success message and display it
+    
     <?php if (!empty($success_message)): ?>
       document.addEventListener('DOMContentLoaded', function() {
         showPopupMessage("<?php echo $success_message; ?>", 'success');

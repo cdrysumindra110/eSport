@@ -1,87 +1,161 @@
-/* Table section */
+/* General Container Styling */
+.ut-container {
+    background-color: #282828;
+    color: #ffffff;
+    font-family: sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Header Section */
+.ut-header {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.ut-header__button {
+    margin-left: auto;
+    background-color: #38b2d1;
+    border: none;
+    color: #181818;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.ut-header__button:hover {
+    background-color: #2bd8ff;
+    color: #000000;
+}
+
+/* Table Section */
 .ut-table {
     width: 100%;
     max-width: 1200px; /* Limit table width */
-    border-collapse: collapse; /* Ensure borders are collapsed */
+    border-collapse: collapse;
     background-color: #282828;
-    margin: 0 auto; /* Center table */
-    border: none; /* Remove border */
-    table-layout: fixed; /* Ensure all columns have the same width */
+    margin: 0 auto;
+    border: none;
+    table-layout: auto; /* Changed from fixed to auto */
 }
 
-/* Table header and cell styling */
+/* Table Header and Cell Styling */
 .ut-table__head,
 .ut-table__cell {
-    padding: 10px;
+    padding: 12px;
     text-align: left;
     word-break: break-word;
-    border: none; /* Remove border from all cells */
-    vertical-align: middle; /* Ensure vertical alignment is consistent */
+    border: none;
+    vertical-align: middle;
+    background-color: #282828; /* Same background color for both header and cell */
+    box-sizing: border-box; /* Added box-sizing */
+}
+
+/* Table Header Styling */
+.ut-table__head {
+    background-color: #383838; /* Dark background for header */
+    color: #ffffff; /* Text color for header */
 }
 
 /* Column Styles */
-.ut-table__head--status,
-.ut-table__cell--status {
-    width: 12rem; /* Fixed width for status column */
+.ut-table__head--game,
+.ut-table__cell--game {
+    width: 14rem; /* Sufficient width for game column */
+    text-align: left;
 }
 
-/* Status label */
+.ut-table__head--date,
+.ut-table__cell--date,
+.ut-table__head--brackets,
+.ut-table__cell--brackets,
+.ut-table__head--prize,
+.ut-table__cell--prize {
+    width: 150px;
+    text-align: left;
+}
+
+.ut-table__head--status,
+.ut-table__cell--status {
+    width: 10rem; /* Reduced width for status column */
+    text-align: left;
+}
+
+/* Status Label Styling */
 .ut-status--new {
     background-color: #66ff66;
     color: #000000;
-    padding: 5px 10px;
+    padding: 2px 8px; /* Reduced padding */
     border-radius: 5px;
     font-weight: bold;
-    font-size: 11px;
+    font-size: 10px; /* Reduced font size */
     text-align: center;
-    width: 100%; /* Ensure the label occupies full available width */
+    width: auto; /* Auto width to fit content */
+    max-width: 80px; /* Limit max width */
     box-sizing: border-box; /* Prevent overflow of padding */
+    white-space: nowrap; /* Prevent text from wrapping */
 }
 
-/* Row styles */
+/* Row Styling */
 .ut-row {
-    position: relative; /* Set position for hover effect */
-    cursor: pointer; /* Change cursor to pointer */
-    background-color: #383838; /* Same background for all rows */
+    position: relative;
+    cursor: pointer;
+    background-color: #383838;
+    padding: 10px;
+    border-bottom: none !important;
 }
 
-/* Hover effect for all rows */
+/* Hover Effect for Rows */
 .ut-row:hover {
-    background-color: #00f7ff0b; /* Hover background color */
-    color: #00f7ff; /* Text color on hover */
+    background-color: #00f7ff0b;
+    color: #00f7ff;
 }
 
-/* Icon inside row */
+/* Icon Inside Row */
 .ut-row .ut-row__icon-eye {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     font-size: 18px;
     color: #00f7ff;
-    display: none; /* Start hidden */
+    display: none; /* Initially hidden */
 }
 
 .ut-row:hover .ut-row__icon-eye {
     display: block; /* Show on hover */
 }
 
-/* Image inside table */
+/* Image Inside Table */
 .ut-image img {
     width: 100px;
     height: 70px;
     object-fit: cover;
-    border-radius: 1px; /* Rounded corners */
+    border-radius: 1px;
 }
 
-/* Information section inside row */
+/* Information Section Inside Row */
 .ut-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Align entire info section in a single row */
     margin-left: 10px;
+    align-items: center; /* Vertically align content */
+}
+
+.ut-info__name,
+.ut-info__host {
+    display: block; /* Ensure these elements stack within the row */
+    font-size: 14px;
 }
 
 .ut-info__name {
     font-weight: bold;
+    margin-right: 10px; /* Space between name and host */
 }
 
 .ut-info__host {
@@ -89,12 +163,12 @@
     color: #ffffff;
 }
 
-/* Responsive Design */
+/* Responsive Design for Smaller Screens */
 @media (max-width: 600px) {
     .ut-table__head,
     .ut-table__cell {
         padding: 8px;
-        font-size: 14px; /* Adjust font size */
+        font-size: 14px;
     }
 
     .ut-image img {
@@ -110,6 +184,21 @@
     .ut-header__button {
         margin-top: 10px; /* Space above button */
     }
+
+    .ut-table__head--status,
+    .ut-table__cell--status,
+    .ut-table__head--date,
+    .ut-table__cell--date,
+    .ut-table__head--brackets,
+    .ut-table__cell--brackets,
+    .ut-table__head--prize,
+    .ut-table__cell--prize {
+        width: auto; /* Allow columns to adjust on small screens */
+    }
+
+    /* Adjust the .ut-info layout on small screens */
+    .ut-info {
+        flex-direction: column; /* Stack the info vertically on small screens */
+        align-items: flex-start; /* Align left on small screens */
+    }
 }
-
-

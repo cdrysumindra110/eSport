@@ -195,77 +195,77 @@ $conn->close();
             </div>
 
             <div id="myTournamentsSection" class="profile-section">
-            <div class="unique-container">
-              <h2 class="unique-header">Organized Tournaments</h2> 
-              <div class="ut-container">
-                  <div class="ut-header">
-                      <a href="#" class="ut-header__button">EXPLORE TOURNAMENTS</a>
-                  </div>
-                  <table class="ut-table">
-                      <thead>
-                          <tr>
-                              <th class="ut-table__head">
-                                  <i class='fa fa-trophy' style='color:#00d696'></i> TOURNAMENTS
-                              </th>
-                              <th class="ut-table__head ut-table__head--status">
-                                  <i class='fa fa-flag-checkered' style='color:#00d696'></i> STATUS
-                              </th>
-                              <th class="ut-table__head ut-table__cell--date">
-                                  <i class='fa fa-calendar' style='color:#00d696'></i> DATE
-                              </th>
-                              <th class="ut-table__head ut-table__cell--prize" style="padding-left: 20px;">
-                                  <i class='fas fa-medal' style='color:#00d696'></i> PRIZE
-                              </th>
-                              <th class="ut-table__head"></th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <?php if (!empty($tournaments)): ?>
-                              <?php foreach ($tournaments as $tournament): ?>
-                                  <div class="ut-container">
-                                      <table class="ut-table">
-                                          <tr class="ut-row">
-                                              <td class="ut-table__cell ut-table__cell--first">
-                                                  <div class="ut-image">
-                                                      <?php if (!empty($tournament['bannerimg'])): ?>
-                                                          <img src="data:image/jpeg;base64,<?php echo base64_encode($tournament['bannerimg']); ?>" alt="Tournament Banner">
-                                                      <?php else: ?>
-                                                          <img src="./img/dash-logo.png" alt="Default Tournament Banner">
-                                                      <?php endif; ?>
-                                                  </div>
+              <div class="unique-container">
+                <h2 class="unique-header">Organized Tournaments</h2> 
+                <div class="ut-container">
+                    <button class="ut-header">
+                        <a href="organize.php" class="ut-header__button">CREATE TOURNAMENTS</a>
+                    </button>
+                    <table class="ut-table">
+                        <thead>
+                            <tr>
+                                <th class="ut-table__head">
+                                    <i class='fa fa-trophy' style='color:#00d696'></i> TOURNAMENTS
+                                </th>
+                                <th class="ut-table__head ut-table__head--status">
+                                    <i class='fa fa-flag-checkered' style='color:#00d696'></i> STATUS
+                                </th>
+                                <th class="ut-table__head ut-table__cell--date">
+                                    <i class='fa fa-calendar' style='color:#00d696'></i> DATE
+                                </th>
+                                <th class="ut-table__head ut-table__cell--prize" style="padding-left: 20px;">
+                                    <i class='fas fa-medal' style='color:#00d696'></i> PRIZE
+                                </th>
+                                <th class="ut-table__head"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($tournaments)): ?>
+                                <?php foreach ($tournaments as $tournament): ?>
+                                    <div class="ut-container">
+                                        <table class="ut-table">
+                                            <tr class="ut-row">
+                                                <td class="ut-table__cell ut-table__cell--first">
+                                                    <div class="ut-image">
+                                                        <?php if (!empty($tournament['bannerimg'])): ?>
+                                                            <img src="data:image/jpeg;base64,<?php echo base64_encode($tournament['bannerimg']); ?>" alt="Tournament Banner">
+                                                        <?php else: ?>
+                                                            <img src="./img/dash-logo.png" alt="Default Tournament Banner">
+                                                        <?php endif; ?>
+                                                    </div>
 
-                                                  <div class="ut-info">
-                                                      <div class="ut-info__name"><?php echo htmlspecialchars($tournament['tname']); ?></div>
-                                                      <div class="ut-info__host">Hosted by 
-                                                          <span style="color: #00f7ff;">
-                                                              <?php echo htmlspecialchars($_SESSION['uname']); ?>
-                                                          </span>
-                                                      </div>
-                                                  </div>
-                                              </td>
-                                              <td class="ut-table__cell ut-table__cell--status">
-                                                  <div class="ut-status--new">NEW</div>
-                                              </td>
-                                              <td class="ut-table__cell"><?php echo htmlspecialchars($tournament['sdate']); ?></td>
-                                              <td class="ut-table__cell ut-table__cell--prize" style="padding-left: 20px;">
-                                                  <?php echo htmlspecialchars($tournament['prizes']); ?>
-                                              </td>
-                                              <td class="ut-table__cell">
-                                                  <a href="tournament_details.php?tournament_id=<?php echo $tournament['id']; ?>">
-                                                      <i class='fa fa-eye ut-row__icon-eye'></i>
-                                                  </a>
-                                              </td>
-                                          </tr>
-                                      </table>
-                                  </div>
-                              <?php endforeach; ?>
-                          <?php else: ?>
-                              <tr><td colspan="5"><?php echo htmlspecialchars($error_message); ?></td></tr>
-                          <?php endif; ?>
-                      </tbody>
-                  </table>
+                                                    <div class="ut-info">
+                                                        <div class="ut-info__name"><?php echo htmlspecialchars($tournament['tname']); ?></div>
+                                                        <div class="ut-info__host">Hosted by 
+                                                            <span style="color: #00f7ff;">
+                                                                <?php echo htmlspecialchars($_SESSION['uname']); ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="ut-table__cell ut-table__cell--status">
+                                                    <div class="ut-status--new">NEW</div>
+                                                </td>
+                                                <td class="ut-table__cell"><?php echo htmlspecialchars($tournament['sdate']); ?></td>
+                                                <td class="ut-table__cell ut-table__cell--prize" style="padding-left: 20px;">
+                                                    <?php echo htmlspecialchars($tournament['prizes']); ?>
+                                                </td>
+                                                <td class="ut-table__cell">
+                                                    <a href="tournament_details.php?tournament_id=<?php echo $tournament['id']; ?>">
+                                                        <i class='fa fa-eye ut-row__icon-eye'></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="5"><?php echo htmlspecialchars($error_message); ?></td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
               </div>
-            </div>
           </div>
     </div>
 

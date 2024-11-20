@@ -183,7 +183,7 @@ $conn->close();
       <div class="ut-container">
         <h2 class="unique-header">Available Tournaments</h2>
             <div class="ut-header">
-                <a href="#" class="ut-header__button">EXPLORE TOURNAMENTS</a>
+                <a href="tournaments.php" class="ut-header__button">EXPLORE TOURNAMENTS</a>
             </div>
             <table class="ut-table">
                 <thead>
