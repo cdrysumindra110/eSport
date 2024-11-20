@@ -466,10 +466,13 @@
 }
 
 .fieldlabels {
-  color: #000000;
-  text-align: left;
-  font-size: larger;
+  color: #000000 !important;
+  text-align: left !important;
+  font-size: 16px !important; 
+  margin-bottom: 5px;
+  display: block; 
 }
+
 
 
 #progressbar {
