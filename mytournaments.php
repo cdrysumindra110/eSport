@@ -198,9 +198,9 @@ $conn->close();
               <div class="unique-container">
                 <h2 class="unique-header">Organized Tournaments</h2> 
                 <div class="ut-container">
-                    <button class="ut-header">
-                        <a href="organize.php" class="ut-header__button">CREATE TOURNAMENTS</a>
-                    </button>
+                    <div class="ut-header">
+                        <a href="organize.php" class="ut-header__button"><i class="fas fa-plus" style="color: white;"></i> CREATE TOURNAMENTS</a>
+                    </div>
                     <table class="ut-table">
                         <thead>
                             <tr>
