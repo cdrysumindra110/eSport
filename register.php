@@ -209,298 +209,307 @@
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
 
     <style>
-/* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
 
-/* Tournament Registration Container */
-.tournament-reg_container {
-    background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
-    color: #fff;
-    text-align: center;
-    padding: 50px 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    margin-bottom: 30px;
-}
+        .tournament-reg_container {
+            background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
+            color: #fff;
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
 
-/* Content Styling */
-.tournament-reg_container .content {
-    max-width: 800px;
-    margin: 0 auto;
-}
+        .tournament-reg_container .content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-/* Heading Styles */
-.tournament-reg_container h1 {
-    font-size: 36px;
-    margin: 15px 0;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: color 0.3s ease;
-}
-.tournament-reg_container h2 {
-    font-size: 24px;
-    margin: 10px 0;
-    font-weight: semi-bold;
-    letter-spacing: 1.5px;
-    color: #ffeb3b;
-}
-.tournament-reg_container h3 {
-    font-size: 20px;
-    margin: 8px 0;
-    font-weight: normal;
-}
+        .tournament-reg_container h1 {
+            font-size: 36px;
+            margin: 15px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s ease;
+        }
 
-/* Button Styles */
-.ctn_btn {
-    display: inline-block;
-    background-color: #ff4081;
-    color: #fff;
-    padding: 12px 25px;
-    font-size: 18px;
-    border-radius: 5px;
-    text-decoration: none;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    margin-top: 20px;
-}
-.ctn_btn:hover {
-    background-color: #f50057;
-    transform: scale(1.05);
-}
+        .tournament-reg_container h2 {
+            font-size: 24px;
+            margin: 10px 0;
+            font-weight: semi-bold;
+            letter-spacing: 1.5px;
+            color: #ffeb3b;
+        }
 
-/* Countdown Styling */
-.countdown {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-    font-size: 24px;
-}
-.countdown div {
-    background-color: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 5px;
-    min-width: 60px;
-    font-weight: bold;
-}
+        .tournament-reg_container h3 {
+            font-size: 20px;
+            margin: 8px 0;
+            font-weight: normal;
+        }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .tournament-reg_container {
-        padding: 30px 15px;
-    }
-    .tournament-reg_container h1 {
-        font-size: 28px;
-    }
-    .tournament-reg_container h2 {
-        font-size: 20px;
-    }
-    .tournament-reg_container h3 {
-        font-size: 16px;
-    }
-    .ctn_btn {
-        font-size: 16px;
-        padding: 10px 20px;
-    }
-    .countdown div {
-        padding: 15px;
-        font-size: 20px;
-    }
-}
+        .ctn_btn {
+            display: inline-block;
+            background-color: #ff4081;
+            color: #fff;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-top: 20px;
+        }
 
-/* Container Styles */
-.container-registration {
-    background-color: #fff;
-    width: 90%;
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-.container-registration:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
+        .ctn_btn:hover {
+            background-color: #f50057;
+            transform: scale(1.05);
+        }
 
-/* Header */
-.container-registration h2 {
-    text-align: center;
-    font-size: 28px;
-    color: #333;
-}
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #fff; /* Adjust color as needed */
+            }
 
-/* Form Styles */
-#registration_form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+            .time-section {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: rgba(255, 255, 255, 0.2);
+            }
 
-/* Section Styles */
-#solo_reg,
-#duo_reg,
-#sqd_reg {
-    background-color: #fafafa;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
+            .countdown div {
+                padding: 20px;
+                border-radius: 5px;
+                min-width: 60px;
+                font-weight: bold;
+                text-align: center;
+            }
 
-/* Unique Class Names */
-.form-group-solo,
-.form-group-duo,
-.form-group-squad {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-/* Player Container Styling */
-#players {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
+            .countdown span {
+                margin-top: 5px;
+                font-size: 16px;
+            }
+            .separator {
+                font-size: 24px;
+                font-weight: bold;
+                align-self: center;
+                color: #fff; /* Adjust color as needed */
+            }
 
-/* Player Section Styling */
-.player-section {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
 
-/* Responsive Design for Smaller Screens */
-@media (max-width: 768px) {
-    #players {
-        grid-template-columns: 1fr;
-    }
-}
+        @media (max-width: 768px) {
+            .tournament-reg_container {
+                padding: 30px 15px;
+            }
 
-/* Input Styles */
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
+            .tournament-reg_container h1 {
+                font-size: 28px;
+            }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="tel"]:focus,
-input[type="file"]:focus {
-    border-color: #6200ea;
-    box-shadow: 0 0 5px rgba(98, 0, 234, 0.4);
-}
+            .tournament-reg_container h2 {
+                font-size: 20px;
+            }
 
-/* Button Styles */
-button[type="submit"] {
-    background-color: #6200ea;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-button[type="submit"]:hover {
-    background-color: #4b00b3;
-}
+            .tournament-reg_container h3 {
+                font-size: 16px;
+            }
 
-/* Preview Image */
-.preview img {
-    max-width: 100%;
-    max-height: 150px;
-    border-radius: 5px;
-}
+            .ctn_btn {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
 
-/* Player Info */
-.player-section h3 {
-    font-size: 20px;
-    color: #333;
-    margin-bottom: 8px;
-}
-.player-section label {
-    font-size: 14px;
-    color: #666;
-}
-.player-section input {
-    margin-bottom: 8px;
-}
+            .countdown div {
+                padding: 15px;
+                font-size: 20px;
+            }
+        }
 
-/* Section-specific Styles */
-#solo_reg .form-group-solo label,
-#duo_reg .form-group-duo label,
-#sqd_reg .form-group-squad label {
-    font-weight: bold;
-    color: #444;
-}
+        .container-registration {
+            background-color: #fff;
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-/* Transitions for Effects */
-.container-registration,
-#registration_form div,
-input,
-button {
-    transition: all 0.3s ease;
-}
+        .container-registration:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
 
-/* Button Styles for Registration */
-#reg-btn {
-    background-color: #6200ea;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    display: none;  /* Hide button by default */
-    opacity: 0;     /* Ensure it's fully invisible */
-    pointer-events: none;  /* Prevent clicks when hidden */
-    visibility: hidden;    /* Ensure visibility is set to hidden */
-    margin-top: 20px;
-}
+        .container-registration h2 {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+        }
 
-#reg-btn:hover {
-    background-color: #4b00b3;
-}
+        #registration_form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-/* Hide Sections by Default */
-#solo_reg, #duo_reg, #squad_reg {
-    display: none;  /* Sections are hidden initially */
-}
+        #solo_reg,
+        #duo_reg,
+        #sqd_reg {
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
 
-/* For smooth transition */
-.hidden {
-    display: none !important;
-}
+        .form-group-solo,
+        .form-group-duo,
+        .form-group-squad {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
 
-/* Add margin-bottom to the last input or div element before the submit button */
-form > div:last-child {
-    margin-bottom: 10px; /* Adjust this value for more or less gap */
-}
+        #players {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
 
-/* Optionally, add some space directly to the submit button */
-button[type="submit"] {
-    margin-top: 10px; /* Adjust this value for desired space between the form and button */
-}
+        .player-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-/* Optional: add space between form fields */
-form > div {
-    margin-bottom: 7px; /* Adds gap between form fields if needed */
-}
+        @media (max-width: 768px) {
+            #players {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="file"]:focus {
+            border-color: #6200ea;
+            box-shadow: 0 0 5px rgba(98, 0, 234, 0.4);
+        }
+
+        button[type="submit"] {
+            background-color: #6200ea;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #4b00b3;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 5px;
+        }
+
+        .player-section h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .player-section label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .player-section input {
+            margin-bottom: 8px;
+        }
+
+        #solo_reg .form-group-solo label,
+        #duo_reg .form-group-duo label,
+        #sqd_reg .form-group-squad label {
+            font-weight: bold;
+            color: #444;
+        }
+
+        .container-registration,
+        #registration_form div,
+        input,
+        button {
+            transition: all 0.3s ease;
+        }
+
+        #reg-btn {
+            background-color: #6200ea;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+            margin-top: 20px;
+        }
+
+        #reg-btn:hover {
+            background-color: #4b00b3;
+        }
+
+        #solo_reg,
+        #duo_reg,
+        #squad_reg {
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        form > div:last-child {
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            margin-top: 10px;
+        }
+
+        form > div {
+            margin-bottom: 7px;
+        }
 
     </style>
   </head>
@@ -590,10 +599,25 @@ form > div {
         <br><br>
         <h3>THE TOURNAMENT STARTS IN:</h3>
         <div class="countdown">
-            <div id="days">0</div>
-            <div id="hours">0</div>
-            <div id="minutes">0</div>
-            <div id="seconds">0</div>
+            <div class="time-section">
+                <div id="days">0</div>
+                <span>Days</span>
+            </div>
+            <div class="separator">:</div>
+            <div class="time-section">
+                <div id="hours">0</div>
+                <span>Hours</span>
+            </div>
+            <div class="separator">:</div>
+            <div class="time-section">
+                <div id="minutes">0</div>
+                <span>Minutes</span>
+            </div>
+            <div class="separator">:</div>
+            <div class="time-section">
+                <div id="seconds">0</div>
+                <span>Seconds</span>
+            </div>
         </div>
     </div>
 </div>
