@@ -206,12 +206,6 @@ exit;
           <h2 class="unique-header">Wallet</h2>
                       
           <h2 class="unique-header">Wallet</h2>
-          
-          <h2 class="unique-header">Wallet</h2>
-                      
-          <h2 class="unique-header">Wallet</h2>
-          
-          <h2 class="unique-header">Wallet</h2>
         </div>
     </div>
 

@@ -335,8 +335,7 @@
   box-shadow: none !important;
   outline: none !important;
   padding: 0;
-  background-color: #282828; /* Ensure background is transparent */
-  
+  background-color: whitesmoke !important;
 }
 
 
@@ -428,7 +427,7 @@
 
 #msform .action-button-previous:hover,
 #msform .action-button-previous:focus {
-    background-color: #000000
+    background-color: #000000;
 }
 
 .card {
@@ -467,8 +466,9 @@
 }
 
 .fieldlabels {
-    color: gray;
-    text-align: left
+  margin-bottom: 14px;
+  color: rgb(0, 0, 0);
+  text-align: left;
 }
 
 #progressbar {
@@ -710,7 +710,9 @@
 /* Contact with you text field */
 
 .fieldlabels {
-  margin-bottom: 5px;
+    margin-bottom: 10px;
+    color: rgb(0, 0, 0);
+    text-align: left;
 }
 
 .social-media-row {
@@ -846,7 +848,7 @@
   display: block;
   font-size: 1em;
   margin-bottom: 8px;
-  color: #333;
+  color: #000000;
 }
 
 .brac-input {

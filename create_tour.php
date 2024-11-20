@@ -230,9 +230,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <span id="popup-message">Please select a provider.</span>
         <span id="close-popup" class="close-btn">&times;</span>
       </div>
-      
-          <!-- partial:index.partial.php -->
-          <div class="container-fluid" style="width: 100%;">
+    </div>
+    <!-- partial:index.partial.php -->
+    <div class="container-fluid" style="width: 100%;">
             <div class="row justify-content-center" style="width: 100%;">
                 <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2" style="width: 100%;">
                     <div class="card px-0 pt-4 pb-0 mt-3 mb-3" >
@@ -295,8 +295,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
                                     <div class="match-details-container">
-                                      <h3 class="fs-titleh3">Bracket Details</h3>
-                                    
                                       <div class="bracket-selection">
                                         <label class="brac-label" for="bracket-type">Bracket Type</label>
                                         <select id="bracket-type" name="bracket-type" class="brac-input">
@@ -462,7 +460,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                   <br>
                                   <div class="row justify-content-center">
                                       <div class="col-3">
-                                          <!-- <img src="img.png" class="fit-image"> -->
+                                          <img src="img.png" class="fit-image">
                                       </div>
                                   </div> 
                                   <br><br>
@@ -484,7 +482,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
           </div>
-    </div>
 
     
     <!-- FOOTER -->
