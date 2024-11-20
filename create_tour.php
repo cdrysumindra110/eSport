@@ -141,7 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>   
 
     <!-- popup -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -264,20 +265,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <h2 class="steps">Step 1 - 4</h2>
                                         </div>
                                     </div> 
-                                      <label class="fieldlabels">Selected Game</label>
+                                      <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Selected Game</label>
                                       <input type="text" id="selected_game" name="selected_game" readonly />
-                                      <label class="fieldlabels">Tournament Name</label> 
+                                      <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Tournament Name</label> 
                                       <input type="text" name="tname" id="tname" placeholder="Tournament Name" required /> 
-                                      <label class="fieldlabels">Start Date</label> 
+                                      <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Start Date</label> 
                                       <input type="date" name="sdate" id="sdate" placeholder="Start Date(DD/MM/YYYY)" required /> 
-                                      <label class="fieldlabels">Start Time</label> 
+                                      <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Start Time</label> 
                                       <input type="time" name="stime" id="stime" placeholder="Time displayed in Time displayed in +0545" required /> 
-                                      <label class="fieldlabels">Game Banner</label>
+                                      <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Game Banner</label>
                                       <input type="file" id="bannerimg" name="bannerimg" accept="image/*" onchange="showPreview(event);" required />
                                       <div class="preview">
                                         <img id="bannerimg-preview">
                                       </div>
-                                      <label class="fieldlabels">About</label>
+                                      <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">About</label>
                                       <div id="editor-container-about" style="height: 200px; display: block !important; height: 200px !important;"></div>
                                       <input type="hidden" name="about" id="about">                           
                                     </div> 
@@ -296,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                     <div class="match-details-container">
                                       <div class="bracket-selection">
-                                        <label class="brac-label" for="bracket-type">Bracket Type</label>
+                                        <label class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;" for="bracket-type">Bracket Type</label>
                                         <select id="bracket-type" name="bracket-type" class="brac-input">
                                           <option value="battle_royal">Battle Royal</option>
                                           <option value="round_robin">Round Robin</option>
@@ -306,7 +307,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                       </div>
                                     
                                       <div class="match-selection">
-                                        <label class="brac-label" for="match-type">Match Type</label>
+                                        <label class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;" for="match-type">Match Type</label>
                                         <select id="match-type" name="match-type" class="brac-input">
                                           <option value="solo">Solo</option>
                                           <option value="duo">Duo</option>
@@ -316,21 +317,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     
                                       <!-- Solo Container -->
                                       <div id="solo-container" class="match-container" style="display: none;">
-                                        <label for="solo-players" class="brac-label">Number of Players</label>
+                                        <label for="solo-players" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Players</label>
                                         <input type="number" id="solo-players" name="solo-players" class="brac-input">
                                       </div>
                                     
                                       <!-- Duo Container -->
                                       <div id="duo-container" class="match-container" style="display: none;">
-                                        <label for="duo-teams" class="brac-label">Number of Teams</label>
+                                        <label for="duo-teams" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Teams</label>
                                         <input type="number" id="duo-teams" name="duo-teams" class="brac-input">
                                     
-                                        <label for="duo-players-per-team" class="brac-label">Players per Team</label>
+                                        <label for="duo-players-per-team" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Players per Team</label>
                                         <input type="number" id="duo-players" name="duo-players" class="brac-input"></div>
                                     
                                       <!-- Squad Container -->
                                       <div id="squad-container" class="match-container" style="display: none;">
-                                        <label for="squad-teams" class="brac-label">Number of Teams</label>
+                                        <label for="squad-teams" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Teams</label>
                                         <select id="squad-teams" name="squad-teams" class="brac-input">
                                           <option value="1">1</option>
                                           <option value="2">2</option>
@@ -354,12 +355,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                           <option value="20">20</option>
                                         </select>
                                     
-                                        <label for="squad-players-per-team" class="brac-label">Players per Team</label>
+                                        <label for="squad-players-per-team" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Players per Team</label>
                                         <input type="number" id="squad-players" name="squad-players" class="brac-input">
                                       </div>
 
 
-                                      <label for="rounds" class="brac-label">Number of Rounds</label>
+                                      <label for="rounds" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Rounds</label>
                                         <select id="rounds" name="rounds" class="brac-input">
                                           <option value="1">1</option>
                                           <option value="2">2</option>
@@ -369,14 +370,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                           <option value="6">6</option>
                                         </select>
 
-                                        <!-- <label for="advancement" class="brac-label">Group Advancement</label>
+                                        <!-- <label for="advancement" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Group Advancement</label>
                                         <select id="advancement" name="advancement" class="brac-input">
                                             <option value="random">Random</option>
                                             <option value="elimination">Elimination</option>
                                         </select> -->
                                     
                                         <h3 class="fs-titleh3">Placement Point System</h3>
-                                        <label for="placement" class="brac-label">Placement</label>
+                                        <label for="placement" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Placement</label>
                                         <textarea id="placement" name="placement" class="brac-input" rows="7" placeholder="#1 = 10pts\n#2 = 8pts\n#3 = 6pts\n#Kill = 1pt"></textarea>
                                     </div>
                                     
@@ -399,7 +400,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                     <main class="main-container section-padding">
                                         <div class="unique-input-field">
-                                            <label for="select-provider" class="unique-label">Select Provider</label>
+                                            <label for="select-provider" class="unique-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Select Provider</label>
                                             <div class="social-media-row">
                                                   <select id="select-provider" name="select-provider" class="unique-select">
                                                     <option value="">Select Provider</option>
@@ -410,7 +411,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 <input type="text" id="channel-name" name="channel-name" class="dynamic-input" placeholder="Enter your Channel Name" />
                                             </div>
 
-                                            <label for="social-media" class="unique-label">How players will contact you ?</label>
+                                            <label for="social-media" class="unique-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">How players will contact you ?</label>
                                             <div class="social-media-row">
                                                 <select id="social-media" name="social-media" class="unique-select">
                                                     <option value="">Select a social media</option>

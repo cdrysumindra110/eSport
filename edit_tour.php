@@ -252,9 +252,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <span id="popup-message">Please select a provider.</span>
         <span id="close-popup" class="close-btn">&times;</span>
       </div>
-      
-          <!-- partial:index.partial.php -->
-          <div class="container-fluid" style="width: 100%;">
+    </div>
+    <!-- partial:index.partial.php -->
+    <div class="container-fluid" style="width: 100%;">
             <div class="row justify-content-center" style="width: 100%;">
                 <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2" style="width: 100%;">
                     <div class="card px-0 pt-4 pb-0 mt-3 mb-3" >
@@ -289,19 +289,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                           <h2 class="steps">Step 1 - 4</h2>
                                       </div>
                                   </div> 
-                                  <label class="fieldlabels">Selected Game</label>
+                                  <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Selected Game</label>
                                   <input type="text" id="selected_game" name="selected_game" value="<?php echo htmlspecialchars($tournament_data['selected_game']); ?>" readonly />
                                   
-                                  <label class="fieldlabels">Tournament Name</label>
+                                  <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Tournament Name</label>
                                   <input type="text" name="tname" id="tname" value="<?php echo htmlspecialchars($tournament_data['tname']); ?>" placeholder="Tournament Name" required />
                                   
-                                  <label class="fieldlabels">Start Date</label>
+                                  <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Start Date</label>
                                   <input type="date" name="sdate" id="sdate" value="<?php echo htmlspecialchars($tournament_data['sdate']); ?>" required />
                                   
-                                  <label class="fieldlabels">Start Time</label>
+                                  <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Start Time</label>
                                   <input type="time" name="stime" id="stime" value="<?php echo htmlspecialchars($tournament_data['stime']); ?>" required />
                                   
-                                  <label class="fieldlabels">Game Banner</label>
+                                  <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Game Banner</label>
                                   <input type="file" id="bannerimg" name="bannerimg" accept="image/*" onchange="showPreview(event);" />
                                   <div class="preview">
                                       <?php if ($tournament_data['bannerimg']): ?>
@@ -311,7 +311,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                       <?php endif; ?>
                                   </div>
                                   
-                                  <label class="fieldlabels">About</label>
+                                  <label class="fieldlabels" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">About</label>
                                   <div id="editor-container-about" style="height: 200px;"><?php echo htmlspecialchars($tournament_data['about']); ?></div>
                                   <input type="hidden" name="about" id="about">
                               </div>
@@ -332,7 +332,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                   <div class="match-details-container">
                                       <h3 class="fs-titleh3">Bracket Details</h3>
                                       <div class="bracket-selection">
-                                          <label class="brac-label" for="bracket-type">Bracket Type</label>
+                                          <label class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;" for="bracket-type">Bracket Type</label>
                                           <select id="bracket-type" name="bracket-type" class="brac-input">
                                               <option value="battle_royal" <?php echo ($bracket_data['bracket_type'] == 'battle_royal') ? 'selected' : ''; ?>>Battle Royal</option>
                                               <option value="round_robin" <?php echo ($bracket_data['bracket_type'] == 'round_robin') ? 'selected' : ''; ?>>Round Robin</option>
@@ -342,7 +342,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                       </div>
 
                                       <div class="match-selection">
-                                          <label class="brac-label" for="match-type">Match Type</label>
+                                          <label class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;" for="match-type">Match Type</label>
                                           <select id="match-type" name="match-type" class="brac-input">
                                               <option value="solo" <?php echo ($bracket_data['match_type'] == 'solo') ? 'selected' : ''; ?>>Solo</option>
                                               <option value="duo" <?php echo ($bracket_data['match_type'] == 'duo') ? 'selected' : ''; ?>>Duo</option>
@@ -352,30 +352,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                       <!-- Solo Container -->
                                       <div id="solo-container" class="match-container" style="display: <?php echo ($bracket_data['match_type'] == 'solo') ? 'block' : 'none'; ?>;">
-                                          <label for="solo-players" class="brac-label">Number of Players</label>
+                                          <label for="solo-players" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Players</label>
                                           <input type="number" id="solo-players" name="solo-players" class="brac-input" value="<?php echo htmlspecialchars($bracket_data['solo_players']); ?>" />
                                       </div>
 
                                       <!-- Duo Container -->
                                       <div id="duo-container" class="match-container" style="display: <?php echo ($bracket_data['match_type'] == 'duo') ? 'block' : 'none'; ?>;">
-                                          <label for="duo-teams" class="brac-label">Number of Teams</label>
+                                          <label for="duo-teams" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Teams</label>
                                           <input type="number" id="duo-teams" name="duo-teams" class="brac-input" value="<?php echo htmlspecialchars($bracket_data['duo_teams']); ?>" />
                                           
-                                          <label for="duo-players-per-team" class="brac-label">Players per Team</label>
+                                          <label for="duo-players-per-team" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Players per Team</label>
                                           <input type="number" id="duo-players" name="duo-players" class="brac-input" value="<?php echo htmlspecialchars($bracket_data['duo_players_per_team']); ?>" />
                                       </div>
 
                                       <!-- Squad Container -->
                                       <div id="squad-container" class="match-container" style="display: <?php echo ($bracket_data['match_type'] == 'squad') ? 'block' : 'none'; ?>;">
-                                          <label for="squad-teams" class="brac-label">Number of Teams</label>
+                                          <label for="squad-teams" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Teams</label>
                                           <input type="number" id="squad-teams" name="squad-teams" class="brac-input" value="<?php echo htmlspecialchars($bracket_data['squad_teams']); ?>" />
                                           
-                                          <label for="squad-players-per-team" class="brac-label">Players per Team</label>
+                                          <label for="squad-players-per-team" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Players per Team</label>
                                           <input type="number" id="squad-players" name="squad-players" class="brac-input" value="<?php echo htmlspecialchars($bracket_data['squad_players_per_team']); ?>" />
                                       </div>
 
                                       <!-- Placement Points and Rounds -->
-                                      <label for="rounds" class="brac-label">Number of Rounds</label>
+                                      <label for="rounds" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Number of Rounds</label>
                                       <select id="rounds" name="rounds" class="brac-input">
                                           <option value="1" <?php echo ($bracket_data['rounds'] == '1') ? 'selected' : ''; ?>>1</option>
                                           <option value="2" <?php echo ($bracket_data['rounds'] == '2') ? 'selected' : ''; ?>>2</option>
@@ -386,7 +386,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                       </select>
 
                                       <h3 class="fs-titleh3">Placement Point System</h3>
-                                      <label for="placement" class="brac-label">Placement</label>
+                                      <label for="placement" class="brac-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Placement</label>
                                       <textarea id="placement" name="placement" class="brac-input" rows="7"><?php echo htmlspecialchars($bracket_data['placement']); ?></textarea>
                                   </div>
                               </div>
@@ -407,7 +407,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                   </div>
                                   <main class="main-container section-padding">
                                       <div class="unique-input-field">
-                                          <label for="select-provider" class="unique-label">Select Provider</label>
+                                          <label for="select-provider" class="unique-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">Select Provider</label>
                                           <div class="social-media-row">
                                               <select id="select-provider" name="select-provider" class="unique-select">
                                                   <option value="twitch" <?php echo (isset($stream_data['provider']) && $stream_data['provider'] == 'twitch') ? 'selected' : ''; ?>>Twitch</option>
@@ -416,7 +416,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                               </select>
                                               <input type="text" id="channel-name" name="channel-name" class="dynamic-input" value="<?php echo htmlspecialchars($stream_data['channel_name']); ?>" placeholder="Enter your Channel Name" />
                                           </div>
-                                          <label for="social-media" class="unique-label">How players will contact you?</label>
+                                          <label for="social-media" class="unique-label" style="color: #000000 !important; text-align: left !important; font-size: 22px !important; margin-bottom: 15px; display: block;">How players will contact you?</label>
                                           <div class="social-media-row">
                                               <select id="social-media" name="social-media" class="unique-select">
                                                   <option value="facebook" <?php echo ($stream_data['social_media'] == 'facebook') ? 'selected' : ''; ?>>Facebook</option>
@@ -455,7 +455,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
           </div>
-    </div>
 
     
     <!-- FOOTER -->
