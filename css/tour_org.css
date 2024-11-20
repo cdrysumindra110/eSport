@@ -466,10 +466,11 @@
 }
 
 .fieldlabels {
-  margin-bottom: 14px;
-  color: rgb(0, 0, 0);
+  color: #000000;
   text-align: left;
+  font-size: larger;
 }
+
 
 #progressbar {
     margin-bottom: 30px;
@@ -708,13 +709,6 @@
 }
 
 /* Contact with you text field */
-
-.fieldlabels {
-    margin-bottom: 10px;
-    color: rgb(0, 0, 0);
-    text-align: left;
-}
-
 .social-media-row {
   display: flex;
   align-items: center; /* Center items vertically */
