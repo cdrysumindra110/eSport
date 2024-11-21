@@ -5,8 +5,33 @@ require_once 'config.php';
 // Start the session
 session_start();
 
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  // Sanitize and validate form inputs
+  $name = mysqli_real_escape_string($conn, $_POST['name']);
+  $email = mysqli_real_escape_string($conn, $_POST['email']);
+  $subject = mysqli_real_escape_string($conn, $_POST['subject']);
+  $message = mysqli_real_escape_string($conn, $_POST['message']);
+
+  // Insert data into the database
+  $sql = "INSERT INTO contact (name, email, subject, message) 
+          VALUES ('$name', '$email', '$subject', '$message')";
+
+  if ($conn->query($sql) === TRUE) {
+    $success_message = "Thank you for contacting us.";
+  } else {
+    $error_message = "Error: " . $sql . "<br>" . $conn->error;
+  }
+}
+
+// Close connection
+$conn->close();
 
 ?>
 
@@ -109,7 +134,8 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
       </article>  
 
     </main>
-
+        <!-- Popup Message -->
+        <div class="popup-message" id="popup-message"></div>
         <!-- Section 1 -->
         <section class="full-width background-white">
           <div class="s-12 m-12 l-4">
@@ -150,28 +176,30 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
           <div class="s-12 m-12 l-4 center">
             <h3 class="text-white text-size-30 margin-bottom-40 text-center">Contact Form</h3>
 
-            <form name="contactForm" class="customform text-white" method="post" enctype="multipart/form-data">
+            <form id="contactForm" name="contactForm" class="customform text-white" method="post" enctype="multipart/form-data" action="our-services.php">
               <div class="line">
                 <div class="margin">
                   <div class="s-12 m-12 l-6">
-                    <input name="email" class="required email" placeholder="Your e-mail" title="Your e-mail" type="text" />
+                    <input name="email" id="email" class="required email" placeholder="Your e-mail" title="Your e-mail" type="text" required />
                   </div>
                   <div class="s-12 m-12 l-6">
-                    <input name="name" class="name" placeholder="Your name" title="Your name" type="text" />
+                    <input name="name" id="name" class="name" placeholder="Your name" title="Your name" type="text" required />
                   </div>
                 </div>
               </div>            
-                              
+
               <div class="line">       
                 <div class="s-12">
-                  <input name="subject" class="required subject" placeholder="Subject" title="Subject" type="text" />
+                  <input name="subject" id="subject" class="required subject" placeholder="Subject" title="Subject" type="text" required />
                   <p class="subject-error form-error">Please enter your subject.</p>
                 </div>
                 <div class="s-12">
-                  <textarea name="message" class="required message" placeholder="Your message" rows="3"></textarea>
+                  <textarea name="message" id="message" class="required message" placeholder="Your message" rows="3" required></textarea>
                   <p class="message-error form-error">Please enter your message.</p>
                 </div>
-                <div class="s-12"><button class="button border-radius text-white background-primary" type="submit">Submit</button></div>
+                <div class="s-12">
+                  <button class="button border-radius text-white background-primary" type="submit">Submit</button>
+                </div>
               </div>    
             </form>
           </div>  
@@ -372,6 +400,36 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
   <script type="text/javascript" src="js/responsee.js"></script>
   <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
   <script type="text/javascript" src="js/template-scripts.js"></script> 
-  
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    myModal.show();
+  });
+
+  // Function to show the popup message
+function showPopupMessage(message, type) {
+  const popup = document.getElementById('popup-message');
+  popup.textContent = message;
+  popup.className = 'popup-message'; // Reset to default
+  if (type === 'success') {
+    popup.classList.add('success');
+  } else if (type === 'error') {
+    popup.classList.add('error');
+  }
+  popup.style.display = 'block'; // Show the popup
+  setTimeout(() => {
+    popup.style.display = 'none'; // Hide after 3 seconds
+  }, 3000);
+}
+
+// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
+});
+</script>
 </body>
 </html>

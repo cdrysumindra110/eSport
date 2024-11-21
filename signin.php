@@ -94,6 +94,23 @@ $conn->close();
     .popup-message.error {
       background-color: #f44336; /* Red */
     }
+    .password-container {
+      position: relative;
+      width: 100%;
+    }
+
+    #toggle-password {
+      position: absolute;
+      right: -2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    #toggle-icon {
+      font-size: 1rem;  /* Adjust the size as needed */
+    }
   </style>
 </head>
 <body>
@@ -111,7 +128,12 @@ $conn->close();
         </div>
         <span>| or |</span>
         <input type="email" id="email" name="email" placeholder="Enter your Email id" required />
-        <input type="password" id="password" name="password" placeholder="Enter your Password" required />
+        <div class="password-container">
+          <input type="password" id="password" name="password" placeholder="Enter your Password" required />
+            <button type="button" id="toggle-password">
+              <span id="toggle-icon">👁️</span>
+            </button>
+        </div>
         <a href="#" id="forgot-password">Forgot your password?</a>
         <button type="submit" id="signin-button" name="signin-button">Sign In</button>
       </form>
@@ -133,6 +155,25 @@ $conn->close();
   document.addEventListener('DOMContentLoaded', function () {
     var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
     myModal.show();
+  });
+
+    // Function to toggle password visibility
+    function togglePasswordVisibility(passwordFieldId, toggleButtonId) {
+    const passwordField = document.getElementById(passwordFieldId);
+    const toggleButton = document.getElementById(toggleButtonId);
+    
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      toggleButton.textContent = "🙈"; // Change to 'Hide' icon when visible
+    } else {
+      passwordField.type = "password";
+      toggleButton.textContent = "👁️"; // Change to 'Show' icon when hidden
+    }
+  }
+
+  // Add event listeners to toggle buttons
+  document.getElementById('toggle-password').addEventListener('click', function() {
+    togglePasswordVisibility('password', 'toggle-password');
   });
 
 // Function to show the popup message
