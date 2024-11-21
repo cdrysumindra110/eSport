@@ -1,23 +1,28 @@
 <?php
-
 session_start();
 
+include_once('config.php');  // Database connection
 
-include_once('config.php');
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
+// Load Composer's autoloader
+require 'vendor/autoload.php';
 
+// Initialize the error and success messages
 $error_message = '';
 $success_signup = '';
 
-
+// Generate OTP and activation code for account verification
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
+    // Gather form data
     $uname = $_POST['uname'];
     $email = $_POST['email'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    
+    // Check for empty fields
     if (empty($uname) || empty($email) || empty($password) || empty($confirm_password)) {
         $error_message = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -25,47 +30,93 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif ($password !== $confirm_password) {
         $error_message = "Passwords do not match.";
     } else {
+        // Check if email or username already exists
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? OR uname = ?");
+        $stmt->bind_param("ss", $email, $uname);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-
-        
-        if ($conn->connect_error) {
-            $error_message = "Connection failed: " . $conn->connect_error;
-        } else {
-            
-            $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            if ($row['email'] === $email) {
                 $error_message = "Email already exists.";
-            } else {
-                
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            } elseif ($row['uname'] === $uname) {
+                $error_message = "Username already exists.";
+            }
+        } else {
+            // Generate OTP for email verification
+            $otp_str = str_shuffle("0123456789");
+            $otp = substr($otp_str, 0, 6);
+            $_SESSION['otp'] = $otp;  // Store OTP in session
+            $_SESSION['email'] = $email;  // Store email in session
 
-                
-                $stmt = $conn->prepare("INSERT INTO users (uname, email, password) VALUES (?, ?, ?)");
-                $stmt->bind_param("sss", $uname, $email, $hashed_password);
-                $stmt->execute();
+            // Create the activation code
+            $act_str = rand(100000, 10000000);
+            $activation_code = str_shuffle("abcdefghijklmnopqrstuvwxyz" . $act_str);
 
-                if ($stmt->affected_rows > 0) {
-                    
-                    $_SESSION['username'] = $uname;
+            // Hash the password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-                    
-                    $success_signup = "Account created successfully!";
-                    header("Location: signin.php?success_signup=" . urlencode($success_signup));
+            // Insert the new user into the database
+            $stmt = $conn->prepare("INSERT INTO users (uname, email, password) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $uname, $email, $hashed_password);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                // Send OTP to the user's email using PHPMailer
+                try {
+                    $mail = new PHPMailer(true);
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.example.com';  // Your SMTP server
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'user@example.com';  // Your SMTP username
+                    $mail->Password = 'secret';  // Your SMTP password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                    $mail->Port = 465;
+
+                    $mail->setFrom('no-reply@yourdomain.com', 'Your Website');
+                    $mail->addAddress($email);  // Send OTP to the user's email
+                    $mail->Subject = 'Your OTP for Account Verification';
+                    $mail->Body = "Hello, your OTP for account verification is: $otp";
+                    $mail->send();
+
+                    // Set success message and redirect to the verification page
+                    $success_signup = "Account created successfully! OTP sent to your email for verification.";
+                    header("Location: verify_otp.php?success_signup=" . urlencode($success_signup));
                     exit();
-                } else {
-                    $error_message = "Error: " . $conn->error;
+                } catch (Exception $e) {
+                    $error_message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
                 }
+            } else {
+                $error_message = "Error: " . $conn->error;
             }
 
-            
-            $conn->close();
+            // Close the statement
+            $stmt->close();
         }
     }
+
+    // Close the connection
+    $conn->close();
 }
+
+// If OTP is submitted for verification
+if (isset($_POST['otp_verification'])) {
+    $entered_otp = $_POST['otp'];
+
+    if ($entered_otp == $_SESSION['otp']) {
+        // OTP is correct, proceed to activate the account
+        $activation_code = $_SESSION['activation_code'];
+        // Activate the account (e.g., update the status in the database)
+        // Your activation logic goes here
+
+        echo "Account successfully activated!";
+    } else {
+        // OTP is incorrect
+        echo "Invalid OTP. Please try again.";
+    }
+}
+
 ?>
 
 
@@ -104,35 +155,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <div class="container" id="container">
     <div class="form-container sign-up-container">
-      <form id="signup-form" action="signup.php" method="post">
-        <h1>Sign Up</h1>
-        <div class="social-container">
-          <a class="social-icon" id="google-signup" title="Sign Up with Google"><i class="fab fa-google"></i></a>
-          <a class="social-icon" id="facebook-signup" title="Sign Up with Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a class="social-icon" id="twitch-signup" title="Sign Up with Twitch"><i class="fab fa-twitch"></i></a>
-          <a class="social-icon" id="discord-signup" title="Sign Up with Discord"><i class="fab fa-discord"></i></a>
-        </div>
-        <span>| or |</span>
-        <input type="text" id="uname" name="uname" placeholder="Enter a valid Username" required />
-        <input type="email" id="email" name="email" placeholder="Enter your Email" required />
-        <input type="password" id="password" name="password" placeholder="Enter your Password" required />
-        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required />
-        <button type="submit">Sign Up</button>
-      </form>
+        <form id="signup-form" action="signup.php" method="post">
+            <h1>Sign Up</h1>
+            <div class="social-container">
+                <a class="social-icon" id="google-signup" title="Sign Up with Google"><i class="fab fa-google"></i></a>
+                <a class="social-icon" id="facebook-signup" title="Sign Up with Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a class="social-icon" id="twitch-signup" title="Sign Up with Twitch"><i class="fab fa-twitch"></i></a>
+                <a class="social-icon" id="discord-signup" title="Sign Up with Discord"><i class="fab fa-discord"></i></a>
+            </div>
+            <span>| or |</span>
+            <input type="text" id="uname" name="uname" placeholder="Enter a valid Username" required />
+            <input type="email" id="email" name="email" placeholder="Enter your Email" required />
+            <input type="password" id="password" name="password" placeholder="Enter your Password" required />
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required />
+            <button type="submit" name="signup">Sign Up</button>
+        </form>
     </div>
+
+    <!-- OTP Form Section (only shown after sign-up is successful) -->
+    <?php if (isset($_SESSION['show_otp_form']) && $_SESSION['show_otp_form'] === true): ?>
+    <div class="form-container otp-container">
+        <form id="otp-form" action="signup.php" method="post">
+            <h1>Enter OTP</h1>
+            <input type="text" name="otp" placeholder="Enter OTP" required />
+            <button type="submit" name="otp_verification">Verify OTP</button>
+        </form>
+    </div>
+    <?php endif; ?>
+
     <div class="overlay-container">
-      <div class="overlay">
-        <div class="overlay-panel overlay-left">
-          <div class="logo-container">
-            <a href="./index.php"><img src="./img/logo.png" alt="Logo"></a>
-          </div>
-          <h1>Welcome!</h1>
-          <p>Already have an account?</p>
-          <button class="ghost" id="signIn">Sign In</button>
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <div class="logo-container">
+                    <a href="./index.php"><img src="./img/logo.png" alt="Logo"></a>
+                </div>
+                <h1>Welcome!</h1>
+                <p>Already have an account?</p>
+                <button class="ghost" id="signIn">Sign In</button>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));

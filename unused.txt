@@ -1995,3 +1995,231 @@ $conn->close();
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=====================================================================
+table ccssss
+
+
+
+
+/* General Container Styling */
+.ut-container {
+    background-color: #282828;
+    color: #ffffff;
+    font-family: sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Header Section */
+.ut-header {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.ut-header__button {
+    margin-left: auto;
+    background-color: #38b2d1;
+    border: none;
+    color: #181818;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.ut-header__button:hover {
+    background-color: #2bd8ff;
+    color: #000000;
+}
+
+/* Table Section */
+.ut-table {
+    width: 100%;
+    max-width: 1200px;
+    border-collapse: collapse; /* Collapses borders between cells */
+    table-layout: fixed; /* Fixed layout for consistent column widths */
+    background-color: #282828;
+    margin: 0 auto;
+    border: none; /* Ensure no border on the table itself */
+}
+
+/* Table Header and Cell Styling */
+.ut-table__head,
+.ut-table__cell {
+    padding: 12px;
+    text-align: left;
+    vertical-align: middle;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent overflow */
+    text-overflow: ellipsis; /* Add ellipsis for long content */
+    white-space: nowrap; /* Prevent wrapping */
+    border: none; /* Ensure no border on cells */
+}
+
+/* Column Widths */
+.ut-table__cell--first {
+    width: 30%; /* First column (tournaments) */
+}
+
+.ut-table__cell--status {
+    width: 15%; /* Status column */
+}
+
+.ut-table__cell--date {
+    width: 20%; /* Date column */
+}
+
+.ut-table__cell--prize {
+    width: 20%; /* Prize column */
+}
+
+.ut-table__cell:last-child {
+    width: 15%; /* Action column */
+}
+
+/* Status Label Styling */
+.ut-status--new {
+    background-color: #66ff66;
+    color: #000000;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 10px;
+    text-align: center;
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+/* Row Styling */
+.ut-row {
+    display: flex;
+    background-color: #383838;
+    padding: 10px;
+    align-items: center;
+    border: none; /* Ensure no border on rows */
+}
+
+/* Remove borders from rows */
+.ut-row:first-child {
+    border-bottom: none; /* Ensure no border on the first row */
+}
+
+.ut-row:hover {
+    background-color: #00f7ff0b;
+    color: #00f7ff;
+}
+
+/* Icon Inside Row */
+.ut-row .ut-row__icon-eye {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #00f7ff;
+    display: none; /* Initially hidden */
+}
+
+.ut-row:hover .ut-row__icon-eye {
+    display: block; /* Show on hover */
+}
+
+/* Image Styling */
+.ut-image img {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 1px;
+}
+
+/* Info Section */
+.ut-info {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.ut-info__name {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.ut-info__host {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 600px) {
+    .ut-table {
+        display: block; /* Stack table rows */
+    }
+
+    .ut-table__head {
+        display: none; /* Hide table headers */
+    }
+
+    .ut-row {
+        display: block; /* Stack row elements */
+        margin-bottom: 15px;
+    }
+
+    .ut-table__cell {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        white-space: normal; /* Allow wrapping */
+        border: none; /* Ensure no border on cells */
+    }
+
+    .ut-image img {
+        width: 50px; /* Smaller image size */
+        height: 50px;
+    }
+
+    .ut-header {
+        flex-direction: column; /* Stack header elements */
+        align-items: flex-end;
+    }
+
+    .ut-header__button {
+        margin-top: 10px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+============================
