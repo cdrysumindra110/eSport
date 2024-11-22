@@ -376,11 +376,16 @@ $conn->close();
                 <button class="organizer-actions">
                     <i class='fa fa-gears'></i> Organizer Actions
                     <ul class="dropdown-menu">
-                    <a href="edit_tour.php?tournament_id=<?php echo urlencode($tournament_id); ?>">
-                        <li><i class='fa fa-edit'></i> Edit Tournament</li>
-                    </a>
-                        <li><i class='fa fa-trash'></i> Delete Tournament</li>
+                        <li><i class='fa fa-edit'></i>
+                          <a href="edit_tour.php?tournament_id=<?php echo urlencode($tournament_id); ?>">
+                            Edit Tournament
+                          </a>
+                        </li>
+                        <li><i class='fa fa-trash'></i>Delete Tournament</li>
                     </ul>
+                </button>
+                <button onclick="start_game(<?php echo urlencode($tournament_id); ?>)">
+                    <i class='fa fa-play'></i> Start Game
                 </button>
                 <button class="options"><i class='fa fa-share-alt'></i> Share</button>
                 <button class="options"><i class="fas fa-cog"></i> Options</button>
@@ -609,6 +614,12 @@ function showContent(section) {
 
 </script>
 
+<script>
+  function start_game(tournamentId) {
+    // Redirect to start_game.php with tournament_id
+    window.location.href = 'start_game.php?tournament_id=' + tournamentId;
+  }
+</script>
 </body>
 </html>
 
