@@ -132,7 +132,7 @@
     color: #ffffff;
 }
 
-.ut-game--new {
+.ut-status--new {
     background-color: #66ff66;
     color: #000000;
     padding: 5px 10px;
@@ -189,3 +189,4 @@
         width: auto; 
     }
 }
+

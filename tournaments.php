@@ -209,7 +209,7 @@ $conn->close();
                 <tbody>
                     <?php if (!empty($tournaments)): ?>
                         <?php foreach ($tournaments as $tournament): ?>
-                        <tr class="ut-row">
+                        <tr class="ut-row" onclick="window.location.href='tour_freg.php?tournament_id=<?php echo $tournament['id']; ?>'" style="cursor: pointer;">
                             <td class="ut-table__cell ut-table__cell--first">
                                 <div class="ut-image">
                                     <?php if (!empty($tournament['bannerimg'])): ?>

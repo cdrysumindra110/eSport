@@ -224,7 +224,7 @@ $conn->close();
                                 <?php foreach ($tournaments as $tournament): ?>
                                     <div class="ut-container">
                                         <table class="ut-table">
-                                            <tr class="ut-row">
+                                            <tr class="ut-row" onclick="window.location.href='tournament_details.php?tournament_id=<?php echo $tournament['id']; ?>'" style="cursor: pointer;">
                                                 <td class="ut-table__cell ut-table__cell--first">
                                                     <div class="ut-image">
                                                         <?php if (!empty($tournament['bannerimg'])): ?>
@@ -246,7 +246,7 @@ $conn->close();
                                                 <td class="ut-table__cell ut-table__cell--status">
                                                     <div class="ut-status--new">NEW</div>
                                                 </td>
-                                                <td class="ut-table__cell"><?php echo htmlspecialchars($tournament['sdate']); ?></td>
+                                                <td class="ut-table__cell ut-table__cell--date"><?php echo htmlspecialchars($tournament['sdate']); ?></td>
                                                 <td class="ut-table__cell ut-table__cell--prize" style="padding-left: 20px;">
                                                     <?php echo htmlspecialchars($tournament['prizes']); ?>
                                                 </td>
