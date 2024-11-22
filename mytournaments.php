@@ -83,6 +83,8 @@ $conn->close();
     <!-- CUSTOM STYLE -->      
     <link rel="stylesheet" href="./css/template-style.css">
     <link rel="stylesheet" href="./css/mytournament.css">
+    <!-- <link rel="stylesheet" href="./css/mytournament.css"> -->
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
