@@ -60,12 +60,23 @@ if ($stmt) {
             $sdate = $date->format('F j, Y');  // Month name, day, year
         }
 
-        // Check if the expiration date has passed
+        // Check if the expiration date has passed and handle 'N/A' properly
         $current_time = new DateTime();
-        $expire_time_obj = new DateTime($expire_time);
+        
+        // Check if expire_time is 'N/A' before using it
 
-        // Check if the tournament has expired
-        $is_expired = $current_time > $expire_time_obj;
+        if ($expire_time !== 'N/A') {
+          $expire_time_obj = new DateTime($expire_time);
+          // Check if the tournament has expired
+          $is_expired = $current_time > $expire_time_obj;
+        } else {
+          $expire_time_obj = null;
+          $is_expired = false;
+        }
+
+        $game_id_value = $is_expired ? "Expired" : $game_id;
+        $password_value = $is_expired ? "Expired" : $password;
+        
     } else {
         $error_message = "No tournament found with that ID.";
         echo $error_message;
@@ -313,6 +324,7 @@ $conn->close();
             }
         }
 
+
     </style>
   </head>
 
@@ -392,7 +404,13 @@ $conn->close();
     <div class="left-container">
         <h1>WELCOME TO THE EXCLUSIVE eSPORTS TOURNAMENT</h1>
         <h2><?php echo htmlspecialchars($tname); ?></h2>
-        <h1>Expiry Date and Time: <?php echo htmlspecialchars($expire_time_obj->format('F j, Y g:i A')); ?></h1>
+        <h1>Expiry Date and Time: <?php 
+            if ($expire_time_obj) {
+                echo htmlspecialchars($expire_time_obj->format('F j, Y g:i A'));
+            } else {
+                echo 'N/A'; // or a custom message like "Not available yet"
+            }
+        ?></h1>
         <h2>THE TOURNAMENT EXPIRES IN:</h2>
         <div class="countdown">
             <div class="time-section">
@@ -418,17 +436,22 @@ $conn->close();
     </div>
     <div class="right-container">
         <h2>Game Id and Password</h2>
-        <div class="form-group">
-            <label for="game_id">Game ID</label>
-            <input type="text" id="game_id" name="game_id" value="<?php echo htmlspecialchars($game_id); ?>" readonly onclick="copyText(this)" <?php echo $is_expired ? 'disabled' : ''; ?>>
-        </div>
-        <div class="form-group">
-            <label for="password">Game Password</label>
-            <input type="text" id="password" name="password" value="<?php echo htmlspecialchars($password); ?>" readonly onclick="copyText(this)" <?php echo $is_expired ? 'disabled' : ''; ?>>
-        </div>
+        <?php if ($game_id == 'N/A' || $password == 'N/A'): ?>
+            <p>Game ID and password will be available soon</p>
+        <?php elseif ($is_expired): ?>
+            <p>The Game ID and password have expired</p>
+        <?php else: ?>
+            <div class="form-group">
+                <label for="game_id">Game ID</label>
+                <input type="text" id="game_id" name="game_id" value="<?php echo htmlspecialchars($game_id_value); ?>" readonly onclick="copyText(this)">
+            </div>
+            <div class="form-group">
+                <label for="password">Game Password</label>
+                <input type="text" id="password" name="password" value="<?php echo htmlspecialchars($password_value); ?>" readonly onclick="copyText(this)">
+            </div>
+        <?php endif; ?>
     </div>
 </div>
-
 
     <!-- FOOTER -->
     <footer>
@@ -561,7 +584,7 @@ var x = setInterval(function() {
     document.getElementById("minutes").innerHTML = minutes;
     document.getElementById("seconds").innerHTML = seconds;
 
-    // If the countdown is finished, display a message
+    // If the countdown is finished, disable the game fields and change their values
     if (distance < 0) {
         clearInterval(x);
         document.getElementById("days").innerHTML = 0;
@@ -574,12 +597,8 @@ var x = setInterval(function() {
         document.getElementById("password").value = "Expired";
         document.getElementById("game_id").disabled = true;
         document.getElementById("password").disabled = true;
-
-        alert("The tournament has expired.");
     }
 }, 1000);
-
-
 
         // Show image preview
         function showPreview(event) {

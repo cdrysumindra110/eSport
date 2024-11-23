@@ -178,8 +178,6 @@ $conn->close();
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-
-
     <style>
       
 .banner-cont{
@@ -491,7 +489,7 @@ $conn->close();
                 <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
             </button>
 
-                <button class="options"><i class="fas fa-cog"></i> Options</button>
+                <button class="options" onclick="joinGame(<?php echo $tournament_id; ?>)"><i class="fas fa-cog"></i> Options</button>
                 <button class="options"><i class='fa fa-share-alt'></i> Share</button>
             </div>
         </div>
@@ -769,6 +767,10 @@ function joinTournament(tournamentId, matchType) {
   function joinTournament(tournamentId, matchType) {
     // Redirect to register.php with tournament_id and match_type as query parameters
     window.location.href = 'register.php?tournament_id=' + tournamentId + '&match_type=' + encodeURIComponent(matchType);
+  }
+  function joinGame(tournamentId) {
+    // Redirect to success.php with tournament_id and match_type as query parameters
+    window.location.href = 'success.php?tournament_id=' + tournamentId;
   }
 </script>
 </body>

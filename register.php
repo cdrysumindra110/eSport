@@ -185,7 +185,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Redirect to success page if no errors occurred
         if (!$error_message) {
-            header("Location: success.php");
+            header("Location: success.php?tournament_id=" . $tournament_id);
             exit;
         }
 

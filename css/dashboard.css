@@ -278,7 +278,7 @@
 /* Dark theme */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #2e3138;
+    --bg: #2e3837;
     --fg: #e3e4e8;
     --primary: #5583f6;
     --switchBg: #454954;
