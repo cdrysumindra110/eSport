@@ -1,3 +1,7 @@
+https://www.sliderrevolution.com/resources/css-toggle-switch/
+
+
+
 <div class="news-container">
     <header class="news-header">
         <h1>Latest News</h1>

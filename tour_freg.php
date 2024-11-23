@@ -489,7 +489,7 @@ $conn->close();
                 <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
             </button>
 
-                <button class="options" onclick="joinGame(<?php echo $tournament_id; ?>)"><i class="fas fa-cog"></i> Options</button>
+                <button class="options"><i class="fas fa-cog"></i> Options</button>
                 <button class="options"><i class='fa fa-share-alt'></i> Share</button>
             </div>
         </div>

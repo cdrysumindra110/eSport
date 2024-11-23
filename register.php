@@ -631,8 +631,9 @@ $conn->close();
         <h3>THE WORLD OF COMPETITIVE GAMING</h3>
         <br>
         <h2>JOIN US FOR THIS EXCLUSIVE LIVE EVENT</h2>
-        <h1><?php echo htmlspecialchars($sdate); ?> at <?php echo htmlspecialchars($stime); ?> Eastern</h1>
-        <a href="#" class="ctn_btn">CLAIM MY SPOT!</a>
+        <h1><?php echo htmlspecialchars($sdate); ?> at <?php echo htmlspecialchars($stime); ?></h1>
+        <!-- <a href="#" class="ctn_btn" >CLAIM MY SPOT!</a> -->
+        <button class="ctn_btn" onclick="joinGame(<?php echo $tournament_id; ?>)">Already Registered</button>
         <br><br>
         <h3>THE TOURNAMENT STARTS IN:</h3>
         <div class="countdown">
@@ -1017,36 +1018,12 @@ document.addEventListener("DOMContentLoaded", function() {
         regButton.style.pointerEvents = "auto";  // Enable clickability
     }
 });
-
+function joinGame(tournamentId) {
+    // Redirect to success.php with tournament_id and match_type as query parameters
+    window.location.href = 'success.php?tournament_id=' + tournamentId;
+  }
 </script>
-<!-- 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Get match_type from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const matchType = urlParams.get('match_type'); // Fetch match_type from the URL query string
 
-    if (!matchType) {
-        console.error('match_type is missing from the URL');
-        return; // Exit if match_type is not present
-    }
-
-    // Hide all sections initially
-    document.getElementById("solo_reg").style.display = "none";
-    document.getElementById("duo_reg").style.display = "none";
-    document.getElementById("squad_reg").style.display = "none";
-
-    // Show the appropriate section based on match_type
-    if (matchType === "solo") {
-        document.getElementById("solo_reg").style.display = "block";
-    } else if (matchType === "duo") {
-        document.getElementById("duo_reg").style.display = "block";
-    } else if (matchType === "squad") {
-        document.getElementById("squad_reg").style.display = "block";
-    }
-});
-
-</script> -->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 
