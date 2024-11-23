@@ -482,8 +482,13 @@ $conn->close();
     <div class="tournament">
         <div class="tournament-operation">
             <div class="operation-btn">
-            <button class="organizer-actions" onclick="joinTournament(<?php echo $tournament_id; ?>, '<?php echo htmlspecialchars($match_type); ?>')">
-              <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
+            <button 
+                class="organizer-actions" 
+                onclick="joinTournament(<?php echo $tournament_id; ?>, '<?php echo htmlspecialchars($match_type); ?>')"
+                <?php echo ($slots_full_message) ? 'disabled' : ''; // Disable if slots are full ?>
+                style="<?php echo ($slots_full_message) ? 'background-color: grey; cursor: not-allowed;' : ''; ?>"
+            >
+                <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
             </button>
 
                 <button class="options"><i class="fas fa-cog"></i> Options</button>
@@ -741,6 +746,23 @@ function showContent(section) {
     document.getElementById(section).classList.add('active');
     document.getElementById(section + '-container').style.display = 'block';
 }
+
+function joinTournament(tournamentId, matchType) {
+    // Check if slots are full (this should be based on the registration count and total teams)
+    var slotsFull = <?php echo ($slots_full_message) ? 'true' : 'false'; ?>;
+    
+    if (slotsFull) {
+        // Display error message (if not already displayed)
+        document.getElementById("error-message").style.display = "block";
+        // Optionally disable the button if not disabled yet
+        document.querySelector('.organizer-actions').disabled = true;
+        document.querySelector('.organizer-actions').style.backgroundColor = 'grey';
+    } else {
+        // Proceed with joining the tournament logic (if slots are not full)
+        // For example, send an AJAX request to register the user.
+    }
+}
+
 </script>
 
 <script>

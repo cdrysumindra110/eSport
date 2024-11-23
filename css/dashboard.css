@@ -1,31 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>title</title>
-    <style>
-        * {
-  border: 0;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-:root {
-  --bg: #e3e4e8;
-  --fg: #17181c;
-  --primary: #255ff4;
-  --switchBg: #c7cad1;
-  font-size: calc(16px + (40 - 16) * (100vw - 320px) / (1280 - 320));
-}
-body, input {
-  font: 1em/1.5 "Inter", sans-serif;
-}
-body {
-  background: var(--bg);
-  color: var(--fg);
-  display: flex;
-  height: 100vh;
-}
+
 /* Switch base */
 .f, .f span {
   display: block;
@@ -35,6 +8,7 @@ body {
   cursor: pointer;
   align-items: center;
   margin: auto;
+  color: #fff;
   -webkit-tap-highlight-color: transparent;
 }
 .f__input {
@@ -310,59 +284,3 @@ body {
     --switchBg: #454954;
   }
 }
-    </style>
-  </head>
-  <body>
-    <div class="unique-input-field">
-        <label class="unique-label">Select Role:</label>
-        <div class="slider-radio-group">
-          <!-- Hidden Radio Buttons -->
-          <input type="radio" id="role-player" name="role" value="player" class="unique-radio" 
-                <?php echo ($role === 'player') ? 'checked' : ''; ?> required>
-          <input type="radio" id="role-organizer" name="role" value="organizer" class="unique-radio" 
-                <?php echo ($role === 'organizer') ? 'checked' : ''; ?> required>
-      
-          <!-- Slider and Labels -->
-          <label class="f">
-            Player
-            <input class="f__input" type="checkbox" id="role-toggle" name="role-toggle">
-            <span class="f__switch">
-              <span class="f__handle">
-                <span class="f__1"></span>
-                <span class="f__2">
-                  <span class="f__2a"></span>
-                  <span class="f__2b"></span>
-                  <span class="f__2c"></span>
-                  <span class="f__2d"></span>
-                  <span class="f__2e"></span>
-                </span>
-                <span class="f__3"></span>
-                <span class="f__4"></span>
-                <span class="f__5"></span>
-                <span class="f__6"></span>
-                <span class="f__7"></span>
-                <span class="f__8"></span>
-                <span class="f__9"></span>
-                <span class="f__10"></span>
-                <span class="f__11"></span>
-                <span class="f__12"></span>
-                <span class="f__13"></span>
-                <span class="f__14"></span>
-                <span class="f__15"></span>
-                <span class="f__16"></span>
-                <span class="f__17"></span>
-              </span>
-            </span>
-            Organizer
-          </label>
-        </div>
-      </div>
-<script>
-    document.getElementById('role-toggle').addEventListener('change', function () {
-  const isChecked = this.checked;
-  document.getElementById('role-player').checked = !isChecked;
-  document.getElementById('role-organizer').checked = isChecked;
-});
-
-</script>>
-</html>

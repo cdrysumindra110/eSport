@@ -20,7 +20,19 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
 
 // Get the logged-in user ID
 $user_id = $_SESSION['user_id'];
+// Fetch current user data (cover photo and profile picture)
+$sql = "SELECT cover_photo, profile_pic FROM users WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($cover_photo, $profile_pic);
 
+if ($stmt->num_rows > 0) {
+    $stmt->fetch();
+} else {
+    die("Error: User not found.");
+}
 // Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -163,30 +175,36 @@ exit;
         </div>
 
         <div class="profile-container">
-                <div class="cover-photo-container">
-                    <div class="cover-photo">
-                        <input id="coverPhotoFile" name="coverPhotoFile" type="file" onchange="loadCoverPhoto(event)" class="file-input" />
-                        <label for="coverPhotoFile" class="cover-photo-label">
-                            <span class="icon-wrapper">
-                                <i class="fas fa-camera"></i>
-                            </span>
-                            <span>Change Cover</span>
-                        </label>
-                        <img id="coverPhoto" name="coverPhoto" src="./img/neon.png" alt="Cover Photo" class="cover-photo-img" />
-                        <div class="cover-overlay"></div>
-                    </div>
-                </div>
-                <div class="profile-pic">
-                    <input id="profilePicFile" name="profilePicFile" type="file" onchange="loadProfilePic(event)" class="file-input" />
-                    <label for="profilePicFile" class="profile-pic-label">
-                        <span class="icon-wrapper">
-                          <i class="fas fa-camera"></i>
-                        </span>
-                        <span>Change Profile</span>
-                    </label>
-                    <img src="./img/dash-logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
-                </div>
-            </div>
+              <div class="cover-photo-container">
+                  <div class="cover-photo">
+                      <input type="file" name="cover_photo" id="cover_photo" accept="image/*" onchange="loadCoverPhoto(event)" class="file-input" />
+                      <label for="cover_photo" class="cover-photo-label">
+                      </label>
+                      <!-- Display user's cover photo or default cover photo -->
+                      <img id="coverPhoto" 
+                          name="coverPhoto" 
+                          src="<?php echo isset($cover_photo) && !empty($cover_photo) 
+                                      ? 'data:image/jpeg;base64,' . base64_encode($cover_photo) 
+                                      : './img/dash-cover.png'; ?>" 
+                          alt="Cover Photo" 
+                          class="cover-photo-img" />
+                      <div class="cover-overlay"></div>
+                  </div>
+              </div>
+              <div class="profile-pic">
+                  <input type="file" name="profile_pic" id="profile_pic" accept="image/*" onchange="loadProfilePic(event)" class="file-input" />
+                  <label for="profile_pic" class="profile-pic-label">
+                  </label>
+                  <!-- Display user's profile picture or default profile picture -->
+                  <img id="profilePic" 
+                      name="profilePic" 
+                      src="<?php echo isset($profile_pic) && !empty($profile_pic) 
+                                  ? 'data:image/jpeg;base64,' . base64_encode($profile_pic) 
+                                  : './img/dash-logo.png'; ?>" 
+                      alt="Profile Picture" 
+                      class="profile-pic-img" />
+              </div>
+          </div>
 
         <div class="unique-container">
           <div class="wallet-container">

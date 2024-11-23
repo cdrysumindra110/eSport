@@ -13,90 +13,80 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     exit();
 }
 
+// Get the logged-in user's ID
+$user_id = $_SESSION['user_id']; // Assuming 'user_id' is stored in session
 
-$tournament_id = isset($_GET['tournament_id']) ? $_GET['tournament_id'] : null;
+// Check if tournament ID is passed via POST after form submission
+$tournament_id = isset($_POST['tournament_id']) ? $_POST['tournament_id'] : null;
+
+// If not set, check if it's passed via GET (for initial page load)
 if (!$tournament_id) {
-    header('Location: tournament_details.php'); // Redirect to a page listing tournaments
-    exit();
+    $tournament_id = isset($_GET['tournament_id']) ? $_GET['tournament_id'] : null;
 }
 
-
-// Fetch tournament details from the database
-$sql = "SELECT 
-            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
-            b.bracket_type, b.match_type, u.uname AS creator_name 
-        FROM tournaments t
-        LEFT JOIN brackets b ON t.id = b.tournament_id
-        LEFT JOIN users u ON t.user_id = u.id  
-        WHERE t.id = ?";
-
-$stmt = $conn->prepare($sql);
-if ($stmt) {
-    $stmt->bind_param("i", $tournament_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $tournament = $result->fetch_assoc();
-
-        // Assign variables from the $tournament array
-        $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
-        $tname = $tournament['tname'] ?? 'Unknown Tournament';
-        $sdate = $tournament['sdate'] ?? '';
-        $stime = $tournament['stime'] ?? '';
-        $about = $tournament['about'] ?? '';
-        $bannerimg = $tournament['bannerimg'] ?? '';
-        $creator_name = $tournament['creator_name'] ?? 'Unknown Creator';
-
-        // Format the date to show month and day in words (keep year as a number)
-        if ($sdate) {
-            $date = new DateTime($sdate);
-            $sdate = $date->format('F j, Y');  // Month name, day, year
-        }
-    } else {
-        $error_message = "No tournament found with that ID.";
-    }
-    $stmt->close();
-} else {
-    $error_message = "Error preparing the tournament detail statement: " . $conn->error;
+// Handle case when tournament_id is missing
+if (!$tournament_id) {
+    die("Error: Missing tournament ID.");
 }
+
+// Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve form data
-    $tournament_id = isset($_POST['tournament_id']) ? intval($_POST['tournament_id']) : null;
-    $game_id = isset($_POST['game_id']) ? intval($_POST['game_id']) : null;
-    $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-    $expire_time = isset($_POST['expire_time']) ? trim($_POST['expire_time']) : '';
+  // Retrieve form data
+  $game_id = isset($_POST['game_id']) ? intval($_POST['game_id']) : null;
+  $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+  $expire_time = isset($_POST['expire_time']) ? trim($_POST['expire_time']) : '';
 
-    // Validate form data
-    if (!$tournament_id) {
-        die("Error: Missing tournament ID in the form submission.");
-    }
-    if (empty($password)) {
-        $error_message = "Password is required.";
-    }
-    if (!empty($expire_time) && strtotime($expire_time) === false) {
-        $error_message = "Invalid expiration time format.";
-    }
+  // Validate form data
+  if (empty($game_id)) {
+      $error_message = "Game ID is required.";
+  }
+  if (empty($password)) {
+      $error_message = "Password is required.";
+  }
+  if (!empty($expire_time) && strtotime($expire_time) === false) {
+      $error_message = "Invalid expiration time format.";
+  }
 
-    // Insert into the database
-    if (empty($error_message)) {
-        $sql = "INSERT INTO game (tournament_id, game_id, password, expire_time) VALUES (?, ?, ?, ?)";
-        if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("iiss", $tournament_id, $game_id, $password, $expire_time);
-            if ($stmt->execute()) {
-                $success_message = "Game created successfully!";
-                header("Location: success.php?tournament_id=" . $tournament_id);
-                exit();
-            } else {
-                $error_message = "Error inserting data: " . $stmt->error;
-            }
-            $stmt->close();
-        } else {
-            $error_message = "Error preparing the statement: " . $conn->error;
-        }
-    }
+  // Check if game already exists for this tournament and user
+  if (empty($error_message)) {
+      $sql = "SELECT COUNT(*) FROM game WHERE tournament_id = ? AND user_id = ?";
+      if ($stmt = $conn->prepare($sql)) {
+          $stmt->bind_param("ii", $tournament_id, $user_id);
+          $stmt->execute();
+          $stmt->bind_result($count);
+          $stmt->fetch();
+          $stmt->close();
+
+          // If the game already exists for this tournament and user
+          if ($count > 0) {
+              $error_message = "You have already created a game for this tournament.";
+          }
+      } else {
+          $error_message = "Error checking existing game data: " . $conn->error;
+      }
+  }
+
+  // Insert into the database if no errors
+  if (empty($error_message)) {
+      $sql = "INSERT INTO game (tournament_id, user_id, game_id, password, expire_time) VALUES (?, ?, ?, ?, ?)";
+      if ($stmt = $conn->prepare($sql)) {
+          $stmt->bind_param("iiiss", $tournament_id, $user_id, $game_id, $password, $expire_time);
+          if ($stmt->execute()) {
+              $success_message = "Game created successfully!";
+              // Redirect to success page
+              header("Location: success.php?tournament_id=" . $tournament_id);
+              exit();
+          } else {
+              $error_message = "Error inserting data: " . $stmt->error;
+          }
+          $stmt->close();
+      } else {
+          $error_message = "Error preparing the statement: " . $conn->error;
+      }
+  }
 }
 
+// Close the database connection
 $conn->close();
 ?>
 
@@ -415,33 +405,6 @@ $conn->close();
         <div class="popup-message" id="popup-message"></div>
 <!-- ++++++++++++++++++++++++++++++++++++++++++++++Form containrerer+++++++++++++++++++++++++++++++++++ -->
 <div class="tournament-reg_container">
-    <div class="left-container">
-        <h1>WELCOME TO THE EXCLUSIVE eSPORTS TOURNAMENT</h1>
-        <h2><?php echo htmlspecialchars($tname); ?></h2>
-        <h1><?php echo htmlspecialchars($sdate); ?> at <?php echo htmlspecialchars($stime); ?> </h1>
-        <h2>THE TOURNAMENT BEGINS IN:</h2>
-        <div class="countdown">
-            <div class="time-section">
-                <div id="days">0</div>
-                <span>Days</span>
-            </div>
-            <div class="separator">:</div>
-            <div class="time-section">
-                <div id="hours">0</div>
-                <span>Hours</span>
-            </div>
-            <div class="separator">:</div>
-            <div class="time-section">
-                <div id="minutes">0</div>
-                <span>Minutes</span>
-            </div>
-            <div class="separator">:</div>
-            <div class="time-section">
-                <div id="seconds">0</div>
-                <span>Seconds</span>
-            </div>
-        </div>
-    </div>
     <div class="right-container">
         <h2>Set Up Tournament</h2>
         <form action="start_game.php" method="POST">

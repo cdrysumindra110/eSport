@@ -13,23 +13,24 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     exit();
 }
 
-
 $tournament_id = isset($_GET['tournament_id']) ? $_GET['tournament_id'] : null;
 if (!$tournament_id) {
-  die("Error: Missing tournament ID or match type.");
+    die("Error: Missing tournament ID or match type.");
     exit();
 }
 
-
-// Fetch tournament details from the database
+// SQL Query to fetch tournament and game data
 $sql = "SELECT 
             t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
-            b.bracket_type, b.match_type, u.uname AS creator_name 
+            b.bracket_type, b.match_type, u.uname AS creator_name,
+            g.game_id, g.password, g.expire_time
         FROM tournaments t
         LEFT JOIN brackets b ON t.id = b.tournament_id
-        LEFT JOIN users u ON t.user_id = u.id  
+        LEFT JOIN users u ON t.user_id = u.id
+        LEFT JOIN game g ON t.id = g.tournament_id
         WHERE t.id = ?";
 
+// Prepare and execute the query
 $stmt = $conn->prepare($sql);
 if ($stmt) {
     $stmt->bind_param("i", $tournament_id);
@@ -48,22 +49,35 @@ if ($stmt) {
         $bannerimg = $tournament['bannerimg'] ?? '';
         $creator_name = $tournament['creator_name'] ?? 'Unknown Creator';
 
+        // Game-related data
+        $game_id = $tournament['game_id'] ?? 'N/A';
+        $password = $tournament['password'] ?? 'N/A';
+        $expire_time = $tournament['expire_time'] ?? 'N/A';
+
         // Format the date to show month and day in words (keep year as a number)
         if ($sdate) {
             $date = new DateTime($sdate);
             $sdate = $date->format('F j, Y');  // Month name, day, year
         }
+
+        // Check if the expiration date has passed
+        $current_time = new DateTime();
+        $expire_time_obj = new DateTime($expire_time);
+
+        // Check if the tournament has expired
+        $is_expired = $current_time > $expire_time_obj;
     } else {
         $error_message = "No tournament found with that ID.";
+        echo $error_message;
     }
     $stmt->close();
 } else {
     $error_message = "Error preparing the tournament detail statement: " . $conn->error;
+    echo $error_message;
 }
 
 $conn->close();
 ?>
-
 
 
 <!-- HTML form goes here, including success and error messages -->
@@ -113,7 +127,7 @@ $conn->close();
             width: 100%;
             max-width: 100%;
             margin: 0 auto;
-            background-color: #f9f9f9;
+            background: linear-gradient(135deg, #3498db, #8e44ad);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
@@ -122,10 +136,8 @@ $conn->close();
         .left-container {
             flex: 1;
             padding: 40px;
-            background: linear-gradient(135deg, #3498db, #8e44ad);
             color: white;
             font-family: 'Arial', sans-serif;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -225,8 +237,6 @@ $conn->close();
         .right-container {
             flex: 1;
             padding: 20px;
-            background: linear-gradient(135deg, #8e44ad, #3498db);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .right-container h2 {
@@ -382,8 +392,8 @@ $conn->close();
     <div class="left-container">
         <h1>WELCOME TO THE EXCLUSIVE eSPORTS TOURNAMENT</h1>
         <h2><?php echo htmlspecialchars($tname); ?></h2>
-        <h1><?php echo htmlspecialchars($sdate); ?> at <?php echo htmlspecialchars($stime); ?> </h1>
-        <h2>THE TOURNAMENT BEGINS IN:</h2>
+        <h1>Expiry Date and Time: <?php echo htmlspecialchars($expire_time_obj->format('F j, Y g:i A')); ?></h1>
+        <h2>THE TOURNAMENT EXPIRES IN:</h2>
         <div class="countdown">
             <div class="time-section">
                 <div id="days">0</div>
@@ -407,31 +417,17 @@ $conn->close();
         </div>
     </div>
     <div class="right-container">
-        <h2>Set Up Tournament</h2>
-        <form action="start_game.php" method="POST">
-        <input type="hidden" name="tournament_id" value="<?php echo htmlspecialchars($tournament_id); ?>">
-
-            <div class="form-group">
-                <label for="game_id">Game ID</label>
-                <input type="text" id="game_id" name="game_id" placeholder="Enter Game ID" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Game Password</label>
-                <input type="text" id="password" name="password" placeholder="Enter Game Password" required>
-            </div>
-            <div class="form-group">
-                <label for="expire_time">Tournament Expiration Time</label>
-                <input type="datetime-local" id="expire_time" name="expire_time" required>
-            </div>
-            <div class="form-group">
-                <button type="button" class="cancel-btn" onclick="window.history.back();">Cancel</button>
-                <button type="submit" value="submit" class="start-btn">Start Tournament</button>
-            </div>
-        </form>
+        <h2>Game Id and Password</h2>
+        <div class="form-group">
+            <label for="game_id">Game ID</label>
+            <input type="text" id="game_id" name="game_id" value="<?php echo htmlspecialchars($game_id); ?>" readonly onclick="copyText(this)" <?php echo $is_expired ? 'disabled' : ''; ?>>
+        </div>
+        <div class="form-group">
+            <label for="password">Game Password</label>
+            <input type="text" id="password" name="password" value="<?php echo htmlspecialchars($password); ?>" readonly onclick="copyText(this)" <?php echo $is_expired ? 'disabled' : ''; ?>>
+        </div>
     </div>
 </div>
-
-    
 
 
     <!-- FOOTER -->
@@ -545,25 +541,44 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
-        // Countdown function
-        function updateCountdown() {
-            var eventDate = new Date('<?php echo $sdate; ?> ' + '<?php echo $stime; ?>');
-            var now = new Date().getTime();
-            var timeLeft = eventDate - now;
+// Get the expiry time from PHP and convert it into JavaScript Date object
+var expireTime = new Date("<?php echo $expire_time_obj->format('Y-m-d H:i:s'); ?>").getTime();
 
-            var days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+// Update the countdown every second
+var x = setInterval(function() {
+    var now = new Date().getTime();
+    var distance = expireTime - now;
 
-            document.getElementById('days').innerText = days;
-            document.getElementById('hours').innerText = hours;
-            document.getElementById('minutes').innerText = minutes;
-            document.getElementById('seconds').innerText = seconds;
-        }
+    // Calculate days, hours, minutes, and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // Update countdown every second
-        setInterval(updateCountdown, 1000);
+    // Display the results
+    document.getElementById("days").innerHTML = days;
+    document.getElementById("hours").innerHTML = hours;
+    document.getElementById("minutes").innerHTML = minutes;
+    document.getElementById("seconds").innerHTML = seconds;
+
+    // If the countdown is finished, display a message
+    if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("days").innerHTML = 0;
+        document.getElementById("hours").innerHTML = 0;
+        document.getElementById("minutes").innerHTML = 0;
+        document.getElementById("seconds").innerHTML = 0;
+
+        // Set game_id and password to "Expired" in case of expiration
+        document.getElementById("game_id").value = "Expired";
+        document.getElementById("password").value = "Expired";
+        document.getElementById("game_id").disabled = true;
+        document.getElementById("password").disabled = true;
+
+        alert("The tournament has expired.");
+    }
+}, 1000);
+
 
 
         // Show image preview
@@ -580,6 +595,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 </script>
 
+<script>
+
+function copyText(element) {
+        element.select();
+        document.execCommand('copy');
+        alert('Text copied to clipboard: ' + element.value);
+    }
+</script>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

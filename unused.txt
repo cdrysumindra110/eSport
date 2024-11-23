@@ -2487,3 +2487,133 @@ if (isset($_POST['otp_verification'])) {
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+// Include the config file for database connection
+require_once 'config.php';
+
+// Start the session
+session_start();
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+// Check if the user is logged in
+if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
+    header('Location: signin.php');
+    exit();
+}
+
+// Get the logged-in user ID
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User ID not set in session.");
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch current user data
+$sql = "SELECT role, full_name, dob, country, city, cover_photo, profile_pic FROM users WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($role, $full_name, $dob, $country, $city, $cover_photo, $profile_pic);
+
+if ($stmt->num_rows > 0) {
+    $stmt->fetch();
+} else {
+    die("Error: User not found.");
+}
+$stmt->close();
+
+// Handle profile update form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
+    // Sanitize and validate inputs
+    $role = trim($_POST['role']);
+    $full_name = trim($_POST['full_name']);
+    $dob_month = (int)$_POST['dob-month'];
+    $dob_day = (int)$_POST['dob-day'];
+    $dob_year = (int)$_POST['dob-year'];
+    $country = trim($_POST['country']);
+    $city = trim($_POST['city']);
+
+    // Validate Date of Birth
+    if (!checkdate($dob_month, $dob_day, $dob_year)) {
+        $error_message = 'Invalid date provided.';
+    } else {
+        $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
+
+        // Process file uploads
+        $cover_photo = null;
+        $profile_pic = null;
+
+        if (isset($_FILES['cover_photo']) && $_FILES['cover_photo']['error'] === UPLOAD_ERR_OK) {
+            $cover_photo_tmp = $_FILES['cover_photo']['tmp_name'];
+            $cover_photo = file_get_contents($cover_photo_tmp);
+        }
+
+        if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+            $profile_pic_tmp = $_FILES['profile_pic']['tmp_name'];
+            $profile_pic = file_get_contents($profile_pic_tmp);
+        }
+
+        // Prepare the SQL query
+        $stmt = $conn->prepare("
+            UPDATE users 
+            SET role = ?, full_name = ?, dob = ?, country = ?, city = ?, cover_photo = ?, profile_pic = ?
+            WHERE id = ?
+        ");
+
+        if (!$stmt) {
+            die('Prepare failed: ' . $conn->error);
+        }
+
+        // Bind parameters
+        $stmt->bind_param('sssssbbi', $role, $full_name, $dob, $country, $city, $null, $null, $user_id);
+
+        // Send binary data
+        if ($cover_photo) {
+            $stmt->send_long_data(5, $cover_photo);
+        }
+        if ($profile_pic) {
+            $stmt->send_long_data(6, $profile_pic);
+        }
+
+        // Execute the query
+        if ($stmt->execute()) {
+            $success_message = 'Profile updated successfully.';
+        } else {
+            $error_message = 'Error updating profile: ' . $stmt->error;
+        }
+
+        $stmt->close();
+    }
+
+    // Redirect with messages
+    $query_string = '';
+    if (!empty($success_message)) {
+        $query_string .= 'success_message=' . urlencode($success_message);
+    }
+    if (!empty($error_message)) {
+        $query_string .= '&error_message=' . urlencode($error_message);
+    }
+    header('Location: dashboard.php?' . $query_string);
+    exit;
+}
+
+// Close the database connection
+$conn->close();
+?>

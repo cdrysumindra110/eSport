@@ -1,4 +1,4 @@
-<?php  
+<?php
 // Include the config file for database connection
 require_once 'config.php';
 
@@ -30,7 +30,6 @@ $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($role, $full_name, $dob, $country, $city, $cover_photo, $profile_pic);
 
-// If the user exists, fetch their data
 if ($stmt->num_rows > 0) {
     $stmt->fetch();
 } else {
@@ -38,85 +37,82 @@ if ($stmt->num_rows > 0) {
 }
 $stmt->close();
 
-// Check if success or error messages are set in the URL
-if (isset($_GET['success_signin'])) {
-    $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
-}
-if (isset($_GET['success_message'])) {
-    $success_message = htmlspecialchars(urldecode($_GET['success_message']));
-}
-if (isset($_GET['error_message'])) {
-    $error_message = htmlspecialchars(urldecode($_GET['error_message']));
-}
+// Handle profile update form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
+    // Sanitize and validate inputs
+    $role = trim($_POST['role']);
+    $full_name = trim($_POST['full_name']);
+    $dob_month = (int)$_POST['dob-month'];
+    $dob_day = (int)$_POST['dob-day'];
+    $dob_year = (int)$_POST['dob-year'];
+    $country = trim($_POST['country']);
+    $city = trim($_POST['city']);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  if (isset($_POST['update_profile'])) {
-      $role = trim($_POST['role']);
-      $full_name = trim($_POST['full_name']);
-      $dob_month = (int)$_POST['dob-month'];
-      $dob_day = (int)$_POST['dob-day'];
-      $dob_year = (int)$_POST['dob-year'];
-      $country = trim($_POST['country']);
-      $city = trim($_POST['city']);
+    // Validate Date of Birth
+    if (!checkdate($dob_month, $dob_day, $dob_year)) {
+        $error_message = 'Invalid date provided.';
+    } else {
+        $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
 
-      // Validate Date of Birth
-      if (!checkdate($dob_month, $dob_day, $dob_year)) {
-          $error_message = 'Invalid date provided.';
-      } else {
-          $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_day);
+        // Process file uploads
+        $cover_photo = null;
+        $profile_pic = null;
 
-          // Process File Uploads
-          $cover_photo = null;
-          $profile_pic = null;
+        if (isset($_FILES['cover_photo']) && $_FILES['cover_photo']['error'] === UPLOAD_ERR_OK) {
+            $cover_photo_tmp = $_FILES['cover_photo']['tmp_name'];
+            $cover_photo = file_get_contents($cover_photo_tmp);
+        }
 
-          if (isset($_FILES['cover_photo']) && $_FILES['cover_photo']['error'] === UPLOAD_ERR_OK) {
-              $cover_photo_tmp = $_FILES['cover_photo']['tmp_name'];
-              $cover_photo = file_get_contents($cover_photo_tmp); // Storing file as binary
-          }
+        if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+            $profile_pic_tmp = $_FILES['profile_pic']['tmp_name'];
+            $profile_pic = file_get_contents($profile_pic_tmp);
+        }
 
-          if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
-              $profile_pic_tmp = $_FILES['profile_pic']['tmp_name'];
-              $profile_pic = file_get_contents($profile_pic_tmp); // Storing file as binary
-          }
+        // Prepare the SQL query
+        $stmt = $conn->prepare("
+            UPDATE users 
+            SET role = ?, full_name = ?, dob = ?, country = ?, city = ?, cover_photo = ?, profile_pic = ?
+            WHERE id = ?
+        ");
 
-          // Prepare the SQL Query
-          $stmt = $conn->prepare("
-              UPDATE users 
-              SET role = ?, full_name = ?, dob = ?, country = ?, city = ?, cover_photo = ?, profile_pic = ?
-              WHERE id = ?
-          ");
+        if (!$stmt) {
+            die('Prepare failed: ' . $conn->error);
+        }
 
-          if (!$stmt) {
-              die('Prepare failed: ' . $conn->error);
-          }
+        // Bind parameters
+        $stmt->bind_param('sssssbbi', $role, $full_name, $dob, $country, $city, $null, $null, $user_id);
 
-          // Bind parameters to the query
-          $stmt->bind_param('sssssbbi', $role, $full_name, $dob, $country, $city, $cover_photo, $profile_pic, $user_id);
+        // Send binary data
+        if ($cover_photo) {
+            $stmt->send_long_data(5, $cover_photo);
+        }
+        if ($profile_pic) {
+            $stmt->send_long_data(6, $profile_pic);
+        }
 
-          // Execute the query
-          if ($stmt->execute()) {
-              $success_message = 'Profile updated successfully.';
-          } else {
-              $error_message = 'Error updating profile: ' . $stmt->error;
-          }
+        // Execute the query
+        if ($stmt->execute()) {
+            $success_message = 'Profile updated successfully.';
+        } else {
+            $error_message = 'Error updating profile: ' . $stmt->error;
+        }
 
-          $stmt->close();
-      }
+        $stmt->close();
+    }
 
-      // Redirect with messages
-      $query_string = '';
-      if (!empty($success_message)) {
-          $query_string .= 'success_message=' . urlencode($success_message);
-      }
-      if (!empty($error_message)) {
-          $query_string .= '&error_message=' . urlencode($error_message);
-      }
-      header('Location: dashboard.php?' . $query_string);
-      exit;
-  }
+    // Redirect with messages
+    $query_string = '';
+    if (!empty($success_message)) {
+        $query_string .= 'success_message=' . urlencode($success_message);
+    }
+    if (!empty($error_message)) {
+        $query_string .= '&error_message=' . urlencode($error_message);
+    }
+    header('Location: dashboard.php?' . $query_string);
+    exit;
 }
 
-// Close the connection
+// Close the database connection
 $conn->close();
 ?>
 
@@ -136,6 +132,7 @@ $conn->close();
     <link rel="stylesheet" href="owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
     <link rel="stylesheet" href="./css/template-style.css">
+    <link rel="stylesheet" href="./css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -241,79 +238,155 @@ $conn->close();
         </div>
 
         <form id="update_profile" action="dashboard.php" method="post" enctype="multipart/form-data">
-            <div class="profile-container">
-                <div class="cover-photo-container">
-                    <div class="cover-photo">
-                        <input type="file" name="cover_photo" id="cover_photo" accept="image/*" onchange="loadCoverPhoto(event)" class="file-input" required/>
-                        <label for="cover_photo" class="cover-photo-label">
-                            <span class="icon-wrapper">
-                                <i class="fas fa-camera"></i>
-                            </span>
-                            <span>Change Cover</span>
-                        </label>
-                        <img id="coverPhoto" name="coverPhoto" src="./img/dash-cover.png" alt="Cover Photo" class="cover-photo-img" />
-                        <div class="cover-overlay"></div>
-                    </div>
-                </div>
-                <div class="profile-pic">
-                    <input type="file" name="profile_pic" id="profile_pic" accept="image/*" onchange="loadProfilePic(event)" class="file-input" required/>
-                    <label for="profile_pic" class="profile-pic-label">
-                        <span class="icon-wrapper">
+          <div class="profile-container">
+              <div class="cover-photo-container">
+                  <div class="cover-photo">
+                      <input type="file" name="cover_photo" id="cover_photo" accept="image/*" onchange="loadCoverPhoto(event)" class="file-input" />
+                      <label for="cover_photo" class="cover-photo-label">
+                          <span class="icon-wrapper">
+                              <i class="fas fa-camera"></i>
+                          </span>
+                          <span>Change Cover</span>
+                      </label>
+                      <!-- Display user's cover photo or default cover photo -->
+                      <img id="coverPhoto" 
+                          name="coverPhoto" 
+                          src="<?php echo isset($cover_photo) && !empty($cover_photo) 
+                                      ? 'data:image/jpeg;base64,' . base64_encode($cover_photo) 
+                                      : './img/dash-cover.png'; ?>" 
+                          alt="Cover Photo" 
+                          class="cover-photo-img" />
+                      <div class="cover-overlay"></div>
+                  </div>
+              </div>
+              <div class="profile-pic">
+                  <input type="file" name="profile_pic" id="profile_pic" accept="image/*" onchange="loadProfilePic(event)" class="file-input" />
+                  <label for="profile_pic" class="profile-pic-label">
+                      <span class="icon-wrapper">
                           <i class="fas fa-camera"></i>
-                        </span>
-                        <span>Change Profile</span>
-                    </label>
-                    <img src="./img/dash-logo.png" id="profilePic" name="profilePic" class="profile-pic-img" />
-                </div>
-            </div>
+                      </span>
+                      <span>Change Profile</span>
+                  </label>
+                  <!-- Display user's profile picture or default profile picture -->
+                  <img id="profilePic" 
+                      name="profilePic" 
+                      src="<?php echo isset($profile_pic) && !empty($profile_pic) 
+                                  ? 'data:image/jpeg;base64,' . base64_encode($profile_pic) 
+                                  : './img/dash-logo.png'; ?>" 
+                      alt="Profile Picture" 
+                      class="profile-pic-img" />
+              </div>
+          </div>
+
+          <!-- Update Profile -->
+          <div id="profileUpdateSection" class="profile-section">
+              <div class="unique-container">
+                  <h2 class="unique-header">Role Selection</h2>
+                  <div class="unique-input-field">
+                      <div class="slider-radio-group">
+                        <!-- Hidden Radio Buttons -->
+                        <input type="radio" id="role-player" name="role" value="player" class="unique-radio" 
+                              <?php echo ($role === 'player') ? 'checked' : ''; ?> style="visibility: hidden;" required>
+                        <input type="radio" id="role-organizer" name="role" value="organizer" class="unique-radio" 
+                              <?php echo ($role === 'organizer') ? 'checked' : ''; ?> style="visibility: hidden;" required>
+                    
+                        <!-- Slider and Labels -->
+                        <label class="f">
+                                          Player
+                      <input class="f__input" type="checkbox" id="role-toggle" name="role-toggle" 
+                            <?php echo ($role === 'organizer') ? 'checked' : ''; ?>>
+                          <span class="f__switch">
+                            <span class="f__handle">
+                              <span class="f__1"></span>
+                              <span class="f__2">
+                                <span class="f__2a"></span>
+                                <span class="f__2b"></span>
+                                <span class="f__2c"></span>
+                                <span class="f__2d"></span>
+                                <span class="f__2e"></span>
+                              </span>
+                              <span class="f__3"></span>
+                              <span class="f__4"></span>
+                              <span class="f__5"></span>
+                              <span class="f__6"></span>
+                              <span class="f__7"></span>
+                              <span class="f__8"></span>
+                              <span class="f__9"></span>
+                              <span class="f__10"></span>
+                              <span class="f__11"></span>
+                              <span class="f__12"></span>
+                              <span class="f__13"></span>
+                              <span class="f__14"></span>
+                              <span class="f__15"></span>
+                              <span class="f__16"></span>
+                              <span class="f__17"></span>
+                            </span>
+                          </span>
+                          Organizer
+                        </label>
+                      </div>
+                    </div>
 
 
 
-        <!-- Update Profile -->
-            <div id="profileUpdateSection" class="profile-section">
-                <div class="unique-container">
-                    <h2 class="unique-header">Role Selection</h2>
-                    <div class="unique-input-field">
-                        <label class="unique-label">Select Role:</label>
-                        <div class="radio-group">
-                            <input type="radio" id="role-player" name="role" value="player" class="unique-radio" required>
-                            <label for="role-player" class="unique-radio-label">Player</label>
-                            <input type="radio" id="role-organizer" name="role" value="organizer" class="unique-radio" required>
-                            <label for="role-organizer" class="unique-radio-label">Organizer</label>
-                        </div>
-                    </div>
+                  <h2 class="unique-header">Personal Information</h2>
+                  <div class="unique-input-field">
+                      <label for="full_name" class="unique-label">Full Name</label>
+                      <input type="text" id="full_name" name="full_name" class="unique-input" placeholder="Fname Lname" 
+                            value="<?php echo htmlspecialchars($full_name); ?>" required>
+                  </div>
+                  <div class="unique-input-field">
+                      <label for="dob" class="unique-label">Date Of Birth</label>
+                      <div class="dob-row">
+                          <select id="dob-year" name="dob-year" class="unique-select" required>
+                              <!-- Generate year options -->
+                              <?php for ($year = date('Y'); $year >= 1900; $year--): ?>
+                                  <option value="<?php echo $year; ?>" <?php echo ($year == (int)date('Y', strtotime($dob))) ? 'selected' : ''; ?>>
+                                      <?php echo $year; ?>
+                                  </option>
+                              <?php endfor; ?>
+                          </select>
+                          <select id="dob-month" name="dob-month" class="unique-select" required>
+                              <!-- Generate month options -->
+                              <?php for ($month = 1; $month <= 12; $month++): ?>
+                                  <option value="<?php echo $month; ?>" <?php echo ($month == (int)date('m', strtotime($dob))) ? 'selected' : ''; ?>>
+                                      <?php echo $month; ?>
+                                  </option>
+                              <?php endfor; ?>
+                          </select>
+                          <select id="dob-day" name="dob-day" class="unique-select" required>
+                              <!-- Generate day options -->
+                              <?php for ($day = 1; $day <= 31; $day++): ?>
+                                  <option value="<?php echo $day; ?>" <?php echo ($day == (int)date('d', strtotime($dob))) ? 'selected' : ''; ?>>
+                                      <?php echo $day; ?>
+                                  </option>
+                              <?php endfor; ?>
+                          </select>
+                      </div>
+                  </div>
 
-                    <h2 class="unique-header">Personal Information</h2>
-                    <div class="unique-input-field">
-                        <label for="full_name" class="unique-label">Full Name</label>
-                        <input type="text" id="full_name" name="full_name" class="unique-input" placeholder="Fname Lname" required>
-                    </div>
-                    <div class="unique-input-field">
-                        <label for="dob" class="unique-label">Date Of Birth</label>
-                        <div class="dob-row">
-                            <select id="dob-year" name="dob-year" class="unique-select" required></select>
-                            <select id="dob-month" name="dob-month" class="unique-select" required></select>
-                            <select id="dob-day" name="dob-day" class="unique-select" required></select>
-                        </div>
-                    </div>
+                  <h2 class="unique-header">Location</h2>
+                  <div class="unique-input-field">
+                      <label for="country" class="unique-label">Country</label>
+                      <select id="country" name="country" class="unique-select" required>
+                          <!-- Populate with existing countries -->
+                          <option value="<?php echo htmlspecialchars($country); ?>" selected><?php echo htmlspecialchars($country); ?></option>
+                      </select>
+                  </div>
+                  <div class="unique-info">
+                      <i class="unique-info-icon"></i> You can change your country once every 6 months.
+                  </div>
+                  <div class="unique-input-field">
+                      <label for="city" class="unique-label">City</label>
+                      <input type="text" id="city" name="city" class="unique-input" placeholder="City" 
+                            value="<?php echo htmlspecialchars($city); ?>" required>
+                  </div>
+                  <button type="button" class="unique-button" onclick="showSection('profileUpdateSection')">CANCEL</button>
+                  <button type="submit" name="update_profile" value="submit" class="unique-button">SAVE CHANGES</button>
+              </div>
+          </div>
+      </form>
 
-                    <h2 class="unique-header">Location</h2>
-                    <div class="unique-input-field">
-                        <label for="country" class="unique-label">Country</label>
-                        <select id="country" name="country" class="unique-select" required></select>
-                    </div>
-                    <div class="unique-info">
-                        <i class="unique-info-icon"></i> You can change your country once every 6 months.
-                    </div>
-                    <div class="unique-input-field">
-                        <label for="city" class="unique-label">City</label>
-                        <input type="text" id="city" name="city" class="unique-input" placeholder="City" required>
-                    </div>
-                    <button type="button" class="unique-button" onclick="showSection('profileUpdateSection')">CANCEL</button>
-                    <button type="submit" name="update_profile" value="submit" class="unique-button">SAVE CHANGES</button>
-                </div>
-            </div>
-        </form>
     </div>
 
             
@@ -596,6 +669,58 @@ document.addEventListener('DOMContentLoaded', function() {
   <?php endif; ?>
 });
 
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Get the checkbox (toggle) element
+  const roleToggle = document.getElementById('role-toggle');
+
+  // Get the hidden radio buttons for Player and Organizer
+  const playerRadio = document.getElementById('role-player');
+  const organizerRadio = document.getElementById('role-organizer');
+
+  // Function to update the role based on the toggle state
+  function updateRole() {
+    if (roleToggle.checked) {
+      // If checked, set 'organizer' radio button as selected
+      organizerRadio.checked = true;
+      playerRadio.checked = false;
+    } else {
+      // If unchecked, set 'player' radio button as selected
+      playerRadio.checked = true;
+      organizerRadio.checked = false;
+    }
+
+    // Send the role data to the server via AJAX (example using fetch)
+    sendRoleToDatabase();
+  }
+
+  // Event listener for toggle state change
+  roleToggle.addEventListener('change', updateRole);
+
+  // Initial update on page load (in case the role is already set)
+  updateRole();
+
+  // Function to send the selected role to the server (example using fetch)
+  function sendRoleToDatabase() {
+    const role = playerRadio.checked ? 'player' : 'organizer';
+
+    // Example: Use Fetch API to send role to the server (assuming a POST endpoint)
+    fetch('/update-role', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ role: role }), // Send role data as JSON
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Role updated successfully:', data);
+    })
+    .catch(error => {
+      console.error('Error updating role:', error);
+    });
+  }
+});
 
 
 </script>
