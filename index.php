@@ -463,7 +463,7 @@ if (!$isSignin) {
                 </div> 
               </div>  
               <!-- Team Member Photo -->
-              <img src="img/team-02.jpg"/>
+              <img src="img/team-02.png"/>
             </div>                                                                                                                                                                                                              
             <div class="margin-top">                          
               <!-- Team Member Description -->

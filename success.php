@@ -13,6 +13,7 @@ if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     exit();
 }
 
+// Get tournament ID from the URL
 $tournament_id = isset($_GET['tournament_id']) ? $_GET['tournament_id'] : null;
 if (!$tournament_id) {
     die("Error: Missing tournament ID or match type.");
@@ -64,19 +65,17 @@ if ($stmt) {
         $current_time = new DateTime();
         
         // Check if expire_time is 'N/A' before using it
-
         if ($expire_time !== 'N/A') {
-          $expire_time_obj = new DateTime($expire_time);
-          // Check if the tournament has expired
-          $is_expired = $current_time > $expire_time_obj;
+            $expire_time_obj = new DateTime($expire_time);
+            // Check if the tournament has expired
+            $is_expired = $current_time > $expire_time_obj;
         } else {
-          $expire_time_obj = null;
-          $is_expired = false;
+            $expire_time_obj = null;
+            $is_expired = false;
         }
 
         $game_id_value = $is_expired ? "Expired" : $game_id;
         $password_value = $is_expired ? "Expired" : $password;
-        
     } else {
         $error_message = "No tournament found with that ID.";
         echo $error_message;
@@ -85,6 +84,35 @@ if ($stmt) {
 } else {
     $error_message = "Error preparing the tournament detail statement: " . $conn->error;
     echo $error_message;
+}
+
+// Fetch user ID from the session
+$user_id = $_SESSION['user_id']; 
+
+// Query to check if the user is registered
+$registration_query = "SELECT * FROM (
+    SELECT tournament_id, email FROM solo_registration WHERE tournament_id = ? AND email = ?
+    UNION
+    SELECT tournament_id, email FROM duo_registration WHERE tournament_id = ? AND email = ?
+    UNION
+    SELECT tournament_id, email FROM squad_registration WHERE tournament_id = ? AND email = ?
+) as registered WHERE tournament_id = ?";
+
+$stmt = $conn->prepare($registration_query);
+$stmt->bind_param("ississs", $tournament_id, $_SESSION['email'], $tournament_id, $_SESSION['email'], $tournament_id, $_SESSION['email'], $tournament_id);
+$stmt->execute();
+$registration_result = $stmt->get_result();
+
+// Check if the user is registered
+$is_registered = $registration_result->num_rows > 0;
+
+// Display game ID and password only if the user is registered
+if ($is_registered) {
+    $game_id_value = $is_expired ? "Expired" : $game_id;
+    $password_value = $is_expired ? "Expired" : $password;
+} else {
+    $game_id_value = "Access Restricted";
+    $password_value = "Access Restricted";
 }
 
 $conn->close();
@@ -400,7 +428,7 @@ $conn->close();
         <!-- Popup Message -->
         <div class="popup-message" id="popup-message"></div>
 <!-- ++++++++++++++++++++++++++++++++++++++++++++++Form containrerer+++++++++++++++++++++++++++++++++++ -->
-<div class="tournament-reg_container">
+<div class="tournament-reg_container"> 
     <div class="left-container">
         <h1>WELCOME TO THE EXCLUSIVE eSPORTS TOURNAMENT</h1>
         <h2><?php echo htmlspecialchars($tname); ?></h2>
@@ -440,7 +468,7 @@ $conn->close();
             <p>Game ID and password will be available soon</p>
         <?php elseif ($is_expired): ?>
             <p>The Game ID and password have expired</p>
-        <?php else: ?>
+        <?php elseif ($is_registered): ?>
             <div class="form-group">
                 <label for="game_id">Game ID</label>
                 <input type="text" id="game_id" name="game_id" value="<?php echo htmlspecialchars($game_id_value); ?>" readonly onclick="copyText(this)">
@@ -449,6 +477,8 @@ $conn->close();
                 <label for="password">Game Password</label>
                 <input type="text" id="password" name="password" value="<?php echo htmlspecialchars($password_value); ?>" readonly onclick="copyText(this)">
             </div>
+        <?php else: ?>
+            <p>Access Restricted. You must register for this tournament to view the Game ID and Password.</p>
         <?php endif; ?>
     </div>
 </div>
