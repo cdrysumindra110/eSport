@@ -6,6 +6,7 @@ include_once("config.php"); // Include your database connection file
 $error_message = '';
 $success_message = '';   
 
+
 if (isset($_POST['email']) && isset($_POST['password'])) {
     // Sanitize user inputs
     $email = htmlspecialchars(trim($_POST["email"]));

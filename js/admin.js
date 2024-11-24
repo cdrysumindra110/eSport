@@ -109,13 +109,11 @@ document.getElementById('analytics-link').addEventListener('click', function(eve
 });
 
 // Function to show the popup and display user details
-function showPopup(id, fullName, email, createdAt, updatedAt, uname, country, city, role, coverPhoto, profilePic, dob) {
+function showPopup(id, fullName, email, uname, country, city, role, coverPhoto, profilePic, dob) {
   document.getElementById("popup-text").innerHTML = `  
       <strong>ID:</strong> ${id} <br>
       <strong>Full Name:</strong> ${fullName} <br>
       <strong>Email:</strong> ${email} <br>
-      <strong>Created At:</strong> ${createdAt} <br>
-      <strong>Updated At:</strong> ${updatedAt} <br>
       <strong>Username:</strong> ${uname} <br>
       <strong>Country:</strong> ${country} <br>
       <strong>City:</strong> ${city} <br>

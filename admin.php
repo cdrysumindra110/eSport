@@ -6,6 +6,11 @@ session_start();
 $error_message = '';
 $success_message = '';
 
+if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
+  header('Location: admin_login.php'); // Redirect to admin login page
+  exit;
+}
+
 // Check if a success message is set in session
 if (isset($_SESSION['message'])) {
     $success_message = $_SESSION['message']; // Get message from session
