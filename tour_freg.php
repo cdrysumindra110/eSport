@@ -57,35 +57,44 @@ if ($stmt) {
 
         // Calculate registered teams/players based on match type
         if ($match_type == 'solo') {
-            $sql = "SELECT COUNT(*) AS registered FROM solo_registration WHERE tournament_id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $tournament_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
-            $registered_count = $row['registered']; // Number of solo players registered
-            $total_teams = $tournament['solo_players']; // Total players allowed for solo
-            $registration_message = "Players Registered"; // Message for solo
+            $sql_solo = "SELECT COUNT(*) AS registered FROM solo_registration WHERE tournament_id = ?";
+            $stmt_solo = $conn->prepare($sql_solo);
+            if ($stmt_solo) {
+                $stmt_solo->bind_param("i", $tournament_id);
+                $stmt_solo->execute();
+                $result_solo = $stmt_solo->get_result();
+                $row_solo = $result_solo->fetch_assoc();
+                $registered_count = $row_solo['registered'];
+                $total_teams = $tournament['solo_players'];
+                $registration_message = "Players Registered";
+                $stmt_solo->close(); // Close the statement here
+            }
         } elseif ($match_type == 'duo') {
-            $sql = "SELECT COUNT(*) AS registered FROM duo_registration WHERE tournament_id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $tournament_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
-            $registered_count = $row['registered']; // Number of duo teams registered
-            $total_teams = $tournament['duo_teams']; // Total teams allowed for duo
-            $registration_message = "Teams Registered"; // Message for duo
+            $sql_duo = "SELECT COUNT(*) AS registered FROM duo_registration WHERE tournament_id = ?";
+            $stmt_duo = $conn->prepare($sql_duo);
+            if ($stmt_duo) {
+                $stmt_duo->bind_param("i", $tournament_id);
+                $stmt_duo->execute();
+                $result_duo = $stmt_duo->get_result();
+                $row_duo = $result_duo->fetch_assoc();
+                $registered_count = $row_duo['registered'];
+                $total_teams = $tournament['duo_teams'];
+                $registration_message = "Teams Registered";
+                $stmt_duo->close(); // Close the statement here
+            }
         } elseif ($match_type == 'squad') {
-            $sql = "SELECT COUNT(*) AS registered FROM squad_registration WHERE tournament_id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $tournament_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
-            $registered_count = $row['registered']; // Number of squad teams registered
-            $total_teams = $tournament['squad_teams']; // Total teams allowed for squad
-            $registration_message = "Teams Registered"; // Message for squad
+            $sql_squad = "SELECT COUNT(*) AS registered FROM squad_registration WHERE tournament_id = ?";
+            $stmt_squad = $conn->prepare($sql_squad);
+            if ($stmt_squad) {
+                $stmt_squad->bind_param("i", $tournament_id);
+                $stmt_squad->execute();
+                $result_squad = $stmt_squad->get_result();
+                $row_squad = $result_squad->fetch_assoc();
+                $registered_count = $row_squad['registered'];
+                $total_teams = $tournament['squad_teams'];
+                $registration_message = "Teams Registered";
+                $stmt_squad->close(); // Close the statement here
+            }
         } else {
             $registered_count = 0; // Default to 0 if the match type is invalid
             $total_teams = 0; // Default total to 0
@@ -100,58 +109,50 @@ if ($stmt) {
         // Display the teams/players-registered message
         $teams_registered_message = "$registered_count / $total_teams $registration_message";
 
-        // Fetch registered participants' usernames and profile images based on match type
-// Fetch registered participants' usernames and profile images based on match type
-$registered_usernames = [];
-if ($match_type == 'solo') {
-    // Get username and logos from solo_registration and users table
-    $sql = "SELECT u.uname, u.profile_pic
-            FROM solo_registration sr
-            JOIN users u ON sr.email = u.email
-            WHERE sr.tournament_id = ?";
-} elseif ($match_type == 'duo') {
-    // Get username and logos from duo_registration and users table
-    $sql = "SELECT u.uname, u.profile_pic
-            FROM duo_registration dr
-            JOIN users u ON dr.email = u.email
-            WHERE dr.tournament_id = ?";
-} elseif ($match_type == 'squad') {
-    // Get username and logos from squad_registration and users table
-    $sql = "SELECT u.uname, u.profile_pic
-            FROM squad_registration sr
-            JOIN users u ON sr.email = u.email
-            WHERE sr.tournament_id = ?";
-} else {
-    $registered_usernames = []; // Default to empty array if match type is invalid
-}
+        // Fetch registered participants
+        $participants = []; // Initialize an array to hold participants' details
+        if ($match_type == 'solo') {
+            $sql_participants = "SELECT player_name AS team_name, NULL AS logo_path 
+                                 FROM solo_registration 
+                                 WHERE tournament_id = ?";
+        } elseif ($match_type == 'duo') {
+            $sql_participants = "SELECT team_name, logo_path 
+                                 FROM duo_registration 
+                                 WHERE tournament_id = ?";
+        } elseif ($match_type == 'squad') {
+            $sql_participants = "SELECT team_name, logo_path 
+                                 FROM squad_registration 
+                                 WHERE tournament_id = ?";
+        }
 
-// If there is a valid SQL statement, fetch results
-if (!empty($sql)) {
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $tournament_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Collect usernames and profile images in an array
-    while ($row = $result->fetch_assoc()) {
-        $registered_usernames[] = [
-            'uname' => $row['uname'],
-            'logo_path' => $row['profile_pic'] ?: 'default-logo.jpg' // Use 'profile_pic' and set a default logo if empty
-        ];
-    }
-}
-
+        if (isset($sql_participants)) {
+            $stmt_participants = $conn->prepare($sql_participants);
+            if ($stmt_participants) {
+                $stmt_participants->bind_param("i", $tournament_id);
+                $stmt_participants->execute();
+                $result_participants = $stmt_participants->get_result();
+                while ($row = $result_participants->fetch_assoc()) {
+                    $participants[] = $row;
+                }
+                $stmt_participants->close(); // Close this statement
+            } else {
+                $error_message = "Error preparing the participants query: " . $conn->error;
+            }
+        }
 
     } else {
         $error_message = "No tournament found with that ID.";
     }
-    $stmt->close();
+    $stmt->close(); // Close the tournament detail statement
 } else {
     $error_message = "Error preparing the tournament detail statement: " . $conn->error;
 }
 
 $conn->close();
 ?>
+
+
+
 
 
 <!DOCTYPE html>
@@ -563,36 +564,37 @@ $conn->close();
         </div>
 
         <div class="content-container schedule-container" id="schedule-container">
-            <p class="content-title"><i class="fas fa-user"></i>&nbsp;&nbsp;Usernames</p>
+            <p class="content-title"><i class="fas fa-user"></i>&nbsp;&nbsp;Registered Participants</p>
             <p class="cont-title" style="display: flex; flex-direction: column;">
-              <?php
-                if (!empty($registered_usernames)) {
-                    $counter = 1; // Initialize the counter
-                    foreach ($registered_usernames as $user) {
-                        ?>
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <!-- Display user logo dynamically -->
-                            <div class="small-banner" style="width: 40px; height: 40px; margin-right: 10px; overflow: hidden; border-radius: 50%;">
-                                <?php
-                                // Check if the logo exists and display it, otherwise show default logo
-                                $logo_path = 'uploads/' . htmlspecialchars($user['logo_path']);
-                                if (file_exists($logo_path)) {
-                                    echo '<img src="' . $logo_path . '" alt="User Logo" style="width: 100%; height: 100%; object-fit: cover;">';
-                                } else {
-                                    echo '<img src="uploads/dash-logo.png" alt="Default Logo" style="width: 100%; height: 100%; object-fit: cover;">';
-                                }
-                                ?>
-                            </div>
-                            <!-- Display the username with the counter -->
-                            <span><?php echo $counter . ". " . htmlspecialchars($user['uname']); ?></span>
-                        </div>
-                        <?php
-                        $counter++; // Increment the counter
-                    }
-                } else {
-                    echo "No participants registered yet.";
-                }
-              ?>
+            <?php
+if (!empty($participants)) {
+    $counter = 1; // Initialize the counter
+    foreach ($participants as $participant) {
+        ?>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <!-- Display participant logo dynamically -->
+            <div class="small-banner" style="width: 40px; height: 40px; margin-right: 10px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.2);">
+                <?php
+                // Determine the logo path (check if participant has a logo)
+                $logo_path = !empty($participant['logo_path']) && file_exists('uploads/' . htmlspecialchars($participant['logo_path'])) 
+                             ? 'uploads/' . htmlspecialchars($participant['logo_path']) 
+                             : 'uploads/dash-logo.png'; // Fallback to default logo if no participant logo
+                
+                // Display the logo
+                echo '<img src="' . $logo_path . '" alt="Participant Logo" style="width: 100%; height: 100%; object-fit: cover;">';
+                ?>
+            </div>
+            <!-- Display participant team name or player name with the counter -->
+            <span><?php echo $counter . ". " . htmlspecialchars($participant['team_name']); ?></span>
+        </div>
+        <?php
+        $counter++; // Increment the counter
+    }
+} else {
+    echo "<p>No participants registered yet.</p>";
+}
+?>
+
             </p>
         </div>
     </div>
