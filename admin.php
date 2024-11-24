@@ -1,6 +1,18 @@
 <?php
 
 include('config.php'); 
+session_start();
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+// Check if a success message is set
+if (isset($_SESSION['success_message'])) {
+  echo '<p>' . $_SESSION['success_message'] . '</p>';
+  // Unset the success message after displaying it (so it doesn't show again on page reload)
+  unset($_SESSION['success_message']);
+}
 
 $users = [];
 
@@ -51,6 +63,7 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" href="./css/admin.css">
 </head>
 <body>
+<div class="popup-message" id="popup-message"></div>
       <header class="page-header">
         <nav>
           <a href="#0" aria-label="InfiKnight logo" class="logo">
@@ -753,6 +766,16 @@ if (isset($_GET['delete_id'])) {
         
       </svg>
 <script src="./js/admin.js"></script>
+<script>
+		// Example usage for PHP error and success messages
+document.addEventListener('DOMContentLoaded', function() {
+  <?php if (!empty($success_message)): ?>
+    showPopupMessage("<?php echo $success_message; ?>", 'success');
+  <?php elseif (!empty($error_message)): ?>
+    showPopupMessage("<?php echo $error_message; ?>", 'error');
+  <?php endif; ?>
+});
+	</script>
 </body>
 </html>
 
