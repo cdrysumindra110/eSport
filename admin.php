@@ -1,5 +1,4 @@
 <?php
-
 include('config.php'); 
 session_start();
 
@@ -7,52 +6,52 @@ session_start();
 $error_message = '';
 $success_message = '';
 
-// Check if a success message is set
-if (isset($_SESSION['success_message'])) {
-  echo '<p>' . $_SESSION['success_message'] . '</p>';
-  // Unset the success message after displaying it (so it doesn't show again on page reload)
-  unset($_SESSION['success_message']);
+// Check if a success message is set in session
+if (isset($_SESSION['message'])) {
+    $success_message = $_SESSION['message']; // Get message from session
+    unset($_SESSION['message']); // Clear the message after showing it
+}
+
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message']; // Get error message from session
+    unset($_SESSION['error_message']); // Clear the message after showing it
 }
 
 $users = [];
 
+// Fetch users from the database
 if ($conn) {
-
     $query = "SELECT * FROM users"; 
     $result = mysqli_query($conn, $query);
-
 
     if ($result) {
         while ($user = mysqli_fetch_assoc($result)) {
             $users[] = $user;
         }
     } else {
-
         echo "Error fetching users: " . mysqli_error($conn);
     }
 } else {
-
     echo "Error connecting to the database: " . mysqli_connect_error();
 }
 
+// Deleting a user
 if (isset($_GET['delete_id'])) {
-
-    $delete_id = mysqli_real_escape_string($conn, $_GET['delete_id']);
-
+    $delete_id = mysqli_real_escape_string($conn, $_GET['delete_id']); // Sanitize the delete_id
 
     $delete_query = "DELETE FROM users WHERE id = $delete_id"; 
 
     if (mysqli_query($conn, $delete_query)) {
-
-        header('Location: admin.php'); 
+        $_SESSION['success_message'] = "User deleted successfully."; // Set success message in session
+        header('Location: admin.php'); // Redirect back to the admin page after deletion
         exit;
     } else {
-
-        echo "Error deleting user: " . mysqli_error($conn);
+        $_SESSION['error_message'] = "Error deleting user: " . mysqli_error($conn); // Set error message in session
+        header('Location: admin.php'); // Redirect back with error message
+        exit;
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -210,8 +209,6 @@ if (isset($_GET['delete_id'])) {
                                           '<?php echo htmlspecialchars($user['id']); ?>',
                                           '<?php echo htmlspecialchars($user['full_name']); ?>',
                                           '<?php echo htmlspecialchars($user['email']); ?>',
-                                          '<?php echo htmlspecialchars($user['created_at']); ?>',
-                                          '<?php echo htmlspecialchars($user['updated_at']); ?>',
                                           '<?php echo htmlspecialchars($user['uname']); ?>',
                                           '<?php echo htmlspecialchars($user['country']); ?>',
                                           '<?php echo htmlspecialchars($user['city']); ?>',
@@ -767,14 +764,24 @@ if (isset($_GET['delete_id'])) {
       </svg>
 <script src="./js/admin.js"></script>
 <script>
-		// Example usage for PHP error and success messages
-document.addEventListener('DOMContentLoaded', function() {
-  <?php if (!empty($success_message)): ?>
-    showPopupMessage("<?php echo $success_message; ?>", 'success');
-  <?php elseif (!empty($error_message)): ?>
-    showPopupMessage("<?php echo $error_message; ?>", 'error');
-  <?php endif; ?>
-});
+        // Display popup message when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if (isset($_SESSION['message'])): ?>
+                showPopupMessage("<?php echo $_SESSION['message']; ?>", 'success');
+                <?php unset($_SESSION['message']); ?> // Clear message after showing
+            <?php endif; ?>
+        });
+
+        // Function to show the popup message
+        function showPopupMessage(message, type) {
+            var popup = document.getElementById('popup-message');
+            popup.innerHTML = message;
+            popup.classList.add(type);  // Add success or error class
+            popup.style.display = 'block';  // Show the popup
+            setTimeout(function() {
+                popup.style.display = 'none';  // Hide the popup after 5 seconds
+            }, 5000);
+        }
 	</script>
 </body>
 </html>

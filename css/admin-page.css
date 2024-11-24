@@ -312,6 +312,24 @@ padding:75px 30px;
 }
 
 
+.popup-message {
+    display: none;
+    padding: 15px;
+    margin: 20px;
+    border-radius: 5px;
+    width: 20%;
+    color: white;
+    background-color: #4CAF50; /* Default to green for success */
+    position: fixed;
+    top: 65px;
+    right: 0px;
+    z-index: 1000;
+    text-align: center;
+}
 
-
-
+.popup-message.success {
+    background-color: #4CAF50; /* Green for success */
+}
+.popup-message.error {
+    background-color: #f44336; /* Red for error */
+}

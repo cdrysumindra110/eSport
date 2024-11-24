@@ -2,10 +2,9 @@
 session_start(); // Start the session at the beginning
 include_once("config.php"); // Include your database connection file
 
-
 // Initialize messages
 $error_message = '';
-$success_message = '';
+$success_message = '';   
 
 if (isset($_POST['email']) && isset($_POST['password'])) {
     // Sanitize user inputs
@@ -29,18 +28,18 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
             $_SESSION['isLogin'] = true;
             $_SESSION['user_id'] = $user['id']; // Optionally store user ID
             $_SESSION['user_email'] = $user['email']; // Optionally store email
-			$_SESSION['success_message'] = 'Successfully logged in!';
+            $_SESSION['message'] = 'Successfully logged in!'; // Store success message
 
             // Redirect to the admin page
             header("Location: admin.php");
             exit();  // Stop further execution
         } else {
             // Invalid password
-            $error_message = "Invalid email or password!";
+            $_SESSION['message'] = "Invalid email or password!"; // Store error message
         }
     } else {
         // No user found with the given email
-        $error_message = "Invalid email or password!";
+        $_SESSION['message'] = "Invalid email or password!"; // Store error message
     }
 
     // Close the statement
@@ -48,50 +47,60 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 }
 ?>
 
-
-
 <!DOCTYPE html>
 <html>
 <head>
-<title>InfiKnight Admin Login Form</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="keywords" content="Gaming Login Form Widget Tab Form,Login Forms,Sign up Forms,Registration Forms,News letter Forms,Elements"/>
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<link href="./css/admin-page.css" rel="stylesheet" type="text/css" media="all" />
+    <title>InfiKnight Admin Login Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="Gaming Login Form Widget Tab Form,Login Forms,Sign up Forms,Registration Forms,News letter Forms,Elements"/>
+    <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+    <link href="./css/admin-page.css" rel="stylesheet" type="text/css" media="all" />
 </head>
 
 <body>
 <div class="popup-message" id="popup-message"></div>
-	<div class="padding-all">
-		<div class="header">
-			<h1><a href="index.php"><img src="./img/dash-logo.png" alt=" "></a> Admin Login Form</h1>
-		</div>
+    <div class="padding-all">
+        <div class="header">
+            <h1><a href="index.php"><img src="./img/dash-logo.png" alt=" "></a> Admin Login Form</h1>
+        </div>
 
-		<div class="design-w3l">
-			<div class="mail-form-agile">
-				<form action="admin_login.php" method="post">
-					<input type="text" name="email" id="email" placeholder="Enter email..." required=""/>
-					<input type="password"  name="password" id="password" class="padding" placeholder="Enter Password" required=""/>
-					<input type="submit" value="Login">
-				</form>
-			</div>
-		  <div class="clear"> </div>
-		</div>
-		
-		<div class="footer">
-		<p>© 2022 All Rights Reserved | Design by Team <a href="https://sumindra14.com.np/" > &infin; InfiKnight </a></p>
-		</div>
-	</div>
-	<script>
-		// Example usage for PHP error and success messages
-document.addEventListener('DOMContentLoaded', function() {
-  <?php if (!empty($success_message)): ?>
-    showPopupMessage("<?php echo $success_message; ?>", 'success');
-  <?php elseif (!empty($error_message)): ?>
-    showPopupMessage("<?php echo $error_message; ?>", 'error');
-  <?php endif; ?>
-});
-	</script>
+        <div class="design-w3l">
+            <div class="mail-form-agile">
+                <form action="admin_login.php" method="post">
+                    <input type="text" name="email" id="email" placeholder="Enter email..." required=""/>
+                    <input type="password"  name="password" id="password" class="padding" placeholder="Enter Password" required=""/>
+                    <input type="submit" value="Login">
+                </form>
+            </div>
+          <div class="clear"> </div>
+        </div>
+        
+        <div class="footer">
+        <p>© 2022 All Rights Reserved | Design by Team <a href="https://sumindra14.com.np/" > &infin; InfiKnight </a></p>
+        </div>
+    </div>
+
+    <script>
+        // Display popup message when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if (isset($_SESSION['message'])): ?>
+                showPopupMessage("<?php echo $_SESSION['message']; ?>", 'success');
+                <?php unset($_SESSION['message']); ?> // Clear message after showing
+            <?php endif; ?>
+        });
+
+        // Function to show the popup message
+        function showPopupMessage(message, type) {
+            var popup = document.getElementById('popup-message');
+            popup.innerHTML = message;
+            popup.classList.add(type);  // Add success or error class
+            popup.style.display = 'block';  // Show the popup
+            setTimeout(function() {
+                popup.style.display = 'none';  // Hide the popup after 5 seconds
+            }, 5000);
+        }
+    </script>
+
 </body>
 </html>
