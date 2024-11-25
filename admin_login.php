@@ -32,7 +32,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
             $_SESSION['message'] = 'Successfully logged in!'; // Store success message
 
             // Redirect to the admin page
-            header("Location: admin.php");
+            header("Location: ./admin/admin.php");
             exit();  // Stop further execution
         } else {
             // Invalid password
