@@ -92,6 +92,9 @@ if (!$isSignin) {
       </nav>
     </header>
     
+    <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
+    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 100;">
+    </div>
         <!-- Popup Message -->
         <div class="popup-message" id="popup-message"></div>
 
@@ -698,10 +701,15 @@ if (!$isSignin) {
         </div>  
       </section>
     </footer>
-    <script type="text/javascript" src="js/responsee.js"></script>
-    <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
-    <script type="text/javascript" src="js/template-scripts.js"></script> 
-
+    <script type="text/javascript" src="./js/responsee.js"></script>
+    <script type="text/javascript" src="./owl-carousel/owl.carousel.js"></script>
+    <script type="text/javascript" src="./js/template-scripts.js"></script> 
+    <script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+        loader.style.display = "none";
+    });
+  </script>
     <!-- Popup page Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -734,6 +742,11 @@ document.addEventListener('DOMContentLoaded', function() {
   <?php endif; ?>
 });
 </script>
-
+<script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+        loader.style.display = "none";
+    });
+  </script>
   </body>
 </html>

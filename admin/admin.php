@@ -66,8 +66,15 @@ if (isset($_GET['delete_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../admin/css/admin.css">
+    <style>
+
+
+    </style>
 </head>
 <body>
+<div id="preloader" style="background: #000 url(../img/loading100.gif) no-repeat center center; 
+        background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
+        </div>
 <div class="popup-message" id="popup-message"></div>
       <header class="page-header">
         <nav>
@@ -82,27 +89,18 @@ if (isset($_GET['delete_id'])) {
           </button>
       
           <ul class="admin-menu">
-            <section class="search-and-user">
-              <form>
-                <input type="search" placeholder="Search Pages...">
-                <button type="submit" aria-label="submit form">
-                  <svg aria-hidden="true">
-                    <use xlink:href="#search"></use>
-                  </svg>
-                </button>
-              </form>
-      
-              <div class="admin-profile">
-                <span class="greeting">Admin</span>
-                <div class="notifications">
-                  <span class="badge">108</span>
-                  <svg>
-                    <use xlink:href="#users"></use>
-                  </svg>
-                </div>
-              </div>
-            </section>
-            
+            <li class="dropdown">
+              <a href="#">
+              <svg class="icon icon-user-check">
+                <use xlink:href="#icon-user-check"></use>
+              </svg>
+                <span>Admin</span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Logout</a></li>
+              </ul>
+            </li>  
+                    
             <!-- Users Menu Section -->
             <li class="menu-heading">
               <h3>Admin Control</h3>
@@ -118,7 +116,7 @@ if (isset($_GET['delete_id'])) {
             
             <!-- Tournament Menu Section -->
             <li>
-              <a href="../admin/tournaments.html">
+              <a href="../admin/tournaments.php">
                 <svg>
                   <use xlink:href="#tournaments"></use>
                 </svg>
@@ -128,28 +126,28 @@ if (isset($_GET['delete_id'])) {
             
             <!-- Registration Menu Section -->
             <li>
-              <a href="../admin/registrations.html">
+              <a href="../admin/registrations.php">
                 <svg class="icon icon-tour_reg"><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Registration</span>
               </a>
             </li>
 
             <li>
-              <a href="../admin/disputes_message.html">
+              <a href="../admin/disputes_message.php">
                 <svg class=""><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Disputes Message</span>
               </a>
             </li>
 
             <li>
-              <a href="../admin/contents.html">
+              <a href="../admin/contents.php">
                 <svg class=""><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Contents</span>
               </a>
             </li>
             
             <li>
-              <a href="../admin/result.html">
+              <a href="../admin/result.php">
                 <svg>
                   <use xlink:href="#charts"></use>
                 </svg>
@@ -162,7 +160,7 @@ if (isset($_GET['delete_id'])) {
               <h3>Settings</h3>
             </li>
             <li>
-              <a href="#0">
+              <a href="../admin/settings.php">
                 <svg>
                   <use xlink:href="#settings"></use>
                 </svg>
@@ -613,6 +611,10 @@ if (isset($_GET['delete_id'])) {
           <path fill="#506a81" style="fill: var(--color195, #506a81)" d="M15.882 25.147c0.062 0.001 0.062 0.001 0.125 0.001 0.047 0.001 0.047 0.001 0.095 0.002 0 0.017 0 0.034 0 0.051-0.141 0.026-0.281 0.051-0.422 0.077-0.040 0.007-0.079 0.015-0.12 0.022-0.058 0.010-0.058 0.010-0.117 0.021-0.035 0.006-0.071 0.013-0.107 0.019-0.103 0.014-0.103 0.014-0.307 0.014 0.017-0.051 0.034-0.101 0.051-0.153 0.152 0.003 0.152 0.003 0.305 0.005 0.173-0.008 0.32-0.062 0.497-0.059z"></path>
           <path fill="#1d1607" style="fill: var(--color196, #1d1607)" d="M28.575 19.629c0.017 0 0.034 0 0.051 0 0.044 0.15 0.071 0.26 0.009 0.407-0.051 0.088-0.106 0.173-0.162 0.258-0.061-0.182-0.036-0.24 0.022-0.419 0.015-0.046 0.029-0.092 0.045-0.14 0.012-0.035 0.023-0.070 0.035-0.106zM28.677 19.68c0.051 0.076 0.051 0.076 0.102 0.153-0.051 0.025-0.051 0.025-0.102 0.051 0-0.067 0-0.135 0-0.204z"></path>
           </symbol>
+        <symbol id="icon-user-check" viewBox="0 0 32 32">
+          <path d="M30 19l-9 9-3-3-2 2 5 5 11-11z"></path>
+          <path d="M14 24h10v-3.598c-2.101-1.225-4.885-2.066-8-2.321v-1.649c2.203-1.242 4-4.337 4-7.432 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h14v-2z"></path>
+          </symbol>
         <symbol id="appearance" viewBox="0 0 16 16">
           <path d="M3,0V7A2,2,0,0,0,5,9H6v5a2,2,0,0,0,4,0V9h1a2,2,0,0,0,2-2V0Zm9,7a1,1,0,0,1-1,1H9v6a1,1,0,0,1-2,0V8H5A1,1,0,0,1,4,7V6h8ZM4,5V1H6V4H7V1H9V4h1V1h2V5Z" />
         </symbol>
@@ -739,7 +741,12 @@ if (isset($_GET['delete_id'])) {
             <path d="M26 10V29.184C25.5818 29.3334 25.2019 29.5738 24.8878 29.8878C24.5738 30.2019 24.3334 30.5818 24.184 31H22V33H24.184C24.3334 33.4182 24.5738 33.7981 24.8878 34.1122C25.2019 34.4262 25.5818 34.6666 26 34.816V54C26 54.2652 26.1054 54.5196 26.2929 54.7071C26.4804 54.8946 26.7348 55 27 55H32V53H28V34.816C28.4182 34.6666 28.7981 34.4262 29.1122 34.1122C29.4262 33.7981 29.6666 33.4182 29.816 33H32V31H29.816C29.6666 30.5818 29.4262 30.2019 29.1122 29.8878C28.7981 29.5738 28.4182 29.3334 28 29.184V11H32V9H27C26.7348 9 26.4804 9.10536 26.2929 9.29289C26.1054 9.48043 26 9.73478 26 10ZM27 33C26.8022 33 26.6089 32.9414 26.4444 32.8315C26.28 32.7216 26.1518 32.5654 26.0761 32.3827C26.0004 32.2 25.9806 31.9989 26.0192 31.8049C26.0578 31.6109 26.153 31.4327 26.2929 31.2929C26.4327 31.153 26.6109 31.0578 26.8049 31.0192C26.9989 30.9806 27.2 31.0004 27.3827 31.0761C27.5654 31.1518 27.7216 31.28 27.8315 31.4444C27.9414 31.6089 28 31.8022 28 32C28 32.2652 27.8946 32.5196 27.7071 32.7071C27.5196 32.8946 27.2652 33 27 33Z" fill="black"></path>
         </symbol>    
     </svg>
-  <script src="./js/admin.js"></script>
+    <script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+        loader.style.display = "none";
+    });
+  </script>
   <script>
         // Display popup message when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -760,6 +767,7 @@ if (isset($_GET['delete_id'])) {
             }, 5000);
         }
 	</script>
+
 </body>
 </html>
 

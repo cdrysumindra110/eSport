@@ -608,6 +608,9 @@ $conn->close();
       </nav>
     </header>
     
+    <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
+    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 100;">
+    </div>
    <!-- MAIN -->
     <main role="main"> 
         <!-- Header -->
@@ -1032,5 +1035,11 @@ function joinGame(tournamentId) {
 <!-- Accordian jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+        loader.style.display = "none";
+    });
+  </script>
 </body>
 </html>

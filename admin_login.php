@@ -60,6 +60,9 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 </head>
 
 <body>
+<div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
+    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 100;">
+    </div>
 <div class="popup-message" id="popup-message"></div>
     <div class="padding-all">
         <div class="header">
@@ -83,6 +86,12 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
     </div>
 
     <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function() {
+                var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+                myModal.show();
+            }, 1000); // 1-second delay before modal appears
+        });
         // Display popup message when page loads
         document.addEventListener('DOMContentLoaded', function() {
             <?php if (isset($_SESSION['message'])): ?>
@@ -102,6 +111,11 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
             }, 5000);
         }
     </script>
-
+    <script>
+        var loader = document.getElementById("preloader");
+        window.addEventListener("load", function () {
+            loader.style.display = "none";
+        })
+    </script>
 </body>
 </html>

@@ -159,7 +159,9 @@ exit;
     </header>
     
 
-     
+    <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
+    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
+    </div>
     <!-- Popup Message -->
     <div class="popup-message" id="popup-message"></div>
 
@@ -261,7 +263,7 @@ exit;
         <div class="line"> 
           <div class="margin2x">
             <div class="hide-s hide-m hide-l xl-2">
-               <img src="img/logo_red.png" alt="">
+               <img src="./img/logo.png" alt="">
             </div>
             <div class="s-12 m-6 l-3 xl-3">
                <h4 class="text-white text-strong">Our Mission</h4>
@@ -313,7 +315,12 @@ exit;
     <script type="text/javascript" src="js/responsee.js"></script>
     <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
     <script type="text/javascript" src="./js/template-scripts.js"></script> 
-
+    <script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+        loader.style.display = "none";
+    });
+  </script>
     <!-- Popup page Scripts -->
 <script>
    document.addEventListener('DOMContentLoaded', function () {

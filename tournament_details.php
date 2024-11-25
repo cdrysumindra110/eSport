@@ -353,7 +353,9 @@ $conn->close();
     </header>
     
   
-     
+    <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
+    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 100;">
+    </div>
     <!-- Popup Message -->
     <div class="popup-message" id="popup-message">
 
@@ -550,7 +552,12 @@ $conn->close();
     <script type="text/javascript" src="js/responsee.js"></script>
     <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
     <script type="text/javascript" src="js/template-scripts.js"></script> 
-
+    <script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+        loader.style.display = "none";
+    });
+  </script>
 <script>
 function showContent(section) {
     // Hide all content containers
@@ -613,26 +620,21 @@ function showContent(section) {
 }
 
 </script>
-
+<script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+        loader.style.display = "none";
+    });
+  </script>
 <script>
   function start_game(tournamentId) {
     // Redirect to start_game.php with tournament_id
     window.location.href = 'start_game.php?tournament_id=' + tournamentId;
   }
 </script>
+
 </body>
 </html>
 
 
 
-
-
-
-
-
-
-
-<!-- 
-
-after clicking on table data such as tournaments created by user it should redirect towards the tournment_details.php page with its all originaldetails
-  -->

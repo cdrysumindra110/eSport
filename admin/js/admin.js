@@ -1,3 +1,8 @@
+var loader = document.getElementById("preloader");
+window.addEventListener("load", function () {
+    loader.style.display = "none";
+});
+
 const html = document.documentElement;
 const body = document.body;
 const menuLinks = document.querySelectorAll(".admin-menu a");
