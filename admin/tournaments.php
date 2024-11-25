@@ -130,9 +130,9 @@
           <!-- Tournament Management Section -->
           <section id="tournament">
             <div class="main-content">
-              Tournament Management
+              <h1>Tournament Management</h1>
             </div>
-            Hello World
+            
           </section>
         </section>
   

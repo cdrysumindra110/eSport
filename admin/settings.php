@@ -127,9 +127,9 @@
           <!-- Setting Management Section -->
           <section id="Setting">
             <div class="main-content">
-              User Control pannel
+              <h1>Admin Control pannel</h1>
             </div>
-            Hello World
+            
           </section>
         </section>
   

@@ -130,9 +130,9 @@
           <!-- Contents Management Section -->
           <section id="contents">
             <div class="main-content">
-              Contents Section
+              <h1>Contents Management</h1>
             </div>
-            Hello World
+            
           </section>
         </section>
   

@@ -130,9 +130,9 @@
           <!-- Result Management Section -->
           <section id="result">
             <div class="main-content">
-              Result Section
+              <h1>Result Management</h1>
             </div>
-            Hello World
+            
           </section>
         </section>
   

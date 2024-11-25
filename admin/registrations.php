@@ -130,9 +130,9 @@
           <!-- Registration Management Section -->
           <section id="registration">
             <div class="main-content">
-              Registration Management Section
+              <h1>Registration Management</h1>
             </div>
-            Hello World
+            
           </section>
         </section>
   

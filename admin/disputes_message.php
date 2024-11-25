@@ -1,3 +1,32 @@
+<?php
+include('../config.php'); 
+session_start();
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+// Redirect if not logged in
+if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
+  header('Location: ../admin_login.php');
+  exit;
+}
+
+// Retrieve success/error messages from session
+if (isset($_SESSION['message'])) {
+    $success_message = $_SESSION['message'];
+    unset($_SESSION['message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
+// Fetch data from database
+$sql = "SELECT id, name, email, subject, message, submitted_at FROM contact";
+$result = $conn->query($sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,9 +159,43 @@
           <!-- Registration Management Section -->
           <section id="disputes_message">
             <div class="main-content">
-              Dispute Messages Section
+              <h1>Dispute Management</h1>
             </div>
-            Hello World
+            <div class="message <?= !empty($success_message) ? 'success' : (!empty($error_message) ? 'error' : '') ?>">
+        <?= !empty($success_message) ? $success_message : $error_message ?>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Submitted At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
+                        <td><?= htmlspecialchars($row['name']) ?></td>
+                        <td><?= htmlspecialchars($row['email']) ?></td>
+                        <td><?= htmlspecialchars($row['subject']) ?></td>
+                        <td><?= htmlspecialchars($row['message']) ?></td>
+                        <td><?= htmlspecialchars($row['submitted_at']) ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="6">No data available</td>
+                </tr>
+            <?php endif; ?>
+            <?php $conn->close(); ?>
+        </tbody>
+    </table>
+    </table>
           </section>
         </section>
   
