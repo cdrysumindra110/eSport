@@ -1,6 +1,6 @@
 <?php
 // Include the config file
-require_once 'config.php';
+require_once 'config.php';  // Ensure this includes the $conn connection
 
 // Initialize messages
 $error_message = '';
@@ -11,35 +11,47 @@ session_start();
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
-$sql = "SELECT * FROM news_articles ORDER BY updated_at DESC";
-$result = $conn->query($sql);
+// Fetch articles from the database
+$sql = "SELECT id, title, description, image, updated_at FROM news_articles";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($article_id, $title, $description, $image, $updated_at);
 
-// Initialize an array to store the fetched articles
+// Initialize articles array
 $articles = [];
 
-// Check if there are any rows
-if ($result->num_rows > 0) {
-    // Process each row and store the data in an array
-    while ($row = $result->fetch_assoc()) {
-        // Create an array for each article
-        $article = [
-            'image' => $row['image'],
-            'updated_at' => $row['updated_at'],
-            'title' => $row['title'],
-            'description' => $row['description']
-        ];
+// Fetch articles and process image
+while ($stmt->fetch()) {
+    // Check if image data is in binary format (BLOB) or path (string)
+    if ($image) {
+      // If the image is a file path
+      if (file_exists($image)) {
+          $image_src = htmlspecialchars($image); // Use the path directly
+      } else {
+          $image_src = './img/dash-logo.png'; // Default image if path is not found
+      }
+  } else {
+      // If there is no image, use the default
+      $image_src = './img/dash-logo.png'; // Default image
+  }
+  
 
-        // Add the article to the articles array
-        $articles[] = $article;
-    }
-} else {
-    // No news articles found, set error message
-    $error_message = 'No news articles available at the moment.';
+    // Add each article to the articles array
+    $articles[] = [
+        'id' => $article_id,
+        'title' => $title,
+        'description' => $description,
+        'image' => $image_src,  // Add the image data
+        'updated_at' => $updated_at
+    ];
 }
+
+$stmt->close();
 
 // Fetch leaderboard data from the database
 $sql = "SELECT rank, name, prize FROM leaderboard ORDER BY rank ASC LIMIT 5";
-$result = $conn->query($sql);
+$result = $conn->query($sql);  // Change $mysqli to $conn
 
 // Initialize leaderboard array
 $leaderboard = [];
@@ -51,11 +63,10 @@ if ($result->num_rows > 0) {
     echo "No data found";
 }
 
-
-
 // Close the database connection
 $conn->close();
 ?>
+
 
 
 
@@ -176,25 +187,35 @@ $conn->close();
           <div class="tab-content">
             <!-- Latest News Tab -->
             <div class="tab active" data-tab="latest" style="width: 100%;">
-                <?php if (!empty($error_message)): ?>
-                    <div class="error-message">
-                        <p><?php echo $error_message; ?></p>
-                    </div>
-                <?php else: ?>
-                    <!-- Loop through the articles and display them -->
-                    <?php foreach ($articles as $article): ?>
-                        <div class="news-card">
-                            <img src="<?php echo $article['image']; ?>" alt="Article Image" class="news-image" />
-                            <div class="news-details">
-                                <p>By InfiKnight Gaming Community Updated at <?php echo date("Y-m-d", strtotime($article['updated_at'])); ?></p>
-                                <h2><?php echo $article['title']; ?></h2>
-                                <p><?php echo $article['description']; ?></p>
-                                <a href="#" class="read-more-link">Read More</a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                <main class="app-container">
+            <?php if (!empty($articles)): ?>
+    <?php if (!empty($error_message)): ?>
+        <div class="error-message">
+            <p><?php echo htmlspecialchars($error_message); ?></p>
+        </div>
+    <?php else: ?>
+        <!-- Loop through the articles and display them -->
+        <?php foreach ($articles as $article): ?>
+            <div class="news-card">
+                <!-- Display the article image -->
+                <img src="<?php echo htmlspecialchars($article['image']); ?>" alt="Article Image" class="news-image" />
+                <div class="news-details">
+                    <p>By InfiKnight Gaming Community | Updated at <?= htmlspecialchars($article['updated_at']) ?></p>
+                    <h2><?= htmlspecialchars($article['title']) ?></h2>
+                    <p><?= htmlspecialchars($article['description']) ?></p>
+                    <a href="article_detail.php?id=<?= $article['id'] ?>" class="read-more-link">Read More</a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+<?php else: ?>
+    <p>No articles available at the moment.</p>
+<?php endif; ?>
+
+
+
+
+                <!-- LeaderBoard Section  -->
+            <main class="app-container">
               <div class="app-header">
                 <h1>
                   <i class="fa fa-trophy fa-3x" style="color:#ff9633"></i> Placement
