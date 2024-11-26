@@ -622,7 +622,8 @@
         <path d="M14 24h10v-3.598c-2.101-1.225-4.885-2.066-8-2.321v-1.649c2.203-1.242 4-4.337 4-7.432 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h14v-2z"></path>
         </symbol>
     </svg>
-<script src="./js/admin.js"></script>
+
+    <script src="../admin/js/admin.js?ver=1.0"></script>
 <script>
         // Display popup message when page loads
         document.addEventListener('DOMContentLoaded', function() {

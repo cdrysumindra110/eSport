@@ -2,11 +2,42 @@
 // Include the config file
 require_once 'config.php';
 
+// Initialize messages
+$error_message = '';
+$success_message = '';
 // Start the session
 session_start();
 
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
+
+$sql = "SELECT * FROM news_articles ORDER BY updated_at DESC";
+$result = $conn->query($sql);
+
+// Initialize an array to store the fetched articles
+$articles = [];
+
+// Check if there are any rows
+if ($result->num_rows > 0) {
+    // Process each row and store the data in an array
+    while ($row = $result->fetch_assoc()) {
+        // Create an array for each article
+        $article = [
+            'image' => $row['image'],
+            'author' => $row['author'],
+            'updated_at' => $row['updated_at'],
+            'title' => $row['title'],
+            'description' => $row['description'],
+            'link' => $row['link']
+        ];
+
+        // Add the article to the articles array
+        $articles[] = $article;
+    }
+} else {
+    // No news articles found, set error message
+    $error_message = 'No news articles available at the moment.';
+}
 
 ?>
 
@@ -23,7 +54,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
     <link rel="stylesheet" href="./owl-carousel/owl.carousel.css">
     <link rel="stylesheet" href="./owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
-    <link rel="stylesheet" href="./css/template-style.css">
+    <link rel="stylesheet" href="./css/template-style.css?ver=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -124,94 +155,29 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
               </div>
           </header>
       
-          <div class="tab-menu">
-              <button class="tab-button active" data-tab="latest">Latest</button>
-              <button class="tab-button" data-tab="changelogs">Changelogs</button>
-              <button class="tab-button" data-tab="web3">Web3</button>
-              <button class="tab-button" data-tab="esports">Esports</button>
-              <button class="tab-button" data-tab="features">Features</button>
-              <button class="tab-button" data-tab="community">Community</button>
-          </div>
-      
           <div class="tab-content">
-              <!-- Latest News Tab -->
-              <div class="tab active" data-tab="latest">
-                  <div class="news-card">
-                      <img src="/placeholder.svg" alt="POL" class="news-image" />
-                      <div class="news-details">
-                          <p>by Community Gaming in <a href="#" class="category-link">Web3</a> · 2024-09-04</p>
-                          <h2>More on the MATIC - POL migration for CG users</h2>
-                          <p>Polygon is migrating MATIC token to the new POL token on September 4th. Here's more information for CG users!</p>
-                          <a href="#" class="read-more-link">Read More</a>
-                      </div>
-                  </div>
-              </div>
-      
-              <!-- Changelogs Tab -->
-              <div class="tab" data-tab="changelogs">
-                  <div class="news-card">
-                      <img src="/placeholder.svg" alt="Change" class="news-image" />
-                      <div class="news-details">
-                          <p>by Dev Team in <a href="#" class="category-link">Changelogs</a> · 2024-09-05</p>
-                          <h2>New Feature Release: Version 2.0</h2>
-                          <p>We have just released version 2.0 with exciting new features and improvements.</p>
-                          <a href="#" class="read-more-link">Read More</a>
-                      </div>
-                  </div>
-              </div>
-      
-              <!-- Web3 Tab -->
-              <div class="tab" data-tab="web3">
-                  <div class="news-card">
-                      <img src="/placeholder.svg" alt="Web3" class="news-image" />
-                      <div class="news-details">
-                          <p>by Web3 Insights in <a href="#" class="category-link">Web3</a> · 2024-09-06</p>
-                          <h2>Understanding Web3: A Comprehensive Guide</h2>
-                          <p>Explore the latest trends and developments in the Web3 space with our detailed guide.</p>
-                          <a href="#" class="read-more-link">Read More</a>
-                      </div>
-                  </div>
-              </div>
-      
-              <!-- Esports Tab -->
-              <div class="tab" data-tab="esports">
-                  <div class="news-card">
-                      <img src="/placeholder.svg" alt="Esports" class="news-image" />
-                      <div class="news-details">
-                          <p>by Esports Daily in <a href="#" class="category-link">Esports</a> · 2024-09-07</p>
-                          <h2>Upcoming Esports Tournaments in 2024</h2>
-                          <p>Get ready for the most anticipated esports tournaments of 2024 with our full schedule.</p>
-                          <a href="#" class="read-more-link">Read More</a>
-                      </div>
-                  </div>
-              </div>
-      
-              <!-- Features Tab -->
-              <div class="tab" data-tab="features">
-                  <div class="news-card">
-                      <img src="/placeholder.svg" alt="Feature" class="news-image" />
-                      <div class="news-details">
-                          <p>by Feature Highlights in <a href="#" class="category-link">Features</a> · 2024-09-08</p>
-                          <h2>Feature Spotlight: Enhanced UI</h2>
-                          <p>Check out the new UI enhancements that make your experience smoother and more intuitive.</p>
-                          <a href="#" class="read-more-link">Read More</a>
-                      </div>
-                  </div>
-              </div>
-      
-              <!-- Community Tab -->
-              <div class="tab" data-tab="community">
-                  <div class="news-card">
-                      <img src="/placeholder.svg" alt="Community" class="news-image" />
-                      <div class="news-details">
-                          <p>by Community News in <a href="#" class="category-link">Community</a> · 2024-09-09</p>
-                          <h2>Community Events and Meetups</h2>
-                          <p>Join our upcoming community events and meetups to connect with other enthusiasts.</p>
-                          <a href="#" class="read-more-link">Read More</a>
-                      </div>
-                  </div>
-              </div>
-          </div>
+    <!-- Latest News Tab -->
+    <div class="tab active" data-tab="latest" style="width: 100%;">
+        <?php if (!empty($error_message)): ?>
+            <div class="error-message">
+                <p><?php echo $error_message; ?></p>
+            </div>
+        <?php else: ?>
+            <!-- Loop through the articles and display them -->
+            <?php foreach ($articles as $article): ?>
+                <div class="news-card">
+                    <img src="<?php echo $article['image']; ?>" alt="Article Image" class="news-image" />
+                    <div class="news-details">
+                        <p>By <?php echo $article['author']; ?> Updated at <?php echo date("Y-m-d", strtotime($article['updated_at'])); ?></p>
+                        <h2><?php echo $article['title']; ?></h2>
+                        <p><?php echo $article['description']; ?></p>
+                        <a href="<?php echo $article['link']; ?>" class="read-more-link">Read More</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
       </div>
       
       

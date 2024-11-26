@@ -1,10 +1,56 @@
+<?php
+include('../config.php'); 
+session_start();
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
+  header('Location: ../admin_login.php'); 
+  exit;
+}
+
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
+    // Collect form data
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    $author = $_POST['author'];
+    $image = $_FILES['image']['name'];
+    $link = $_POST['link'];
+    $updated_at = date('Y-m-d H:i:s'); // current timestamp
+
+    // Validate the form fields
+    if (empty($title) || empty($description) || empty($author) || empty($image) || empty($link)) {
+        $error_message = 'All fields are required.';
+    } else {
+        // Image upload handling
+        $target_dir = "uploads/"; // Directory to store images
+        $target_file = $target_dir . basename($image);
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+            // Insert data into the database
+            $sql = "INSERT INTO news_articles (title, description, author, image, link, updated_at) 
+                    VALUES ('$title', '$description', '$author', '$target_file', '$link', '$updated_at')";
+            if ($conn->query($sql) === TRUE) {
+                $success_message = 'News article posted successfully.';
+            } else {
+                $error_message = 'Error: ' . $conn->error;
+            }
+        } else {
+            $error_message = 'Error uploading image.';
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="./css/admin.css">  
+    <link rel="stylesheet" href="../admin/css/admin.css?ver=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -132,6 +178,49 @@
           <section id="contents">
             <div class="main-content">
               <h1>Contents Management</h1>
+
+              <div class="tab-content">
+                  <!-- Add News Form Tab -->
+                  <div class="tab active" data-tab="add-news" style="width: 100%;">
+                      <h3>Add New News Article</h3>
+                      
+                      <?php if (!empty($error_message)): ?>
+                          <div class="error-message">
+                              <p><?php echo $error_message; ?></p>
+                          </div>
+                      <?php endif; ?>
+
+                      <?php if (!empty($success_message)): ?>
+                          <div class="success-message">
+                              <p><?php echo $success_message; ?></p>
+                          </div>
+                      <?php endif; ?>
+                      
+                      <form action="" method="POST" enctype="multipart/form-data">
+                          <div class="form-group">
+                              <label for="title">Title:</label>
+                              <input type="text" name="title" id="title" class="form-control" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="description">Description:</label>
+                              <textarea name="description" id="description" class="form-control" required></textarea>
+                          </div>
+                          <div class="form-group">
+                              <label for="author">Author:</label>
+                              <input type="text" name="author" id="author" class="form-control" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="image">Image:</label>
+                              <input type="file" name="image" id="image" class="form-control" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="link">Link:</label>
+                              <input type="url" name="link" id="link" class="form-control" required>
+                          </div>
+                          <button type="submit" name="submit" class="btn btn-primary">Post News</button>
+                      </form>
+                  </div>
+              </div>
             </div>
             
           </section>
@@ -625,6 +714,7 @@
         <path d="M14 24h10v-3.598c-2.101-1.225-4.885-2.066-8-2.321v-1.649c2.203-1.242 4-4.337 4-7.432 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h14v-2z"></path>
         </symbol>  
     </svg>
+    <script src="../admin/js/admin.js?ver=1.0"></script>
     <script>
     var loader = document.getElementById("preloader");
     window.addEventListener("load", function () {
