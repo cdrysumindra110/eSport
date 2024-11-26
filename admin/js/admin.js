@@ -69,49 +69,6 @@ switchInput.addEventListener("input", function () {
   }
 });
 
-// Function to handle section display
-// Function to hide all sections
-function hideAllSections() {
-  const sections = document.querySelectorAll('.page-content section');
-  sections.forEach(section => {
-    section.style.display = 'none';
-  });
-}
-
-// Function to show a specific section by ID
-function showSection(id) {
-  hideAllSections(); // Hide all sections first
-  const section = document.getElementById(id);
-  if (section) {
-    section.style.display = 'block'; // Show the selected section
-  }
-}
-
-// Add event listeners to navbar links
-document.getElementById('users-link').addEventListener('click', function(event) {
-  event.preventDefault();
-  showSection('users-section');
-});
-
-document.getElementById('tournament-link').addEventListener('click', function(event) {
-  event.preventDefault();
-  showSection('tournament');
-});
-
-document.getElementById('registration-link').addEventListener('click', function(event) {
-  event.preventDefault();
-  showSection('registration');
-});
-
-document.getElementById('account-settings-link').addEventListener('click', function(event) {
-  event.preventDefault();
-  showSection('account-settings');
-});
-
-document.getElementById('analytics-link').addEventListener('click', function(event) {
-  event.preventDefault();
-  showSection('analytics');
-});
 
 // Function to show the popup and display user details
 function showPopup(id, fullName, email, uname, country, city, role, coverPhoto, profilePic, dob) {
@@ -123,8 +80,6 @@ function showPopup(id, fullName, email, uname, country, city, role, coverPhoto, 
       <strong>Country:</strong> ${country} <br>
       <strong>City:</strong> ${city} <br>
       <strong>Role:</strong> ${role} <br>
-      <strong>Cover Photo:</strong> <img src="${coverPhoto}" alt="Cover Photo" width="100px"> <br>
-      <strong>Profile Picture:</strong> <img src="${profilePic}" alt="Profile Picture" width="100px"> <br>
       <strong>Date of Birth:</strong> ${dob} <br>
   `;
   // Display the popup
@@ -137,7 +92,3 @@ function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
 
-// Display the first section (e.g., users-section) when the page loads
-window.onload = function() {
-  showSection('users-section'); // Show the first section on page load
-};
