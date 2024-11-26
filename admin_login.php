@@ -61,7 +61,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 
 <body>
 <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
-    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 100;">
+    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
     </div>
 <div class="popup-message" id="popup-message"></div>
     <div class="padding-all">

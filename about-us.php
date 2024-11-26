@@ -177,18 +177,10 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
         </section>
         
         <!-- Section 3 -->
-        <section class="section text-center background-primary">  
-          <div class="line">
-            <p class="text-white text-handwrite text-size-90 margin-bottom-20 text-line-height-1">Play hard. Win harder.</p>
-            <p class="text-white">
-              Join the next generation of esports champions.<br>
-              Compete, conquer, and elevate your game to the highest level. The arena is waiting for you.
-            </p>
-          </div>
-        </section>
+        
         
         <!-- Section 4 -->
-        <section class="section background-image" style="background-image:url(img/parallax-06.jpg)">
+        <section class="section background-image" style="background-image:url(./img/parallax-06.jpg)">
           <div class="line text-center">
             <h2 class="text-white text-extra-strong text-size-80 text-m-size-40">Do you need help?</h2>
             <p class="text-white">Welcome to our esports hub!<br> Dive into the latest tournaments, team updates, and gaming news. Join the action and be part of our gaming community. </p>

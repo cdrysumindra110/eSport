@@ -342,10 +342,11 @@ $conn->close();
       </section>
 
         <!-- Section 4 -->
-        <section class="section background-image" style="background-image:url(img/parallax-06.jpg)">
+        <section class="section background-image" style="background-image:url(./img/parallax-06.jpg)">
           <div class="line text-center">
             <h2 class="text-white text-extra-strong text-size-80 text-m-size-40">Do you need help?</h2>
-            <p class="text-white">Deleniti pertinacia eu est, te his soluta quaestio pericula illum facilisis.<br> Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat. </p>
+            <p class="text-white">Welcome to our esports hub!<br>
+            Dive into the latest tournaments, team updates, and gaming news. Join the action and be part of our gaming community.</p>
           </div>            
           <div class="line">  
             <div class="s-12 m-12 l-3 center">
