@@ -7,19 +7,19 @@ $error_message = '';
 $success_message = '';
 
 if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
-  header('Location: ../admin_login.php'); // Redirect to admin login page
+  header('Location: ../admin_login.php'); 
   exit;
 }
 
 // Check if a success message is set in session
 if (isset($_SESSION['message'])) {
-    $success_message = $_SESSION['message']; // Get message from session
-    unset($_SESSION['message']); // Clear the message after showing it
+    $success_message = $_SESSION['message'];
+    unset($_SESSION['message']); 
 }
 
 if (isset($_SESSION['error_message'])) {
-    $error_message = $_SESSION['error_message']; // Get error message from session
-    unset($_SESSION['error_message']); // Clear the message after showing it
+    $error_message = $_SESSION['error_message']; 
+    unset($_SESSION['error_message']); 
 }
 
 $users = [];
@@ -42,17 +42,17 @@ if ($conn) {
 
 // Deleting a user
 if (isset($_GET['delete_id'])) {
-    $delete_id = mysqli_real_escape_string($conn, $_GET['delete_id']); // Sanitize the delete_id
+    $delete_id = mysqli_real_escape_string($conn, $_GET['delete_id']);
 
     $delete_query = "DELETE FROM users WHERE id = $delete_id"; 
 
     if (mysqli_query($conn, $delete_query)) {
-        $_SESSION['success_message'] = "User deleted successfully."; // Set success message in session
-        header('Location: admin.php'); // Redirect back to the admin page after deletion
+        $_SESSION['success_message'] = "User deleted successfully."; 
+        header('Location: admin.php'); 
         exit;
     } else {
-        $_SESSION['error_message'] = "Error deleting user: " . mysqli_error($conn); // Set error message in session
-        header('Location: admin.php'); // Redirect back with error message
+        $_SESSION['error_message'] = "Error deleting user: " . mysqli_error($conn); 
+        header('Location: admin.php'); 
         exit;
     }
 }
@@ -65,10 +65,11 @@ if (isset($_GET['delete_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="../admin/css/admin.css">
+    <link rel="stylesheet" href="../admin/css/admin.css">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
 
-
+ 
     </style>
 </head>
 <body>
@@ -97,7 +98,7 @@ if (isset($_GET['delete_id'])) {
                 <span>Admin</span>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="#">Logout</a></li>
+                <li><a href="logout.php"><i class='fa fa-sign-out'></i>&nbsp;&nbsp;Logout</a></li>
               </ul>
             </li>  
                     

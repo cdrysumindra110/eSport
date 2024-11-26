@@ -71,7 +71,7 @@ switchInput.addEventListener("input", function () {
 
 
 // Function to show the popup and display user details
-function showPopup(id, fullName, email, uname, country, city, role, coverPhoto, profilePic, dob) {
+function showPopup(id, fullName, email, uname, country, city, role, dob) {
   document.getElementById("popup-text").innerHTML = `  
       <strong>ID:</strong> ${id} <br>
       <strong>Full Name:</strong> ${fullName} <br>
