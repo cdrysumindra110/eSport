@@ -23,31 +23,39 @@ $articles = [];
 
 // Fetch articles and process image
 while ($stmt->fetch()) {
-    // Check if image data is in binary format (BLOB) or path (string)
+    // Check if image data is in binary format (BLOB) or file path (string)
     if ($image) {
-      // If the image is a file path
-      if (file_exists($image)) {
-          $image_src = htmlspecialchars($image); // Use the path directly
-      } else {
-          $image_src = './img/dash-logo.png'; // Default image if path is not found
-      }
-  } else {
-      // If there is no image, use the default
-      $image_src = './img/dash-logo.png'; // Default image
-  }
-  
+        if (is_string($image) && file_exists($image)) {
+            // If it's a file path, use the image path directly
+            $image_src = htmlspecialchars($image); 
+        } elseif (is_resource($image)) {
+            // If image is a BLOB, base64 encode the binary data
+            $image_data = stream_get_contents($image);
+            $image_src = 'data:image/jpeg;base64,' . base64_encode($image_data);
+        } elseif (is_string($image) && strpos($image, 'data:image/') === 0) {
+            // If the image is already in base64 format (e.g., from previous processing)
+            $image_src = $image; 
+        } else {
+            // Default image if path or BLOB is invalid
+            $image_src = './img/dash-logo.png'; 
+        }
+    } else {
+        // If there is no image, use the default
+        $image_src = './img/dash-logo.png';
+    }
 
     // Add each article to the articles array
     $articles[] = [
         'id' => $article_id,
         'title' => $title,
         'description' => $description,
-        'image' => $image_src,  // Add the image data
+        'image' => $image_src,  // Add the image data (either path or base64 encoded)
         'updated_at' => $updated_at
     ];
 }
 
 $stmt->close();
+
 
 // Fetch leaderboard data from the database
 $sql = "SELECT rank, name, prize FROM leaderboard ORDER BY rank ASC LIMIT 5";
@@ -188,31 +196,28 @@ $conn->close();
             <!-- Latest News Tab -->
             <div class="tab active" data-tab="latest" style="width: 100%;">
             <?php if (!empty($articles)): ?>
-    <?php if (!empty($error_message)): ?>
-        <div class="error-message">
-            <p><?php echo htmlspecialchars($error_message); ?></p>
-        </div>
-    <?php else: ?>
-        <!-- Loop through the articles and display them -->
-        <?php foreach ($articles as $article): ?>
-            <div class="news-card">
-                <!-- Display the article image -->
-                <img src="<?php echo htmlspecialchars($article['image']); ?>" alt="Article Image" class="news-image" />
-                <div class="news-details">
-                    <p>By InfiKnight Gaming Community | Updated at <?= htmlspecialchars($article['updated_at']) ?></p>
-                    <h2><?= htmlspecialchars($article['title']) ?></h2>
-                    <p><?= htmlspecialchars($article['description']) ?></p>
-                    <a href="article_detail.php?id=<?= $article['id'] ?>" class="read-more-link">Read More</a>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-<?php else: ?>
-    <p>No articles available at the moment.</p>
-<?php endif; ?>
-
-
-
+                <?php if (!empty($error_message)): ?>
+                    <div class="error-message">
+                        <p><?php echo htmlspecialchars($error_message); ?></p>
+                    </div>
+                <?php else: ?>
+                    <!-- Loop through the articles and display them -->
+                    <?php foreach ($articles as $article): ?>
+                        <div class="news-card">
+                            <!-- Display the article image -->
+                            <img src="<?php echo htmlspecialchars($article['image']); ?>" alt="Article Image" class="news-image" />
+                            <div class="news-details">
+                                <p>By InfiKnight Gaming Community | Updated at <?= htmlspecialchars($article['updated_at']) ?></p>
+                                <h2><?= htmlspecialchars($article['title']) ?></h2>
+                                <p><?= htmlspecialchars($article['description']) ?></p>
+                                <a href="article_detail.php?id=<?= $article['id'] ?>" class="read-more-link">Read More</a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            <?php else: ?>
+                <p>No articles available at the moment.</p>
+            <?php endif; ?>
 
                 <!-- LeaderBoard Section  -->
             <main class="app-container">
