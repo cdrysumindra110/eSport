@@ -201,13 +201,13 @@ $result = $conn->query($sql);
         </section>
   
 
-
+<!-- 
         <footer class="page-footer">
           <span>made by </span>
           <a href="" target="_blank">
             <img width="24" height="24" src="../img/dash-logo.png" alt="InfiKnight Logo">
           </a>
-        </footer>
+        </footer> -->
       </section>
     <svg style="display:none;">
         <symbol id="logo" viewBox="0 0 140 59">

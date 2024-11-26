@@ -37,6 +37,22 @@ if ($result->num_rows > 0) {
     $error_message = 'No news articles available at the moment.';
 }
 
+// Fetch leaderboard data from the database
+$sql = "SELECT rank, name, prize FROM leaderboard ORDER BY rank ASC LIMIT 5";
+$result = $conn->query($sql);
+
+// Initialize leaderboard array
+$leaderboard = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $leaderboard[] = $row;
+    }
+} else {
+    echo "No data found";
+}
+
+
+
 // Close the database connection
 $conn->close();
 ?>
@@ -56,6 +72,7 @@ $conn->close();
     <link rel="stylesheet" href="./owl-carousel/owl.theme.css">
     <!-- CUSTOM STYLE -->      
     <link rel="stylesheet" href="./css/template-style.css?ver=1.0">
+    <link rel="stylesheet" href="./css/leaderboard.css?ver=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -135,7 +152,7 @@ $conn->close();
           <div class="line">
   
             <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-              ALL Games
+               News
             </h1>
           
           </div>
@@ -177,13 +194,35 @@ $conn->close();
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
+                <main class="app-container">
+              <div class="app-header">
+                <h1>
+                  <i class="fa fa-trophy fa-3x" style="color:#ff9633"></i> Placement
+                </h1>
+              </div>
+              <div class="app-leaderboard">
+                <div class="app-ribbon"></div>
+                <table>
+                  <?php foreach ($leaderboard as $row): ?>
+                  <tr>
+                    <td class="rank"><?php echo $row['rank']; ?></td>
+                    <td class="participant-name"><?php echo htmlspecialchars($row['name']); ?></td>
+                    <td class="score"> $
+                      <?php echo number_format($row['prize'], 3); ?>
+                      <?php if ($row['rank'] == 1): ?>
+                        <img class="award-icon" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                  <?php endforeach; ?>
+                </table>
+              </div>
+            </main>
             </div>
           </div>
     </div>
-      
-      
-      
-      
+
+
         <!-- Section Videos Section --> 
         <section class="section line-full-width">      
           <div class="margin">

@@ -1,10 +1,82 @@
+<?php
+include('../config.php');
+session_start();
+
+// Redirect if not logged in
+if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
+    header('Location: ../admin_login.php');
+    exit();
+}
+
+
+// Fetch leaderboard data from the database
+$sql = "SELECT rank, name, prize FROM leaderboard ORDER BY rank ASC LIMIT 5";
+$result = $conn->query($sql);
+
+// Initialize leaderboard array
+$leaderboard = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $leaderboard[] = $row;
+    }
+} else {
+    echo "No data found";
+}
+
+
+// Handle form submission for update
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $rank = $_POST['rank'];
+    $name = $_POST['name'];
+    $prize = $_POST['prize'];
+
+    $sql = "UPDATE leaderboard SET name = ?, prize = ? WHERE rank = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sdi", $name, $prize, $rank);
+
+    if ($stmt->execute()) {
+        $_SESSION['message'] = "Leaderboard updated successfully.";
+    } else {
+        $_SESSION['error_message'] = "Error updating leaderboard: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
+
+    header('Location: ../admin/result.php');
+    exit();
+}
+
+// Handle deletion
+if (isset($_GET['delete_rank'])) {
+    $rank = intval($_GET['delete_rank']); // Ensure it's an integer
+
+    $delete_query = "DELETE FROM leaderboard WHERE rank = ?";
+    $stmt = $conn->prepare($delete_query);
+    $stmt->bind_param("i", $rank);
+
+    if ($stmt->execute()) {
+        $_SESSION['message'] = "User deleted successfully.";
+    } else {
+        $_SESSION['error_message'] = "Error deleting user: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
+
+    header('Location: result.php');
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="./css/admin.css">  
+    <!-- <link rel="stylesheet" href="./css/admin.css">   -->
+    <link rel="stylesheet" href="./css/leaderboard.css?ver=1.0">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -127,24 +199,74 @@
           <section class="grid">
             <!-- Dynamic Content can go here -->
           </section>
-
           <!-- Result Management Section -->
           <section id="result">
             <div class="main-content">
               <h1>Result Management</h1>
             </div>
-            
+
+            <!-- Form to Update Leaderboard -->
+            <div id="update-form" class="tab active" data-tab="add-news" style="width: 100%; background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 450px; margin: 20px 0;">
+                <h2>Update Leaderboard</h2>
+                <form action="../admin/result.php" method="POST">
+                
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="rank" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Rank:</label>
+                        <input type="number" name="rank" id="rank" min="1" max="5" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
+                    </div> 
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="name" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Name:</label>
+                        <input type="number" name="name" id="name" step="0.001" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
+                    </div>     
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="prize" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Prize:</label>
+                        <input type="number" name="prize" id="prize" step="0.001" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Update</button>
+                </form>
+            </div>
+
+            <main class="app-container">
+                <div class="app-header">
+                  <h1>
+                    <i class="fa fa-trophy fa-3x" style="color:#ff9633"></i> Placement
+                  </h1>
+                </div>
+                <div class="app-leaderboard" >
+                  <div class="app-ribbon"></div>
+                  <table>
+                    <?php foreach ($leaderboard as $row): ?>
+                    <tr>
+                      <td class="rank"><?php echo $row['rank']; ?></td>
+                      <td class="participant-name"><?php echo htmlspecialchars($row['name']); ?></td>
+                      <td class="score"> $
+                        <?php echo number_format($row['prize'], 3); ?>
+                        <?php if ($row['rank'] == 1): ?>
+                          <img class="award-icon" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
+                        <?php endif; ?>
+                      </td>
+                      <!-- Add delete button -->
+                      <td>
+                        <button class="delete-btn" data-rank="<?php echo $row['rank']; ?>">Delete</button>
+                      </td>
+                    </tr>
+                    <?php endforeach; ?>
+                  </table>
+                </div>
+              </main>
           </section>
         </section>
   
 
-
-        <footer class="page-footer">
+        <!-- <footer class="page-footer">
           <span>made by </span>
           <a href="" target="_blank">
             <img width="24" height="24" src="../img/dash-logo.png" alt="InfiKnight Logo">
           </a>
-        </footer>
+        </footer> -->
       </section>
     <svg style="display:none;">
         <symbol id="logo" viewBox="0 0 140 59">
@@ -654,6 +776,18 @@
             }, 5000);
         }
 	</script>
+  <script>
+  // Handle Delete button click
+  document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      let rank = this.getAttribute('data-rank');
+      if (confirm("Are you sure you want to delete this rank?")) {
+        // Send delete request to PHP
+        window.location.href = 'result.php?delete_rank=' + rank;
+      }
+    });
+  });
+</script>
 </body>
 </html>
 

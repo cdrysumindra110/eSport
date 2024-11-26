@@ -265,33 +265,31 @@ if ($result->num_rows > 0) {
               // Assuming you already have the $articles array filled with data
               if (!empty($articles)): 
               ?>
-<table class="article-news-table">
-  <thead>
-    <tr>
-      <th class="table-header">Image</th>
-      <th class="table-header">Title</th>
-      <th class="table-header">Description</th>
-      <th class="table-header">Updated At</th>
-      <th class="table-header">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($articles as $article): ?>
-      <tr class="table-row">
-        <td class="table-cell"><img src="<?= $article['image'] ?>" alt="Article Image" class="article-image"></td>
-        <td class="table-cell"><?= htmlspecialchars($article['title']) ?></td>
-        <td class="table-cell"><?= htmlspecialchars($article['description']) ?></td>
-        <td class="table-cell"><?= htmlspecialchars($article['updated_at']) ?></td>
-        <td class="table-cell">
-          <button class="action-button update-button" onclick="window.location.href='update_article.php?id=<?= $article['id'] ?>'">Update</button>
-          <button class="action-button delete-button" onclick="confirmDelete(<?= $article['id'] ?>)">Delete</button>
-        </td>
-      </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-
-
+                <table class="article-news-table">
+                  <thead>
+                    <tr>
+                      <th class="table-header">Image</th>
+                      <th class="table-header">Title</th>
+                      <th class="table-header">Description</th>
+                      <th class="table-header">Updated At</th>
+                      <th class="table-header">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($articles as $article): ?>
+                      <tr class="table-row">
+                        <td class="table-cell"><img src="<?= $article['image'] ?>" alt="Article Image" class="article-image"></td>
+                        <td class="table-cell"><?= htmlspecialchars($article['title']) ?></td>
+                        <td class="table-cell"><?= htmlspecialchars($article['description']) ?></td>
+                        <td class="table-cell"><?= htmlspecialchars($article['updated_at']) ?></td>
+                        <td class="table-cell">
+                          <button class="action-button update-button" onclick="window.location.href='update_article.php?id=<?= $article['id'] ?>'">Update</button>
+                          <button class="action-button delete-button" onclick="confirmDelete(<?= $article['id'] ?>)">Delete</button>
+                        </td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
               <?php else: ?>
                   <p>No news articles available at the moment.</p>
               <?php endif; ?>
@@ -302,12 +300,12 @@ if ($result->num_rows > 0) {
   
 
 
-        <footer class="page-footer">
+        <!-- <footer class="page-footer">
           <span>made by </span>
           <a href="" target="_blank">
             <img width="24" height="24" src="../img/dash-logo.png" alt="InfiKnight Logo">
           </a>
-        </footer>
+        </footer> -->
       </section>
     <svg style="display:none;">
         <symbol id="logo" viewBox="0 0 140 59">

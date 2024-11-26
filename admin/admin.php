@@ -67,10 +67,6 @@ if (isset($_GET['delete_id'])) {
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../admin/css/admin.css">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-
- 
-    </style>
 </head>
 <body>
 <div id="preloader" style="background: #000 url(../img/loading100.gif) no-repeat center center; 
@@ -254,12 +250,12 @@ if (isset($_GET['delete_id'])) {
   
 
 
-        <footer class="page-footer">
+        <!-- <footer class="page-footer">
           <span>made by </span>
           <a href="" target="_blank">
             <img width="24" height="24" src="../img/dash-logo.png" alt="InfiKnight Logo">
           </a>
-        </footer>
+        </footer> -->
       </section>
     <svg style="display:none;">
         <symbol id="logo" viewBox="0 0 140 59">
