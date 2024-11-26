@@ -180,7 +180,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
         
         
         <!-- Section 4 -->
-        <section class="section background-image" style="background-image:url(./img/parallax-06.jpg)">
+        <section class="section background-image" style="background-image:url(./img/contact_us.jpg)">
           <div class="line text-center">
             <h2 class="text-white text-extra-strong text-size-80 text-m-size-40">Do you need help?</h2>
             <p class="text-white">Welcome to our esports hub!<br> Dive into the latest tournaments, team updates, and gaming news. Join the action and be part of our gaming community. </p>
