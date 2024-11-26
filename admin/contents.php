@@ -1,49 +1,94 @@
 <?php
-include('../config.php'); 
+include('../config.php');
 session_start();
 
 // Initialize messages
 $error_message = '';
 $success_message = '';
 
+// Check if the user is logged in
 if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
-  header('Location: ../admin_login.php'); 
+  header('Location: ../admin_login.php');
   exit;
 }
 
+// Ensure the uploads directory exists
+$target_dir = 'uploads/';
+if (!is_dir($target_dir)) {
+    mkdir($target_dir, 0777, true); // Create the directory if it doesn't exist
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
-    // Collect form data
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $author = $_POST['author'];
+    // Collect form data and sanitize it
+    $title = mysqli_real_escape_string($conn, $_POST['title']);
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
     $image = $_FILES['image']['name'];
-    $link = $_POST['link'];
     $updated_at = date('Y-m-d H:i:s'); // current timestamp
 
     // Validate the form fields
-    if (empty($title) || empty($description) || empty($author) || empty($image) || empty($link)) {
+    if (empty($title) || empty($description) || empty($image)) {
         $error_message = 'All fields are required.';
     } else {
         // Image upload handling
-        $target_dir = "uploads/"; // Directory to store images
         $target_file = $target_dir . basename($image);
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
-            // Insert data into the database
-            $sql = "INSERT INTO news_articles (title, description, author, image, link, updated_at) 
-                    VALUES ('$title', '$description', '$author', '$target_file', '$link', '$updated_at')";
-            if ($conn->query($sql) === TRUE) {
-                $success_message = 'News article posted successfully.';
-            } else {
-                $error_message = 'Error: ' . $conn->error;
-            }
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+        // Check if the uploaded file is a valid image
+        $check = getimagesize($_FILES['image']['tmp_name']);
+        if ($check === false) {
+            $error_message = 'Uploaded file is not an image.';
         } else {
-            $error_message = 'Error uploading image.';
+            // Restrict image file types (for example: JPG, JPEG, PNG, GIF)
+            if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $error_message = 'Only JPG, JPEG, PNG & GIF files are allowed.';
+            } else {
+                // Try uploading the image
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+                    // Insert data into the database
+                    $sql = "INSERT INTO news_articles (title, description, image, updated_at) 
+                            VALUES ('$title', '$description', '$target_file', '$updated_at')";
+                    if ($conn->query($sql) === TRUE) {
+                        // Redirect after successful submission to prevent re-posting
+                        header("Location: " . $_SERVER['PHP_SELF']); // Redirects to the same page
+                        exit; // Ensure no further code is executed after the redirect
+                    } else {
+                        $error_message = 'Error: ' . $conn->error;
+                    }
+                } else {
+                    $error_message = 'Error uploading image.';
+                }
+            }
         }
     }
 }
+
+$sql = "SELECT id, title, description, image, updated_at FROM news_articles ORDER BY updated_at DESC";
+$result = $conn->query($sql);
+
+// Initialize an array to store the fetched articles
+$articles = [];
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $article = [
+            'id' => $row['id'], 
+            'image' => $row['image'],
+            'updated_at' => $row['updated_at'],
+            'title' => $row['title'],
+            'description' => $row['description']
+        ];
+
+        $articles[] = $article;
+    }
+} else {
+    $error_message = 'No news articles available at the moment.';
+}
+
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -181,46 +226,75 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
 
               <div class="tab-content">
                   <!-- Add News Form Tab -->
-                  <div class="tab active" data-tab="add-news" style="width: 100%;">
-                      <h3>Add New News Article</h3>
-                      
+                  <div class="tab active" data-tab="add-news" style="width: 100%; background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 20px auto;">
+                      <h3 style="font-size: 1.6em; margin-bottom: 20px; color: #333; text-align: center;">Add New News Article</h3>
+
                       <?php if (!empty($error_message)): ?>
-                          <div class="error-message">
+                          <div class="error-message" style="padding: 10px 20px; border-radius: 5px; margin-bottom: 20px; font-size: 1.1em; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
                               <p><?php echo $error_message; ?></p>
                           </div>
                       <?php endif; ?>
 
                       <?php if (!empty($success_message)): ?>
-                          <div class="success-message">
+                          <div class="success-message" style="padding: 10px 20px; border-radius: 5px; margin-bottom: 20px; font-size: 1.1em; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
                               <p><?php echo $success_message; ?></p>
                           </div>
                       <?php endif; ?>
-                      
+
                       <form action="" method="POST" enctype="multipart/form-data">
-                          <div class="form-group">
-                              <label for="title">Title:</label>
-                              <input type="text" name="title" id="title" class="form-control" required>
+                          <div class="form-group" style="margin-bottom: 20px;">
+                              <label for="title" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Title:</label>
+                              <input type="text" name="title" id="title" class="form-control" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
                           </div>
-                          <div class="form-group">
-                              <label for="description">Description:</label>
-                              <textarea name="description" id="description" class="form-control" required></textarea>
+                          <div class="form-group" style="margin-bottom: 20px;">
+                              <label for="description" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Description:</label>
+                              <textarea name="description" id="description" class="form-control" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;"></textarea>
                           </div>
-                          <div class="form-group">
-                              <label for="author">Author:</label>
-                              <input type="text" name="author" id="author" class="form-control" required>
-                          </div>
-                          <div class="form-group">
-                              <label for="image">Image:</label>
-                              <input type="file" name="image" id="image" class="form-control" required>
-                          </div>
-                          <div class="form-group">
-                              <label for="link">Link:</label>
-                              <input type="url" name="link" id="link" class="form-control" required>
-                          </div>
-                          <button type="submit" name="submit" class="btn btn-primary">Post News</button>
+                          <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="image" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Image:</label>
+                            <input type="file" name="image" id="image" class="form-control" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;" onchange="previewImage(event)">
+                            <br>
+                            <!-- Image preview section -->
+                            <img id="imagePreview" src="#" alt="Image Preview" style="max-width: 100%; margin-top: 10px; display: none;">
+                        </div>
+                          <button type="submit" name="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Post News</button>
                       </form>
                   </div>
               </div>
+              <?php
+              // Assuming you already have the $articles array filled with data
+              if (!empty($articles)): 
+              ?>
+<table class="article-news-table">
+  <thead>
+    <tr>
+      <th class="table-header">Image</th>
+      <th class="table-header">Title</th>
+      <th class="table-header">Description</th>
+      <th class="table-header">Updated At</th>
+      <th class="table-header">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php foreach ($articles as $article): ?>
+      <tr class="table-row">
+        <td class="table-cell"><img src="<?= $article['image'] ?>" alt="Article Image" class="article-image"></td>
+        <td class="table-cell"><?= htmlspecialchars($article['title']) ?></td>
+        <td class="table-cell"><?= htmlspecialchars($article['description']) ?></td>
+        <td class="table-cell"><?= htmlspecialchars($article['updated_at']) ?></td>
+        <td class="table-cell">
+          <button class="action-button update-button" onclick="window.location.href='update_article.php?id=<?= $article['id'] ?>'">Update</button>
+          <button class="action-button delete-button" onclick="confirmDelete(<?= $article['id'] ?>)">Delete</button>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+  </tbody>
+</table>
+
+
+              <?php else: ?>
+                  <p>No news articles available at the moment.</p>
+              <?php endif; ?>
             </div>
             
           </section>
@@ -741,7 +815,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
             }, 5000);
         }
 	</script>
+  <script>
+    function confirmDelete(articleId) {
+        // Show confirmation dialog
+        var result = confirm("Do you want to delete this article news?");
+        if (result) {
+            // If user clicks 'Yes', redirect to the delete page
+            window.location.href = "delete_article.php?id=" + articleId;
+        }
+    }
+</script>
+<script>
+  function previewImage(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
 
+    reader.onload = function(e) {
+      const imagePreview = document.getElementById('imagePreview');
+      imagePreview.src = e.target.result;
+      imagePreview.style.display = 'block'; // Show the image
+    }
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+</script>
 </body>
 </html>
 

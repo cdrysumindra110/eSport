@@ -5,9 +5,9 @@ require_once 'config.php';
 // Initialize messages
 $error_message = '';
 $success_message = '';
+
 // Start the session
 session_start();
-
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
@@ -24,11 +24,9 @@ if ($result->num_rows > 0) {
         // Create an array for each article
         $article = [
             'image' => $row['image'],
-            'author' => $row['author'],
             'updated_at' => $row['updated_at'],
             'title' => $row['title'],
-            'description' => $row['description'],
-            'link' => $row['link']
+            'description' => $row['description']
         ];
 
         // Add the article to the articles array
@@ -39,7 +37,10 @@ if ($result->num_rows > 0) {
     $error_message = 'No news articles available at the moment.';
 }
 
+// Close the database connection
+$conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -156,29 +157,29 @@ if ($result->num_rows > 0) {
           </header>
       
           <div class="tab-content">
-    <!-- Latest News Tab -->
-    <div class="tab active" data-tab="latest" style="width: 100%;">
-        <?php if (!empty($error_message)): ?>
-            <div class="error-message">
-                <p><?php echo $error_message; ?></p>
-            </div>
-        <?php else: ?>
-            <!-- Loop through the articles and display them -->
-            <?php foreach ($articles as $article): ?>
-                <div class="news-card">
-                    <img src="<?php echo $article['image']; ?>" alt="Article Image" class="news-image" />
-                    <div class="news-details">
-                        <p>By <?php echo $article['author']; ?> Updated at <?php echo date("Y-m-d", strtotime($article['updated_at'])); ?></p>
-                        <h2><?php echo $article['title']; ?></h2>
-                        <p><?php echo $article['description']; ?></p>
-                        <a href="<?php echo $article['link']; ?>" class="read-more-link">Read More</a>
+            <!-- Latest News Tab -->
+            <div class="tab active" data-tab="latest" style="width: 100%;">
+                <?php if (!empty($error_message)): ?>
+                    <div class="error-message">
+                        <p><?php echo $error_message; ?></p>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+                <?php else: ?>
+                    <!-- Loop through the articles and display them -->
+                    <?php foreach ($articles as $article): ?>
+                        <div class="news-card">
+                            <img src="<?php echo $article['image']; ?>" alt="Article Image" class="news-image" />
+                            <div class="news-details">
+                                <p>By InfiKnight Gaming Community Updated at <?php echo date("Y-m-d", strtotime($article['updated_at'])); ?></p>
+                                <h2><?php echo $article['title']; ?></h2>
+                                <p><?php echo $article['description']; ?></p>
+                                <a href="#" class="read-more-link">Read More</a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+          </div>
     </div>
-</div>
-      </div>
       
       
       

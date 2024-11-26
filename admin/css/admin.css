@@ -951,3 +951,80 @@ button {
   color: #155724;
   border: 1px solid #c3e6cb;
 }
+
+
+/* General Table Styles */
+.article-news-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-family: 'Arial', sans-serif;
+  /* background-color: #4a4a4a; */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+  background-color: #4a4a4a;
+  padding: 10px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.table-row {
+  transition: background-color 0.3s;
+}
+
+.table-row:hover {
+  /* background-color: #f9f9f9; */
+  background-color: #ceebff;
+}
+
+.table-cell {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.article-image {
+  width: 100px;
+  height: auto;
+  border-radius: 5px;
+}
+
+.action-button {
+  padding: 8px 12px;
+  margin: 4px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.update-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.update-button:hover {
+  background-color: #45a049;
+}
+
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #da190b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .article-news-table {
+    font-size: 14px;
+  }
+  .article-image {
+    width: 80px;
+  }
+}
