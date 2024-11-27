@@ -217,7 +217,7 @@ if (isset($_GET['delete_rank'])) {
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label for="name" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Name:</label>
-                        <input type="number" name="name" id="name" step="0.001" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
+                        <input type="text" name="name" id="name" step="0.1" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
                     </div>     
 
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -243,7 +243,7 @@ if (isset($_GET['delete_rank'])) {
                       <td class="rank"><?php echo $row['rank']; ?></td>
                       <td class="participant-name"><?php echo htmlspecialchars($row['name']); ?></td>
                       <td class="score"> $
-                        <?php echo number_format($row['prize'], 3); ?>
+                        <?php echo number_format($row['prize'], 1); ?>
                         <?php if ($row['rank'] == 1): ?>
                           <img class="award-icon" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
                         <?php endif; ?>
