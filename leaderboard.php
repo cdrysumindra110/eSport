@@ -2,8 +2,11 @@
 include('config.php');
 session_start();
 
+// Define $isSignin based on session variable
+$isSignin = isset($_SESSION['isSignin']) && $_SESSION['isSignin'] === true;
+
 // Redirect if not logged in
-if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
+if (!$isSignin) {
     header('Location: signin.php');
     exit();
 }
@@ -34,6 +37,7 @@ if ($result->num_rows > 0) {
 $stmt->close();
 $conn->close();
 ?>
+
 
 
 
