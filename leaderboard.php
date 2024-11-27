@@ -166,7 +166,7 @@ $conn->close();
                         <?php else: ?>
                             <tr>
                                 <td colspan="3" style="text-align: center; color: red;">
-                                    <?php echo isset($error_message) ? htmlspecialchars($error_message) : "No leaderboard data available."; ?>
+                                    <?php echo isset($error_message) ? htmlspecialchars($error_message) : "No leaderboard data available. (N/A)"; ?>
                                 </td>
                             </tr>
                         <?php endif; ?>

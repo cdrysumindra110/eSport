@@ -256,6 +256,12 @@ $conn->close();
             text-align: center;
             margin-bottom: 10px;
         }
+        .right-container p {
+            font-size: 1.8rem;
+            color: #f39c12;
+            text-align: center;
+            margin-top: 10px;
+        }
 
         .form-group {
             margin-bottom: 15px;

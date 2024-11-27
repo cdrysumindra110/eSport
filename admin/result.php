@@ -38,35 +38,43 @@ if ($result->num_rows > 0) {
 
 // Handle form submission for leaderboard insertion
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $rank = $_POST['rank'];
-    $name = $_POST['name'];
-    $prize = $_POST['prize'];
+  $rank = $_POST['rank'];
+  $name = $_POST['name'];
+  $prize = $_POST['prize'];
+  $tournament_id = $_POST['tournament_id']; 
 
-    $sql = "INSERT INTO leaderboard (tournament_id, rank, name, prize) VALUES (?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
+  $sql = "
+      INSERT INTO leaderboard (tournament_id, rank, name, prize)
+      VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+      name = VALUES(name),
+      prize = VALUES(prize)
+  ";
 
-    if ($stmt) {
-        $stmt->bind_param("iisd", $tournament_id, $rank, $name, $prize);
+  $stmt = $conn->prepare($sql);
 
-        if ($stmt->execute()) {
-            $_SESSION['message'] = "Leaderboard inserted successfully.";
-        } else {
-            $_SESSION['error_message'] = "Error inserting leaderboard: " . $stmt->error;
-        }
+  if ($stmt) {
+      $stmt->bind_param("iisd", $tournament_id, $rank, $name, $prize);
 
-        $stmt->close();
-    } else {
-        $_SESSION['error_message'] = "Database error: " . $conn->error;
-    }
+      if ($stmt->execute()) {
+          $_SESSION['message'] = "Leaderboard entry saved successfully.";
+      } else {
+          $_SESSION['error_message'] = "Error saving leaderboard entry: " . $stmt->error;
+      }
 
-    $conn->close();
-    header('Location: ../admin/result.php?tournament_id=' . $tournament_id);
-    exit();
+      $stmt->close();
+  } else {
+      $_SESSION['error_message'] = "Database error: " . $conn->error;
+  }
+
+  $conn->close();
+  header('Location: ../admin/result.php?tournament_id=' . $tournament_id);
+  exit();
 }
 
 // Handle deletion
 if (isset($_GET['delete_rank'])) {
-    $rank = intval($_GET['delete_rank']); // Ensure it's an integer
+    $rank = intval($_GET['delete_rank']); 
 
     $delete_query = "DELETE FROM leaderboard WHERE rank = ?";
     $stmt = $conn->prepare($delete_query);
@@ -89,7 +97,6 @@ if (isset($_GET['delete_rank'])) {
     exit();
 }
 
-// Close database connection
 $conn->close();
 ?>
 
@@ -250,8 +257,7 @@ $conn->close();
                         <input type="number" name="prize" id="prize" step="0.001" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Publish</button>
-                    <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Edit</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Save</button>
                 </form>
             </div>
 
@@ -279,7 +285,7 @@ $conn->close();
                                     <td>
                                         <a href="?tournament_id=<?php echo $tournament_id; ?>&delete_rank=<?php echo $row['rank']; ?>" 
                                           class="delete-btn" style="padding-left : 1px;" 
-                                          onclick="return confirm('Are you sure you want to delete this entry?');">
+                                          onclick="confirm('Are you sure you want to delete this entry?');">
                                           Delete
                                         </a>
                                     </td>

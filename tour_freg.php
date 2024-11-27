@@ -486,8 +486,6 @@ $conn->close();
             <button 
                 class="organizer-actions" 
                 onclick="joinTournament(<?php echo $tournament_id; ?>, '<?php echo htmlspecialchars($match_type); ?>')"
-                <?php echo ($slots_full_message) ? 'disabled' : ''; // Disable if slots are full ?>
-                style="<?php echo ($slots_full_message) ? 'background-color: grey; cursor: not-allowed;' : ''; ?>"
             >
                 <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
             </button>
@@ -572,33 +570,33 @@ $conn->close();
             <p class="content-title"><i class="fas fa-user"></i>&nbsp;&nbsp;Registered Participants</p>
             <p class="cont-title" style="display: flex; flex-direction: column;">
             <?php
-if (!empty($participants)) {
-    $counter = 1; // Initialize the counter
-    foreach ($participants as $participant) {
-        ?>
-        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-            <!-- Display participant logo dynamically -->
-            <div class="small-banner" style="width: 40px; height: 40px; margin-right: 10px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.2);">
-                <?php
-                // Determine the logo path (check if participant has a logo)
-                $logo_path = !empty($participant['logo_path']) && file_exists('uploads/' . htmlspecialchars($participant['logo_path'])) 
-                             ? 'uploads/' . htmlspecialchars($participant['logo_path']) 
-                             : 'uploads/dash-logo.png'; // Fallback to default logo if no participant logo
-                
-                // Display the logo
-                echo '<img src="' . $logo_path . '" alt="Participant Logo" style="width: 100%; height: 100%; object-fit: cover;">';
-                ?>
-            </div>
-            <!-- Display participant team name or player name with the counter -->
-            <span><?php echo $counter . ". " . htmlspecialchars($participant['team_name']); ?></span>
-        </div>
-        <?php
-        $counter++; // Increment the counter
-    }
-} else {
-    echo "<p>No participants registered yet.</p>";
-}
-?>
+              if (!empty($participants)) {
+                  $counter = 1; // Initialize the counter
+                  foreach ($participants as $participant) {
+                      ?>
+                      <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                          <!-- Display participant logo dynamically -->
+                          <div class="small-banner" style="width: 40px; height: 40px; margin-right: 10px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.2);">
+                              <?php
+                              // Determine the logo path (check if participant has a logo)
+                              $logo_path = !empty($participant['logo_path']) && file_exists('uploads/' . htmlspecialchars($participant['logo_path'])) 
+                                          ? 'uploads/' . htmlspecialchars($participant['logo_path']) 
+                                          : 'uploads/dash-logo.png'; // Fallback to default logo if no participant logo
+                              
+                              // Display the logo
+                              echo '<img src="' . $logo_path . '" alt="Participant Logo" style="width: 100%; height: 100%; object-fit: cover;">';
+                              ?>
+                          </div>
+                          <!-- Display participant team name or player name with the counter -->
+                          <span><?php echo $counter . ". " . htmlspecialchars($participant['team_name']); ?></span>
+                      </div>
+                      <?php
+                      $counter++; // Increment the counter
+                  }
+              } else {
+                  echo "<p>No participants registered yet.</p>";
+              }
+              ?>
 
             </p>
         </div>

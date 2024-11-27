@@ -54,7 +54,6 @@ if ($stmt) {
             $date = new DateTime($sdate);
             $sdate = $date->format('F j, Y');  // Month name, day, year
         }
-
     } else {
         $error_message = "No tournament found with that ID.";
     }
@@ -63,7 +62,50 @@ if ($stmt) {
     $error_message = "Error preparing the tournament detail statement: " . $conn->error;
 }
 
-$match_type = isset($_GET['match_type']) ? $_GET['match_type'] : 'solo'; // Default to 'solo' if not provided
+
+// Check if slots are full for a specific match type
+function checkSlotsFull($tournament_id, $match_type) {
+    global $conn;
+    $current_count = 0;
+    $max_slots = 0;
+    
+    // Retrieve the maximum number of slots for the given match type
+    $sql = "SELECT solo_players, duo_teams, squad_teams FROM brackets WHERE tournament_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $tournament_id);
+    $stmt->execute();
+    $stmt->bind_result($solo_players, $duo_teams, $squad_teams);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Set max slots based on match type
+    if ($match_type == 'solo') {
+        $max_slots = $solo_players;
+    } elseif ($match_type == 'duo') {
+        $max_slots = $duo_teams;
+    } elseif ($match_type == 'squad') {
+        $max_slots = $squad_teams;
+    }
+
+    // Check current registrations based on match type
+    if ($match_type == 'solo') {
+        $sql = "SELECT COUNT(*) AS count FROM solo_registration WHERE tournament_id = ?";
+    } elseif ($match_type == 'duo') {
+        $sql = "SELECT COUNT(*) AS count FROM duo_registration WHERE tournament_id = ?";
+    } elseif ($match_type == 'squad') {
+        $sql = "SELECT COUNT(*) AS count FROM squad_registration WHERE tournament_id = ?";
+    }
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $tournament_id);
+    $stmt->execute();
+    $stmt->bind_result($current_count);
+    $stmt->fetch();
+    $stmt->close();
+
+    return $current_count >= $max_slots;
+}
+
 
 // Handle form data when the form is submitted via POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -71,32 +113,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tournament_id = $_POST['tournament_id'];
     $match_type = $_POST['match_type'];
 
-    try {
-        // Check if the user has already registered based on match type
-
-        if ($match_type == "solo") {
-            $player_name = $_POST['solo_name'];
-            $email = $_POST['solo_email'];
-            
-            // Check if the player already registered
-            $sql = "SELECT * FROM solo_registration WHERE tournament_id = ? AND email = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("is", $tournament_id, $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->num_rows > 0) {
-                $error_message = "You have already registered for this tournament.";
-            } else {
-                $ign = $_POST['solo_ign'];
-                $logo_path = uploadFile('solo_logo');
-
-                $sql = "INSERT INTO solo_registration (tournament_id, player_name, email, ign, logo_path)
-                        VALUES (?, ?, ?, ?, ?)";
+    // Check if the slots are full for the match type
+    if (checkSlotsFull($tournament_id, $match_type)) {
+        $error_message = "Registration is closed as the tournament is full.";
+    } else {
+        try {
+            if ($match_type == "solo") {
+                $player_name = $_POST['solo_name'];
+                $email = $_POST['solo_email'];
+                
+                // Check if the player already registered
+                $sql = "SELECT * FROM solo_registration WHERE tournament_id = ? AND email = ?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issss", $tournament_id, $player_name, $email, $ign, $logo_path);
+                $stmt->bind_param("is", $tournament_id, $email);
                 $stmt->execute();
-                $stmt->close();
-                $success_message = "Solo registration successful.";
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
+                    $error_message = "You have already registered for this tournament.";
+                } else {
+                    $ign = $_POST['solo_ign'];
+                    $logo_path = uploadFile('solo_logo');
+
+                    $sql = "INSERT INTO solo_registration (tournament_id, player_name, email, ign, logo_path)
+                            VALUES (?, ?, ?, ?, ?)";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("issss", $tournament_id, $player_name, $email, $ign, $logo_path);
+                    $stmt->execute();
+                    $stmt->close();
+                    $success_message = "Solo registration successful.";
             }
 
         } elseif ($match_type == "duo") {
@@ -205,7 +249,7 @@ function uploadFile($input_name) {
     }
     return null;
 }
-
+}
 // Close the database connection
 $conn->close();
 ?>
@@ -314,7 +358,7 @@ $conn->close();
             gap: 2px;
             margin-top: 20px;
             font-size: 24px;
-            color: #fff; /* Adjust color as needed */
+            color: #fff;
             }
 
             .time-section {
@@ -325,7 +369,7 @@ $conn->close();
             }
 
             .countdown div {
-                padding: 20px;
+                padding: 5px 10px;
                 border-radius: 5px;
                 min-width: 60px;
                 font-weight: bold;
@@ -629,16 +673,15 @@ $conn->close();
     
 <div class="tournament-reg_container">
     <div class="content">
-        <h1>GET READY FOR THE ULTIMATE eSPORTS TOURNAMENT</h1>
+        <h1 style="color:aqua">Drop In. Gear Up. Take Over.</h1>
         <h2><?php echo htmlspecialchars($tname); ?></h2>
-        <h3>THE WORLD OF COMPETITIVE GAMING</h3>
         <br>
         <h2>JOIN US FOR THIS EXCLUSIVE LIVE EVENT</h2>
-        <h1><?php echo htmlspecialchars($sdate); ?> at <?php echo htmlspecialchars($stime); ?></h1>
+        <h1 style="color:aliceblue"><?php echo htmlspecialchars($sdate); ?> at <?php echo htmlspecialchars($stime); ?></h1>
         <!-- <a href="#" class="ctn_btn" >CLAIM MY SPOT!</a> -->
         <button class="ctn_btn" onclick="joinGame(<?php echo $tournament_id; ?>)">Already Registered</button>
         <br><br>
-        <h3>THE TOURNAMENT STARTS IN:</h3>
+        <h3 style="color:white">THE TOURNAMENT STARTS IN:</h3>
         <div class="countdown">
             <div class="time-section">
                 <div id="days">0</div>
@@ -1040,6 +1083,8 @@ function joinGame(tournamentId) {
     window.addEventListener("load", function () {
         loader.style.display = "none";
     });
+
+
   </script>
 </body>
 </html>
