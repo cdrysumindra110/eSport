@@ -1,77 +1,50 @@
 <?php
-// Include the config file
-require_once 'config.php';  // Ensure this includes the $conn connection
+require_once 'config.php'; 
 
 // Initialize messages
 $error_message = '';
 $success_message = '';
 
-// Start the session
+
 session_start();
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
-// Fetch articles from the database
 $sql = "SELECT id, title, description, image, updated_at FROM news_articles";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($article_id, $title, $description, $image, $updated_at);
 
-// Initialize articles array
 $articles = [];
 
 // Fetch articles and process image
 while ($stmt->fetch()) {
-    // Check if image data is in binary format (BLOB) or file path (string)
     if ($image) {
         if (is_string($image) && file_exists($image)) {
-            // If it's a file path, use the image path directly
             $image_src = htmlspecialchars($image); 
         } elseif (is_resource($image)) {
-            // If image is a BLOB, base64 encode the binary data
             $image_data = stream_get_contents($image);
             $image_src = 'data:image/jpeg;base64,' . base64_encode($image_data);
         } elseif (is_string($image) && strpos($image, 'data:image/') === 0) {
-            // If the image is already in base64 format (e.g., from previous processing)
             $image_src = $image; 
         } else {
-            // Default image if path or BLOB is invalid
             $image_src = './img/dash-logo.png'; 
         }
     } else {
-        // If there is no image, use the default
         $image_src = './img/dash-logo.png';
     }
 
-    // Add each article to the articles array
     $articles[] = [
         'id' => $article_id,
         'title' => $title,
         'description' => $description,
-        'image' => $image_src,  // Add the image data (either path or base64 encoded)
+        'image' => $image_src, 
         'updated_at' => $updated_at
     ];
 }
 
 $stmt->close();
-
-
-// Fetch leaderboard data from the database
-$sql = "SELECT rank, name, prize FROM leaderboard ORDER BY rank ASC LIMIT 5";
-$result = $conn->query($sql);  // Change $mysqli to $conn
-
-// Initialize leaderboard array
-$leaderboard = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $leaderboard[] = $row;
-    }
-} else {
-    echo "No data found";
-}
-
-// Close the database connection
 $conn->close();
 ?>
 
@@ -218,32 +191,6 @@ $conn->close();
             <?php else: ?>
                 <p>No articles available at the moment.</p>
             <?php endif; ?>
-
-                <!-- LeaderBoard Section  -->
-            <main class="app-container">
-              <div class="app-header">
-                <h1>
-                  <i class="fa fa-trophy fa-3x" style="color:#ff9633"></i> Placement
-                </h1>
-              </div>
-              <div class="app-leaderboard">
-                <div class="app-ribbon"></div>
-                <table>
-                  <?php foreach ($leaderboard as $row): ?>
-                  <tr>
-                    <td class="rank"><?php echo $row['rank']; ?></td>
-                    <td class="participant-name"><?php echo htmlspecialchars($row['name']); ?></td>
-                    <td class="score"> $
-                      <?php echo number_format($row['prize'], 3); ?>
-                      <?php if ($row['rank'] == 1): ?>
-                        <img class="award-icon" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
-                      <?php endif; ?>
-                    </td>
-                  </tr>
-                  <?php endforeach; ?>
-                </table>
-              </div>
-            </main>
             </div>
           </div>
     </div>
@@ -255,7 +202,8 @@ $conn->close();
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-                <iframe width="800" height="400" src="https://www.youtube.com/embed/ColfvV3PGvc?si=tDtjUanZC0PMu136" 
+              <h1>Latest News</h1>
+                <iframe width="700" height="365" src="https://www.youtube.com/embed/ColfvV3PGvc?si=tDtjUanZC0PMu136" 
                 title="Dota 2 The International 2024" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen></iframe>
@@ -264,7 +212,8 @@ $conn->close();
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-                <iframe width="800" height="400" src="https://www.youtube.com/embed/u1oqfdh4xBY?si=vhWBHZT9TCSuW0Mi" 
+              <h1>Latest News</h1>
+                <iframe width="700" height="365" src="https://www.youtube.com/embed/u1oqfdh4xBY?si=vhWBHZT9TCSuW0Mi" 
                 title="Pubg Tournaments" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen></iframe>
@@ -273,7 +222,8 @@ $conn->close();
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-                <iframe width="800" height="400" src="https://www.youtube.com/embed/oq2Rz2I11l0?si=SMtxcxt0eeu_LMoK" 
+              <h1>Latest News</h1>
+                <iframe width="700" height="365" src="https://www.youtube.com/embed/oq2Rz2I11l0?si=SMtxcxt0eeu_LMoK" 
                 title="Free Fire Tournament" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen></iframe>
@@ -282,129 +232,129 @@ $conn->close();
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-                <iframe width="800" height="400" src="https://www.youtube.com/embed/IS4uCwQ26po?si=6tHwitMYEMoHN8M8" 
-                title="Esport Tournament 2024" frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen></iframe>
+              <h1>Latest News</h1>
+                <iframe width="700" height="365" src="https://www.youtube.com/embed/4N3xwEtLpu0?si=t__WCvNzt33pjJZi&amp;start=10" 
+                title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; 
+                gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
               </a>	
             </div>       
           </div>
         </section>
         
         <!-- Section 8 -->
-      <section class="section background-grey">      
-        <div class="line">
-          <div class="margin2x">
-            <div class="s-12 m-12 l-6">
-               
-              <h3 class="text-size-40 text-m-size-25"><b>Satisfied</b> Clients</h3>
-              <div class="carousel-default owl-carousel carousel-hide-arrows text-left">
-                <div class="item">
-                  <div class="s-12">
-                    <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
-                    <p class="margin-bottom">InfiKnight Esports exceeded our expectations in every way. 
-                      Their commitment to quality and their ability to engage fans is unparalleled. 
-                      We couldn't be happier with the results.</p>
-                    <p class="text-primary text-size-16"><strong>Maria Garcia</strong> / Event Coordinator / GameFest</p>
-                  </div>
-                </div>
+        <section class="section background-grey">      
+          <div class="line">
+            <div class="margin2x">
+              <div class="s-12 m-12 l-6">
                 
-                <div class="item">
-                  <div class="s-12">
-                    <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
-                    <p class="margin-bottom">Working with InfiKnight Esports has been a game-changer for us. Their innovative approach and dedication to excellence truly set them apart. Our gaming events have never been more exciting or professionally managed.</p>
-                    <p class="text-primary text-size-16"><strong>Alex Johnson</strong> / Marketing Director / eSports Central</p>
+                <h3 class="text-size-40 text-m-size-25"><b>Satisfied</b> Clients</h3>
+                <div class="carousel-default owl-carousel carousel-hide-arrows text-left">
+                  <div class="item">
+                    <div class="s-12">
+                      <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
+                      <p class="margin-bottom">InfiKnight Esports exceeded our expectations in every way. 
+                        Their commitment to quality and their ability to engage fans is unparalleled. 
+                        We couldn't be happier with the results.</p>
+                      <p class="text-primary text-size-16"><strong>Maria Garcia</strong> / Event Coordinator / GameFest</p>
+                    </div>
                   </div>
-                </div>
-                
-                <div class="item">
-                  <div class="s-12">
-                    <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
-                    <p class="margin-bottom">The team at InfiKnight Esports is incredible. They bring a level of passion and expertise that’s unmatched in the industry. Their support has been invaluable to our esports initiatives.</p>
-                    <p class="text-primary text-size-16"><strong>Jordan Smith </strong> / Team Manager / ProGamer League </p>
+                  
+                  <div class="item">
+                    <div class="s-12">
+                      <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
+                      <p class="margin-bottom">Working with InfiKnight Esports has been a game-changer for us. Their innovative approach and dedication to excellence truly set them apart. Our gaming events have never been more exciting or professionally managed.</p>
+                      <p class="text-primary text-size-16"><strong>Alex Johnson</strong> / Marketing Director / eSports Central</p>
+                    </div>
                   </div>
-                </div>
+                  
+                  <div class="item">
+                    <div class="s-12">
+                      <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
+                      <p class="margin-bottom">The team at InfiKnight Esports is incredible. They bring a level of passion and expertise that’s unmatched in the industry. Their support has been invaluable to our esports initiatives.</p>
+                      <p class="text-primary text-size-16"><strong>Jordan Smith </strong> / Team Manager / ProGamer League </p>
+                    </div>
+                  </div>
 
-                <div class="item">
-                  <div class="s-12">
-                    <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
-                    <p class="margin-bottom">InfiKnight Esports has transformed how we approach competitive gaming. Their cutting-edge solutions and exceptional service have made them a key partner in our success.</p>
-                    <p class="text-primary text-size-16"><strong> Taylor Brown </strong> / CEO / Ultimate Gaming Arena </p>
+                  <div class="item">
+                    <div class="s-12">
+                      <div class="text-yellow margin-bottom-10"><i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i> <i class="icon-star text-size-12"></i></div>
+                      <p class="margin-bottom">InfiKnight Esports has transformed how we approach competitive gaming. Their cutting-edge solutions and exceptional service have made them a key partner in our success.</p>
+                      <p class="text-primary text-size-16"><strong> Taylor Brown </strong> / CEO / Ultimate Gaming Arena </p>
+                    </div>
                   </div>
+                  
                 </div>
                 
               </div>
-               
-            </div>
-            <div class="s-12 m-12 l-6">
-              <h3 class="text-size-40 text-m-size-25 margin-bottom-30">The Latest From <b>Our Blog</b></h3> 
-              <div class="carousel-default owl-carousel carousel-hide-arrows text-left">
-                
-                <div class="item">
-                  <div class="margin margin-bottom-30">
-                    <div class="s-12 m-3 l-3">
-                      <a class="image-hover-zoom margin-m-bottom-30" href="/">
-                        <img src="img/img-04.jpg" alt="">
-                      </a>  
-                    </div>
-                    <div class="s-12 m-9 l-9">
-                      <h4><a class="text-dark text-primary-hover text-strong" href="/">Unlocking the Secrets of a Successful Esports Event</a></h4>
-                      <p>Alex Johnson shares insider tips on what makes a gaming event truly unforgettable. Discover how to captivate your audience and manage logistics like a pro.</p>
-                      <a class="text-more-info text-primary" href="/">Read more</a>
-                    </div>  
-                  </div> 
-                </div>
+              <div class="s-12 m-12 l-6">
+                <h3 class="text-size-40 text-m-size-25 margin-bottom-30">The Latest From <b>Our Blog</b></h3> 
+                <div class="carousel-default owl-carousel carousel-hide-arrows text-left">
+                  
+                  <div class="item">
+                    <div class="margin margin-bottom-30">
+                      <div class="s-12 m-3 l-3">
+                        <a class="image-hover-zoom margin-m-bottom-30" href="/">
+                          <img src="img/img-04.jpg" alt="">
+                        </a>  
+                      </div>
+                      <div class="s-12 m-9 l-9">
+                        <h4><a class="text-dark text-primary-hover text-strong" href="/">Unlocking the Secrets of a Successful Esports Event</a></h4>
+                        <p>Alex Johnson shares insider tips on what makes a gaming event truly unforgettable. Discover how to captivate your audience and manage logistics like a pro.</p>
+                        <a class="text-more-info text-primary" href="/">Read more</a>
+                      </div>  
+                    </div> 
+                  </div>
 
-                <div class="item">
-                  <div class="margin margin-bottom-30">
-                    <div class="s-12 m-3 l-3">
-                      <a class="image-hover-zoom margin-m-bottom-30" href="/">
-                        <img src="img/img-03.jpg" alt="">
-                      </a>  
-                    </div>
-                    <div class="s-12 m-9 l-9">
-                      <h4><a class="text-dark text-primary-hover text-strong" href="/">Maximizing Your Esports Brand</a></h4>
-                      <p>Maria Garcia explores cutting-edge marketing strategies that can elevate your esports brand. Learn how to create impactful campaigns and connect with your target audience.</p>
-                      <a class="text-more-info text-primary" href="/">Read more</a>
-                    </div>  
-                  </div> 
-                </div>
-                
-                <div class="item">
-                  <div class="margin margin-bottom-30">
-                    <div class="s-12 m-3 l-3">
-                      <a class="image-hover-zoom margin-m-bottom-30" href="/">
-                        <img src="img/img-15.jpg" alt="">
-                      </a>  
-                    </div>
-                    <div class="s-12 m-9 l-9">
-                      <h4><a class="text-dark text-primary-hover text-strong" href="/">The Future of Esports Arenas</a></h4>
-                      <p>Taylor Brown discusses the latest trends in esports arenas and what to expect in the coming years. Get a glimpse into the innovations shaping the future of competitive gaming spaces.</p>
-                      <a class="text-more-info text-primary" href="/">Read more</a>
-                    </div>  
-                  </div> 
-                </div>
+                  <div class="item">
+                    <div class="margin margin-bottom-30">
+                      <div class="s-12 m-3 l-3">
+                        <a class="image-hover-zoom margin-m-bottom-30" href="/">
+                          <img src="img/img-03.jpg" alt="">
+                        </a>  
+                      </div>
+                      <div class="s-12 m-9 l-9">
+                        <h4><a class="text-dark text-primary-hover text-strong" href="/">Maximizing Your Esports Brand</a></h4>
+                        <p>Maria Garcia explores cutting-edge marketing strategies that can elevate your esports brand. Learn how to create impactful campaigns and connect with your target audience.</p>
+                        <a class="text-more-info text-primary" href="/">Read more</a>
+                      </div>  
+                    </div> 
+                  </div>
+                  
+                  <div class="item">
+                    <div class="margin margin-bottom-30">
+                      <div class="s-12 m-3 l-3">
+                        <a class="image-hover-zoom margin-m-bottom-30" href="/">
+                          <img src="img/img-15.jpg" alt="">
+                        </a>  
+                      </div>
+                      <div class="s-12 m-9 l-9">
+                        <h4><a class="text-dark text-primary-hover text-strong" href="/">The Future of Esports Arenas</a></h4>
+                        <p>Taylor Brown discusses the latest trends in esports arenas and what to expect in the coming years. Get a glimpse into the innovations shaping the future of competitive gaming spaces.</p>
+                        <a class="text-more-info text-primary" href="/">Read more</a>
+                      </div>  
+                    </div> 
+                  </div>
 
-                <div class="item">
-                  <div class="margin margin-bottom-30">
-                    <div class="s-12 m-3 l-3">
-                      <a class="image-hover-zoom margin-m-bottom-30" href="/">
-                        <img src="img/img-11.jpg" alt="">
-                      </a>  
-                    </div>
-                    <div class="s-12 m-9 l-9">
-                      <h4><a class="text-dark text-primary-hover text-strong" href="/">Forging Strong Partnerships in Esports</a></h4>
-                      <p>Casey Lee provides advice on building successful partnerships and collaborations within the esports industry. Discover how strategic alliances can drive growth and success.”</p>
-                      <a class="text-more-info text-primary" href="/">Read more</a>
-                    </div>  
-                  </div> 
+                  <div class="item">
+                    <div class="margin margin-bottom-30">
+                      <div class="s-12 m-3 l-3">
+                        <a class="image-hover-zoom margin-m-bottom-30" href="/">
+                          <img src="img/img-11.jpg" alt="">
+                        </a>  
+                      </div>
+                      <div class="s-12 m-9 l-9">
+                        <h4><a class="text-dark text-primary-hover text-strong" href="/">Forging Strong Partnerships in Esports</a></h4>
+                        <p>Casey Lee provides advice on building successful partnerships and collaborations within the esports industry. Discover how strategic alliances can drive growth and success.”</p>
+                        <a class="text-more-info text-primary" href="/">Read more</a>
+                      </div>  
+                    </div> 
+                  </div>
+                  
                 </div>
-                
               </div>
             </div>
-          </div>
-        </div>                                                                                     
-      </section>
+          </div>                                                                                     
+        </section>
 
         <!-- Section 4 -->
         <section class="section background-image" style="background-image:url(./img/contact_us.jpg)">

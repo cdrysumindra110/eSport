@@ -41,21 +41,20 @@ $sql = "SELECT
             b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
             b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
             s.provider, s.channel_name, s.social_media, s.social_media_input,
-            u.uname AS host_username  -- Fetching host username
+            u.uname AS host_username 
         FROM tournaments t
         LEFT JOIN brackets b ON t.id = b.tournament_id
         LEFT JOIN streams s ON t.id = s.tournament_id
-        LEFT JOIN users u ON t.user_id = u.id  -- Joining users to get the host username
-        ORDER BY t.id";  // Removed the WHERE clause
+        LEFT JOIN users u ON t.user_id = u.id 
+        ORDER BY t.id"; 
 
 $stmt = $conn->prepare($sql);
 if ($stmt) {
-    // No need to bind user_id since we are fetching all tournaments
     $stmt->execute();
-    $result = $stmt->get_result();  // Use get_result for multiple rows
+    $result = $stmt->get_result();  
 
     if ($result->num_rows > 0) {
-        // Fetch all tournaments into an array
+
         while ($row = $result->fetch_assoc()) {
             $tournaments[] = $row;
         }

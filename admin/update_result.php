@@ -9,49 +9,47 @@ if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
 }
 
 // Get tournament ID
-$tournament_id = isset($_GET['tournament_id']) ? $_GET['tournament_id'] : null;
+$tournament_id = isset($_GET['tournament_id']) ? intval($_GET['tournament_id']) : null;
 if (!$tournament_id) {
-    die("Error: Missing tournament ID.");
+    die("Error: Missing or invalid tournament ID.");
 }
 
 // Fetch leaderboard data for the given tournament
+$leaderboard = [];
 $sql = "SELECT rank, name, prize FROM leaderboard WHERE tournament_id = ? ORDER BY rank ASC LIMIT 5";
 $stmt = $conn->prepare($sql);
 
-if (!$stmt) {
-    die("Database error: " . $conn->error);
-}
+if ($stmt) {
+    $stmt->bind_param("i", $tournament_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-$stmt->bind_param("i", $tournament_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-// Initialize leaderboard array
-$leaderboard = [];
-if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $leaderboard[] = $row;
     }
+
+    $stmt->close();
 } else {
-    $error_message = "No leaderboard data found for this tournament.";
+    die("Database error: " . $conn->error);
 }
 
 // Handle form submission for leaderboard insertion
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $rank = $_POST['rank'];
-    $name = $_POST['name'];
-    $prize = $_POST['prize'];
+    $rank = intval($_POST['rank']);
+    $name = trim($_POST['name']);
+    $prize = floatval($_POST['prize']);
 
-    $sql = "INSERT INTO leaderboard (tournament_id, rank, name, prize) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO leaderboard (tournament_id, rank, name, prize) VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE name = VALUES(name), prize = VALUES(prize)";
     $stmt = $conn->prepare($sql);
 
     if ($stmt) {
         $stmt->bind_param("iisd", $tournament_id, $rank, $name, $prize);
 
         if ($stmt->execute()) {
-            $_SESSION['message'] = "Leaderboard inserted successfully.";
+            $_SESSION['message'] = "Leaderboard updated successfully.";
         } else {
-            $_SESSION['error_message'] = "Error inserting leaderboard: " . $stmt->error;
+            $_SESSION['error_message'] = "Error updating leaderboard: " . $stmt->error;
         }
 
         $stmt->close();
@@ -64,34 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-// Handle deletion
-if (isset($_GET['delete_rank'])) {
-    $rank = intval($_GET['delete_rank']); // Ensure it's an integer
-
-    $delete_query = "DELETE FROM leaderboard WHERE rank = ?";
-    $stmt = $conn->prepare($delete_query);
-
-    if ($stmt) {
-        $stmt->bind_param("i", $rank);
-
-        if ($stmt->execute()) {
-            $_SESSION['message'] = "User deleted successfully.";
-        } else {
-            $_SESSION['error_message'] = "Error deleting user: " . $stmt->error;
-        }
-
-        $stmt->close();
-    } else {
-        $_SESSION['error_message'] = "Database error: " . $conn->error;
-    }
-
-    header('Location: result.php?tournament_id=' . $tournament_id);
-    exit();
-}
-
 // Close database connection
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -231,70 +205,59 @@ $conn->close();
 
             <!-- Form to Update Leaderboard -->
             <div id="update-form" class="tab active" data-tab="add-news" style="width: 100%; background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 450px; margin: 20px 0;">
-                <h2>Publish Leaderboard</h2>
-                <form action="../admin/result.php?tournament_id=<?php echo htmlspecialchars($_GET['tournament_id'] ?? ''); ?>" method="POST">
-                    <input type="hidden" name="tournament_id" value="<?php echo htmlspecialchars($_GET['tournament_id'] ?? ''); ?>">
+                <h2>Update Leaderboard</h2>
+                <form action="result.php?tournament_id=<?php echo $tournament_id; ?>" method="POST">
+                  <div class="form-group" style="margin-bottom: 20px;">
+                      <label for="rank" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Rank:</label>
+                      <input type="number" name="rank" id="rank" min="1" max="5" required 
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+                  </div> 
 
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="rank" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Rank:</label>
-                        <input type="number" name="rank" id="rank" min="1" max="5" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
-                    </div> 
+                  <div class="form-group" style="margin-bottom: 20px;">
+                      <label for="name" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Name:</label>
+                      <input type="text" name="name" id="name" required 
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+                  </div>     
 
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="name" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Name:</label>
-                        <input type="text" name="name" id="name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
-                    </div>     
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="prize" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Prize:</label>
-                        <input type="number" name="prize" id="prize" step="0.001" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Publish</button>
-                    <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Edit</button>
-                </form>
+                  <div class="form-group" style="margin-bottom: 20px;">
+                      <label for="prize" style="font-weight: bold; color: #555; display: block; margin-bottom: 5px;">Prize:</label>
+                      <input type="number" name="prize" id="prize" step="0.01" required 
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary" 
+                          style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px;">Update</button>
+              </form>
             </div>
-
 
             <main class="app-container">
                 <div class="app-header">
-                    <h1>
-                        <i class="fa fa-trophy fa-3x" style="color:#ff9633"></i> Placement
-                    </h1>
+                  <h1>
+                    <i class="fa fa-trophy fa-3x" style="color:#ff9633"></i> Placement
+                  </h1>
                 </div>
-                <div class="app-leaderboard">
-                    <div class="app-ribbon"></div>
-                    <table>
-                        <?php if (!empty($leaderboard)): ?>
-                            <?php foreach ($leaderboard as $row): ?>
-                                <tr>
-                                    <td class="rank"><?php echo $row['rank']; ?></td>
-                                    <td class="participant-name"><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td class="score" style="padding-right: 1px;">
-                                        $<?php echo number_format($row['prize']); ?>
-                                        <?php if ($row['rank'] == 1): ?>
-                                            <img class="award-icon" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal" />
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <a href="?tournament_id=<?php echo $tournament_id; ?>&delete_rank=<?php echo $row['rank']; ?>" 
-                                          class="delete-btn" style="padding-left : 1px;" 
-                                          onclick="return confirm('Are you sure you want to delete this entry?');">
-                                          Delete
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="3" style="text-align: center; color: red;">
-                                    <?php echo isset($error_message) ? htmlspecialchars($error_message) : "No leaderboard data available."; ?>
-                                </td>
-                            </tr>
+                <div class="app-leaderboard" >
+                  <div class="app-ribbon"></div>
+                  <table>
+                    <?php foreach ($leaderboard as $row): ?>
+                    <tr>
+                      <td class="rank"><?php echo $row['rank']; ?></td>
+                      <td class="participant-name"><?php echo htmlspecialchars($row['name']); ?></td>
+                      <td class="score"> $
+                        <?php echo number_format($row['prize'], 1); ?>
+                        <?php if ($row['rank'] == 1): ?>
+                          <img class="award-icon" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
                         <?php endif; ?>
-                    </table>
+                      </td>
+                      <!-- Add delete button -->
+                      <td>
+                        <button class="delete-btn" data-rank="<?php echo $row['rank']; ?>">Delete</button>
+                      </td>
+                    </tr>
+                    <?php endforeach; ?>
+                  </table>
                 </div>
-            </main>
+              </main>
           </section>
         </section>
   

@@ -1,0 +1,271 @@
+.app-container {
+  width: 85rem;
+  height: auto;
+  background-color: #ffffff;
+  -webkit-box-shadow: 0px 5px 15px 8px #e4e7fb;
+  box-shadow: 0px 5px 15px 8px #e4e7fb;
+  display: flex;
+  margin-left: auto;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0.5rem;
+  position: relative; 
+  right: 2.5rem;      
+  z-index: 998;
+}
+
+.app-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.0rem 1rem;
+}
+  
+h1 {
+  font-family: "Rubik", sans-serif;
+  font-size: 1.7rem;
+  color: #141a39;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.app-leaderboard {
+  width: 100%;
+  position: relative;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: #141a39;
+  cursor: default;
+}
+
+tr {
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.2rem;
+}
+
+tr:not(:first-child):hover {
+  background-color: #fff;
+  transform: scale(1.1);
+  -webkit-box-shadow: 0px 5px 15px 8px #e4e7fb;
+  box-shadow: 0px 5px 15px 8px #e4e7fb;
+}
+
+tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+tr:nth-child(1) {
+  color: #fff;
+}
+
+td {
+  height: 5rem;
+  font-family: "Rubik", sans-serif;
+  font-size: 1.4rem;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+.rank {
+  width: 1rem;
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: left;
+}
+
+.participant-name {
+  text-align: left;
+  padding-left: 5rem;
+  font-size: 1.2rem;
+}
+
+.score {
+  font-weight: bold;
+  font-size: 1.3rem;
+  padding-right: 5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.score:first-child {
+  padding-right: 2rem;
+  width: 10rem;
+}
+
+.award-icon {
+  height: 3rem;
+  margin-left: 1.5rem;
+}
+
+.app-ribbon {
+  width: 87rem;
+  height: 5.5rem;
+  top: -0.5rem;
+  background-color: #5c5be5;
+  position: absolute;
+  left: -1rem;
+  -webkit-box-shadow: 0px 15px 11px -6px #7a7a7d;
+  box-shadow: 0px 15px 11px -6px #7a7a7d;
+}
+
+.app-ribbon::before,
+.app-ribbon::after {
+  content: "";
+  height: 1.5rem;
+  width: 1.5rem;
+  bottom: -0.8rem;
+  transform: rotate(45deg);
+  background-color: #5c5be5;
+  position: absolute;
+  z-index: -1;
+}
+
+.app-ribbon::before {
+  left: 0.35rem;
+}
+
+.app-ribbon::after {
+  right: 0.35rem;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 1024px) {
+  .app-container {
+    position: absolute;
+    width: 90%;
+    top: 12rem; 
+    right: 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .rank {
+    font-size: 1.8rem;
+  }
+
+  .score {
+    font-size: 1.1rem;
+  }
+
+  td {
+    font-size: 1.2rem;
+    padding: 1rem;
+  }
+
+  .award-icon {
+    height: 2rem; /* Reduced from 2.5rem */
+  }
+}
+
+@media (max-width: 740px) {
+  .app-container {
+    width: 90%;
+    top: 2rem; /* Reduced from 3rem */
+    right: 1rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .rank {
+    font-size: 1.6rem;
+  }
+
+  .score {
+    font-size: 1.1rem;
+  }
+
+  td {
+    font-size: 1.1rem;
+    padding: 0.8rem;
+  }
+
+  .award-icon {
+    height: 2rem; /* Reduced from 2.2rem */
+  }
+
+  .app-ribbon {
+    width: 35rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .app-container {
+    width: 100%;
+    top: 1.5rem; /* Reduced from 2rem */
+    right: 0;
+    padding: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  .rank {
+    font-size: 1.5rem;
+  }
+
+  .score {
+    font-size: 1rem;
+  }
+
+  td {
+    font-size: 1rem;
+    padding: 0.6rem;
+  }
+
+  .award-icon {
+    height: 1.8rem; /* Reduced from 2rem */
+  }
+
+  .app-ribbon {
+    width: 100%;
+    left: 0;
+    top: -0.8rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .app-container {
+    width: 100%;
+    top: 1rem; /* Reduced from 1.5rem */
+    right: 0;
+    padding: 0.3rem;
+  }
+
+  h1 {
+    font-size: 1rem;
+  }
+
+  .rank {
+    font-size: 1.4rem;
+  }
+
+  .score {
+    font-size: 0.9rem;
+  }
+
+  td {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+
+  .award-icon {
+    height: 1.6rem; /* Reduced from 1.8rem */
+  }
+
+  .app-ribbon {
+    width: 100%;
+    left: 0;
+    top: -0.5rem;
+  }
+}

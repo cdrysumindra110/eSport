@@ -87,6 +87,7 @@ td {
 .score {
   font-weight: bold;
   font-size: 1.3rem;
+  padding-right: 1rem;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -102,7 +103,7 @@ td {
 }
 
 .app-ribbon {
-  width: 44rem;
+  width: 48rem;
   height: 5.5rem;
   top: -0.5rem;
   background-color: #5c5be5;

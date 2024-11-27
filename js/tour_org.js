@@ -5,13 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   gameCards.forEach(card => {
       card.addEventListener('click', (event) => {
-          // Get the selected game name
           const selectedGame = event.currentTarget.querySelector('h3').textContent;
 
-          // Store the selected game in localStorage
           localStorage.setItem('selectedGame', selectedGame);
 
-          // Redirect to the create_tour.php page
           window.location.href = 'create_tour.php';
       });
   });
@@ -23,16 +20,16 @@ document.getElementById('back-arrow').addEventListener('click', function() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Select all available game cards
+
   document.querySelectorAll('.game-card.available').forEach(card => {
     card.addEventListener('click', function() {
-      // Get the game name from the clicked card
+
       const gameName = this.querySelector('h3').textContent;
       
-      // Store the game name in localStorage
+
       localStorage.setItem('selectedGame', gameName);
       
-      // Redirect to the create_tour.php page
+
       window.location.href = 'create_tour.php';
     });
   });

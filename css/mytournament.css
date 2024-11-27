@@ -38,12 +38,12 @@
 /* Table Section */
 .ut-table {
     width: 100%;
-    max-width: 1200px; /* Limit table width */
+    max-width: 1200px; 
     border-collapse: collapse;
     background-color: #282828;
     margin: 0 auto;
     border: none;
-    table-layout: auto; /* Changed from fixed to auto */
+    table-layout: auto; 
 }
 
 /* Table Header and Cell Styling */
@@ -54,16 +54,16 @@
     word-break: break-word;
     border: none;
     vertical-align: middle;
-    background-color: #282828; /* Same background color for both header and cell */
-    box-sizing: border-box; /* Added box-sizing */
+    background-color: #282828;
+    box-sizing: border-box; 
 }
 /* Targeting the table header columns for Status Date and Prize */
 .ut-table__head--status,
 .ut-table__head--date,
 .ut-table__head--prize {
-    padding-left: 3rem !important; /* Adds 3rem !important padding to the left of the header cells */
+    padding-left: 3rem !important; 
 }
-/* Targeting the 3rd and 4th table headers (Status Date and Prize) */
+
 th:nth-child(3), th:nth-child(4) {
     padding-left: 3rem !important;
 }
@@ -71,8 +71,8 @@ th:nth-child(3), th:nth-child(4) {
 
 /* Table Header Styling */
 .ut-table__head {
-    background-color: #383838; /* Dark background for header */
-    color: #ffffff; /* Text color for header */
+    background-color: #383838; 
+    color: #ffffff; 
 }
 
 
@@ -88,7 +88,7 @@ th:nth-child(3), th:nth-child(4) {
 
 .ut-table__head--status,
 .ut-table__cell--status {
-    width: 10rem; /* Reduced width for status column */
+    width: 10rem; 
     text-align: left;
 }
 
@@ -96,15 +96,15 @@ th:nth-child(3), th:nth-child(4) {
 .ut-status--new {
     background-color: #66ff66;
     color: #000000;
-    padding: 2px 8px; /* Reduced padding */
+    padding: 2px 8px; 
     border-radius: 5px;
     font-weight: bold;
-    font-size: 10px; /* Reduced font size */
+    font-size: 10px;  
     text-align: center;
-    width: auto; /* Auto width to fit content */
-    max-width: 80px; /* Limit max width */
-    box-sizing: border-box; /* Prevent overflow of padding */
-    white-space: nowrap; /* Prevent text from wrapping */
+    width: auto;  
+    max-width: 80px;  
+    box-sizing: border-box;
+    white-space: nowrap;  
 }
 
 /* Row Styling */
@@ -129,11 +129,11 @@ th:nth-child(3), th:nth-child(4) {
     transform: translateY(-50%);
     font-size: 18px;
     color: #00f7ff;
-    display: none; /* Initially hidden */
+    display: none; 
 }
 
 .ut-row:hover .ut-row__icon-eye {
-    display: block; /* Show on hover */
+    display: block; 
 }
 
 /* Image Inside Table */
@@ -147,20 +147,20 @@ th:nth-child(3), th:nth-child(4) {
 /* Information Section Inside Row */
 .ut-info {
     display: flex;
-    flex-direction: row; /* Align entire info section in a single row */
+    flex-direction: row; 
     margin-left: 10px;
-    align-items: center; /* Vertically align content */
+    align-items: center; 
 }
 
 .ut-info__name,
 .ut-info__host {
-    display: block; /* Ensure these elements stack within the row */
+    display: block; 
     font-size: 14px;
 }
 
 .ut-info__name {
     font-weight: bold;
-    margin-right: 10px; /* Space between name and host */
+    margin-right: 10px; 
 }
 
 .ut-info__host {
@@ -177,17 +177,17 @@ th:nth-child(3), th:nth-child(4) {
     }
 
     .ut-image img {
-        width: 50px; /* Smaller image size */
-        height: 50px; /* Smaller image size */
+        width: 50px; 
+        height: 50px; 
     }
 
     .ut-header {
-        flex-direction: column; /* Stack header elements */
+        flex-direction: column; 
         align-items: flex-end;
     }
 
     .ut-header__button {
-        margin-top: 10px; /* Space above button */
+        margin-top: 10px;
     }
 
     .ut-table__head--status,
@@ -196,12 +196,12 @@ th:nth-child(3), th:nth-child(4) {
     .ut-table__cell--date,
     .ut-table__head--prize,
     .ut-table__cell--prize {
-        width: auto; /* Allow columns to adjust on small screens */
+        width: auto; 
     }
 
     /* Adjust the .ut-info layout on small screens */
     .ut-info {
-        flex-direction: column; /* Stack the info vertically on small screens */
-        align-items: flex-start; /* Align left on small screens */
+        flex-direction: column; 
+        align-items: flex-start; 
     }
 }

@@ -1,0 +1,192 @@
+.ut-container {
+    background-color: #282828;
+    color: #ffffff;
+    font-family: sans-serif;
+    margin: 0 auto; 
+    padding: 20px; 
+    box-sizing: border-box; 
+    overflow-x: hidden; 
+    width: 100%;
+}
+
+/* Header section */
+.ut-header {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.ut-header__button {
+    margin-left: auto;
+    background-color: #38b2d1;
+    border: none !important; /* Remove border */
+    color: #181818;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none !important;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.ut-header__button:hover {
+    background-color: #2bd8ff;
+    color: #000000;
+}
+
+/* Table section */
+.ut-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #282828;
+    margin: 0 auto;
+}
+
+.ut-table__cell {
+    padding: 10px;
+    text-align: left;
+    word-break: break-word;
+    background-color: #282828;
+    border: none !important;
+}
+
+/* Header and Cell Styles */
+.ut-table__head,
+.ut-table__cell {
+    padding: 10px;
+    text-align: left;
+    word-break: break-word; 
+    background-color: #282828; 
+    border: none !important; 
+}
+
+.ut-table__head {
+    background-color: #383838; 
+}
+
+/* Column Styles */
+.ut-table__head--game,
+.ut-table__cell--game {
+    width: 12rem;
+    text-align: left;
+}
+
+.ut-table__cell--first {
+    padding-left: 10px;
+    display: flex;
+    align-items: center; 
+}
+
+.ut-table__cell--date,
+.ut-table__cell--brackets,
+.ut-table__cell--prize {
+    width: 150px;
+    text-align: left;
+}
+
+/* Row styles */
+.ut-row {
+    position: relative; 
+    cursor: pointer; 
+    background-color: #282828; 
+    padding: 10px; 
+}
+
+
+.ut-row {
+    border-bottom: none !important; 
+    border: none !important;
+}
+
+
+.ut-row:hover {
+    background-color: #00f7ff0b; 
+    color: #00f7ff;
+}
+
+
+.ut-row:nth-child(n) { 
+    background-color: #282828;
+    border: none !important;
+}
+
+.ut-image img {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 1px;
+}
+
+.ut-info {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.ut-info__name {
+    font-weight: bold;
+}
+
+.ut-info__host {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.ut-status--new {
+    background-color: #66ff66;
+    color: #000000;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    width: 30%;
+}
+
+
+.ut-row__icon-eye {
+    display: none; 
+    opacity: 0; 
+    transition: opacity 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.ut-row:hover .ut-row__icon-eye {
+    display: inline-block; 
+    opacity: 1; 
+    color: #00f7ff !important;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .ut-table__head,
+    .ut-table__cell {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .ut-image img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .ut-header {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .ut-header__button {
+        margin-top: 10px;
+    }
+
+    .ut-table__head--game,
+    .ut-table__cell--game {
+        width: auto; 
+    }
+
+    .ut-table__cell--date,
+    .ut-table__cell--brackets,
+    .ut-table__cell--prize {
+        width: auto; 
+    }
+}
+

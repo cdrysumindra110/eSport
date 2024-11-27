@@ -492,8 +492,11 @@ $conn->close();
                 <i class="fas fa-gamepad"></i>&nbsp; Join Tournament
             </button>
 
-                <button class="options"><i class="fas fa-cog"></i> Options</button>
-                <button class="options"><i class='fa fa-share-alt'></i> Share</button>
+            <button class="options" onclick="leaderboard(<?php echo $tournament_id; ?>)">
+              <i class="fas fa-cog"></i> Leaderboard
+            </button>
+
+            <button class="options"><i class='fa fa-share-alt'></i> Share</button>
             </div>
         </div>
 
@@ -780,6 +783,9 @@ function joinTournament(tournamentId, matchType) {
   function joinGame(tournamentId) {
     // Redirect to success.php with tournament_id and match_type as query parameters
     window.location.href = 'success.php?tournament_id=' + tournamentId;
+  }
+  function leaderboard(tournamentId) {
+    window.location.href = 'leaderboard.php?tournament_id=' + tournamentId;
   }
 </script>
 

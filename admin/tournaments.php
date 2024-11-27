@@ -1,3 +1,97 @@
+<?php
+include('../config.php'); 
+session_start();
+
+// Initialize messages
+$error_message = '';
+$success_message = '';
+
+if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
+  header('Location: ../admin_login.php'); 
+  exit;
+}
+
+// Check if a success message is set in session
+if (isset($_SESSION['message'])) {
+    $success_message = $_SESSION['message'];
+    unset($_SESSION['message']); 
+}
+
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message']; 
+    unset($_SESSION['error_message']); 
+}
+
+$users = [];
+
+// Fetch users from the database
+if ($conn) {
+    $query = "SELECT * FROM users"; 
+    $result = mysqli_query($conn, $query);
+
+    if ($result) {
+        while ($user = mysqli_fetch_assoc($result)) {
+            $users[] = $user;
+        }
+    } else {
+        echo "Error fetching users: " . mysqli_error($conn);
+    }
+} else {
+    echo "Error connecting to the database: " . mysqli_connect_error();
+}
+
+// Fetch username
+$stmt_uname = $conn->prepare("SELECT uname FROM users WHERE id = ?");
+if ($stmt_uname) {
+    $stmt_uname->bind_param("i", $user_id);
+    $stmt_uname->execute();
+    $stmt_uname->bind_result($uname);
+    if ($stmt_uname->fetch()) {
+        $_SESSION['uname'] = $uname;
+    } else {
+        $error_message = "Error: Username not found for the user ID.";
+    }
+    $stmt_uname->close();
+} else {
+    $error_message = "Error preparing the statement: " . $conn->error;
+}
+
+// Fetch tournament data
+$sql = "SELECT 
+            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
+            b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
+            b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
+            s.provider, s.channel_name, s.social_media, s.social_media_input,
+            u.uname AS host_username 
+        FROM tournaments t
+        LEFT JOIN brackets b ON t.id = b.tournament_id
+        LEFT JOIN streams s ON t.id = s.tournament_id
+        LEFT JOIN users u ON t.user_id = u.id 
+        ORDER BY t.id"; 
+
+$stmt = $conn->prepare($sql);
+if ($stmt) {
+    $stmt->execute();
+    $result = $stmt->get_result();  
+
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+            $tournaments[] = $row;
+        }
+    } else {
+        $error_message = "No tournament data found.";
+    }
+    $stmt->close();
+} else {
+    $error_message = "Error preparing the tournament statement: " . $conn->error;
+}
+
+$conn->close();
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +99,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="./css/admin.css">  
+    <link rel="stylesheet" href="./css/tournaments.css">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -133,7 +228,79 @@
             <div class="main-content">
               <h1>Tournament Management</h1>
             </div>
-            
+            <div id="myTournamentsSection" class="profile-section">
+              <div class="ut-container">
+                <h2 class="unique-header">Available Tournaments</h2>
+                    <table class="ut-table">
+                        <thead>
+                            <tr>
+                                <th class="ut-table__head">
+                                    <i class='fa fa-trophy' style='color:#00d696'></i> TOURNAMENTS
+                                </th>
+                                <th class="ut-table__head ut-table__head--game">
+                                    <i class='fa fa-flag-checkered' style='color:#00d696'></i> GAME
+                                </th>
+                                <th class="ut-table__head ut-table__cell--brackets">
+                                    <i class='fa fa-calendar' style='color:#00d696'></i> Brackets
+                                </th>
+                                <th class="ut-table__head ut-table__cell--date">
+                                    <i class='fa fa-calendar' style='color:#00d696'></i> DATE
+                                </th>
+                                <th class="ut-table__head ut-table__cell--prize" style="padding-left: 20px;">
+                                    <i class='fas fa-medal' style='color:#00d696'></i> PRIZE
+                                </th>
+                                <th class="ut-table__head"></th>
+                            </tr>
+                        </thead>           
+                        <tbody>
+                            <?php if (!empty($tournaments)): ?>
+                                <?php foreach ($tournaments as $tournament): ?>
+                                <tr class="ut-row" onclick="window.location.href='result.php?tournament_id=<?php echo $tournament['id']; ?>'" style="cursor: pointer;">
+                                    <td class="ut-table__cell ut-table__cell--first">
+                                        <div class="ut-image">
+                                            <?php if (!empty($tournament['bannerimg'])): ?>
+                                                <img src="data:image/jpeg;base64,<?php echo base64_encode($tournament['bannerimg']); ?>" alt="Tournament Banner">
+                                            <?php else: ?>
+                                                <img src="./img/dash-logo.png" alt="Default Tournament Banner">
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="ut-info">
+                                            <div class="ut-info__name"><?php echo htmlspecialchars($tournament['tname']); ?></div>
+                                            <div class="ut-info__host">Hosted by 
+                                                <span style="color: #00d696;">
+                                                    <?php echo htmlspecialchars($tournament['host_username']); ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="ut-table__cell ut-table__cell--game">
+                                        <?php echo htmlspecialchars($tournament['selected_game']); ?>
+                                    </td>
+                                    <td class="ut-table__cell ut-table__cell--brackets">
+                                        <?php echo htmlspecialchars($tournament['bracket_type']); ?>
+                                    </td>
+                                    <td class="ut-table__cell ut-table__cell--date">
+                                        <?php echo htmlspecialchars($tournament['sdate']); ?>
+                                    </td>
+                                    <td class="ut-table__cell ut-table__cell--prize">
+                                        <?php echo htmlspecialchars($tournament['prizes']); ?>
+                                    </td>
+                                    <td class="ut-table__cell">
+                                        <a href="result.php?tournament_id=<?php echo $tournament['id']; ?>">
+                                            <i class='fa fa-eye ut-row__icon-eye'></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="6">No tournaments found.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
           </section>
         </section>
   
