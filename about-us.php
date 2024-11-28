@@ -89,14 +89,14 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
         </div>
       </nav>
     </header>
-    <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
-        background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
+    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
+        background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
         </div>
     <!-- MAIN -->
     <main role="main">    
       <article>
         <!-- Header -->
-        <header class="section-head background-image" style="background-image:url(img/full_bg.jpg)">
+        <header class="section-head background-image" style="width: 100%; height: 100%; object-fit: cover;background-image:url(img/battleground.gif)">
           <div class="line">
   
             <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
@@ -152,7 +152,7 @@ $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
             <div class="margin2x">              
               <div class="m-12 l-6 margin-m-top-30">
                 <!-- Image --> 
-                <img src="img/img-15.jpg" alt="">
+                <img src="img/mission.jpg" alt="">
               </div> 
                        
               <div class="m-12 l-6">

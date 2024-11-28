@@ -10,42 +10,6 @@ session_start();
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
-$sql = "SELECT id, title, description, image, updated_at FROM news_articles";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$stmt->store_result();
-$stmt->bind_result($article_id, $title, $description, $image, $updated_at);
-
-$articles = [];
-
-// Fetch articles and process image
-while ($stmt->fetch()) {
-    if ($image) {
-        if (is_string($image) && file_exists($image)) {
-            $image_src = htmlspecialchars($image); 
-        } elseif (is_resource($image)) {
-            $image_data = stream_get_contents($image);
-            $image_src = 'data:image/jpeg;base64,' . base64_encode($image_data);
-        } elseif (is_string($image) && strpos($image, 'data:image/') === 0) {
-            $image_src = $image; 
-        } else {
-            $image_src = './img/dash-logo.png'; 
-        }
-    } else {
-        $image_src = './img/dash-logo.png';
-    }
-
-    $articles[] = [
-        'id' => $article_id,
-        'title' => $title,
-        'description' => $description,
-        'image' => $image_src, 
-        'updated_at' => $updated_at
-    ];
-}
-
-$stmt->close();
-
 // Fetch tournament data
 $sql = "SELECT 
             t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
@@ -76,6 +40,45 @@ if ($stmt) {
 } else {
     $error_message = "Error preparing the tournament statement: " . $conn->error;
 }
+
+
+$sql = "SELECT id, title, description, image, updated_at FROM news_articles";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($article_id, $title, $description, $image, $updated_at);
+
+$articles = [];
+
+// Fetch articles and process image
+while ($stmt->fetch()) {
+  if ($image) {
+    if (is_string($image) && file_exists($image)) {
+        $image_src = htmlspecialchars($image);
+    } elseif (is_resource($image)) {
+        $image_data = stream_get_contents($image);
+        // You should check the actual MIME type of the image and use it
+        $image_src = 'data:image/jpeg;base64,' . base64_encode($image_data); // Adjust MIME type if needed (e.g., 'image/png')
+    } elseif (is_string($image) && strpos($image, 'data:image/') === 0) {
+        $image_src = $image;
+    } else {
+        $image_src = './img/dash-logo.png'; // Default image if no image available
+    }
+} else {
+    $image_src = './img/dash-logo.png'; // Default image if no image available
+}
+
+
+    $articles[] = [
+        'id' => $article_id,
+        'title' => $title,
+        'description' => $description,
+        'image' => $image_src, 
+        'updated_at' => $updated_at
+    ];
+}
+
+$stmt->close();
 
 $conn->close();
 ?>
@@ -109,10 +112,10 @@ $conn->close();
 
   <body class="size-1280 primary-color-red">
     <!-- HEADER -->
-    <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
-    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-    
+    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
+    background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
     </div>
+    
     <header role="banner" class="position-absolute">
       <!-- Top Bar -->
       <div class="top-bar full-width hide-s hide-m">
