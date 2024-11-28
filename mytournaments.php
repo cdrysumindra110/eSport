@@ -63,6 +63,23 @@ if ($stmt) {
     $error_message = "Error preparing the tournament statement: " . $conn->error;
 }
 
+// Deleting a user
+if (isset($_GET['delete_id'])) {
+  $delete_id = mysqli_real_escape_string($conn, $_GET['delete_id']);
+
+  $delete_query = "DELETE FROM users WHERE id = $delete_id"; 
+
+  if (mysqli_query($conn, $delete_query)) {
+      $_SESSION['success_message'] = "User deleted successfully."; 
+      header('Location: admin.php'); 
+      exit;
+  } else {
+      $_SESSION['error_message'] = "Error deleting user: " . mysqli_error($conn); 
+      header('Location: admin.php'); 
+      exit;
+  }
+}
+
 $conn->close();
 ?>
 

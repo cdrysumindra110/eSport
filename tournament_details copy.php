@@ -11,8 +11,8 @@ if (!isset($_GET['tournament_id'])) {
     die("Error: Tournament ID not provided.");
 }
 
-$tournament_id = intval($_GET['tournament_id']); 
-$tournament = []; 
+$tournament_id = intval($_GET['tournament_id']); // Validate the tournament ID
+$tournament = []; // Initialize an empty array to hold tournament details
 $error_message = '';
 
 // Fetch tournament details
@@ -54,31 +54,29 @@ if ($stmt) {
     $error_message = "Error preparing the tournament detail statement: " . $conn->error;
 }
 
-// Handle tournament deletion
-if (isset($_POST['delete_tournament']) && $_POST['delete_tournament'] == 'yes') {
-    // Delete the tournament (and related data if needed)
-    $delete_sql = "DELETE FROM tournaments WHERE id = ?";
-    $stmt = $conn->prepare($delete_sql);
-    if ($stmt) {
-        $stmt->bind_param("i", $tournament_id);
-        $stmt->execute();
-        
-        if ($stmt->affected_rows > 0) {
-            $success_message = "Tournament deleted successfully.";
-            // Redirect to a confirmation page or back to the tournament list
-            header("Location: mytournaments.php?message=" . urlencode($success_message));
-            exit();
-        } else {
-            $error_message = "Error deleting tournament.";
-        }
-        $stmt->close();
-    } else {
-        $error_message = "Error preparing the delete statement: " . $conn->error;
-    }
+if (isset($_GET['delete_id'])) {
+  $delete_id = $_GET['delete_id']; // Don't need to escape for prepared statements
+
+  // Prepare the DELETE statement
+  $delete_query = $conn->prepare("DELETE FROM tournaments WHERE id = ?");
+  $delete_query->bind_param("i", $delete_id); // "i" stands for integer type
+
+  if ($delete_query->execute()) {
+      $_SESSION['success_message'] = "Tournament deleted successfully.";  
+      header('Location: mytournaments.php'); 
+      exit;
+  } else {
+      $_SESSION['error_message'] = "Error deleting tournament: " . $delete_query->error;  
+      header('Location: tournament_details.php'); 
+      exit;
+  }
 }
+
+
 
 $conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -406,14 +404,12 @@ $conn->close();
                           Edit Tournament
                         </a>
                       </li>
-                      <ul>
-                          <li style="margin-bottom: 10px;">
-                              <a href="javascript:void(0);" style="text-decoration: none; color: #dc3545;" 
-                                onclick="confirmDelete()">
-                                  <i class="fa fa-trash"></i> Delete Tournament
-                              </a>
-                          </li>
-                      </ul>
+                      <li style="margin-bottom: 10px;">
+                      <a href="?delete_id=<?php echo $tournaments['id']; ?>" onclick="return confirm('Are you sure you want to delete this Tournament?');" style="text-decoration: none; color: #dc3545;">
+                          <i class='fa fa-trash'></i> Delete Tournament
+                      </a>
+
+                      </li>
                     </ul>
                 </button>
                 <button onclick="start_game(<?php echo urlencode($tournament_id); ?>)">
@@ -662,23 +658,7 @@ function showContent(section) {
     window.location.href = 'start_game.php?tournament_id=' + tournamentId;
   }
 </script>
-<script>
-function confirmDelete() {
-    if (confirm("Are you sure you want to delete this tournament?")) {
-        // If confirmed, submit the form to delete the tournament
-        var form = document.createElement("form");
-        form.method = "POST";
-        form.action = ""; // Submit to the same page
-        var input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "delete_tournament";
-        input.value = "yes";
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-</script>
+
 </body>
 </html>
 
