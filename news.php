@@ -45,6 +45,38 @@ while ($stmt->fetch()) {
 }
 
 $stmt->close();
+
+// Fetch tournament data
+$sql = "SELECT 
+            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
+            b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
+            b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
+            s.provider, s.channel_name, s.social_media, s.social_media_input,
+            u.uname AS host_username 
+        FROM tournaments t
+        LEFT JOIN brackets b ON t.id = b.tournament_id
+        LEFT JOIN streams s ON t.id = s.tournament_id
+        LEFT JOIN users u ON t.user_id = u.id 
+        ORDER BY t.id"; 
+
+$stmt = $conn->prepare($sql);
+if ($stmt) {
+    $stmt->execute();
+    $result = $stmt->get_result();  
+
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+            $tournaments[] = $row;
+        }
+    } else {
+        $error_message = "No tournament data found.";
+    }
+    $stmt->close();
+} else {
+    $error_message = "Error preparing the tournament statement: " . $conn->error;
+}
+
 $conn->close();
 ?>
 
@@ -55,7 +87,7 @@ $conn->close();
 <html lang="en-US">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <title>Esports Website</title>
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/icons.css">
@@ -77,9 +109,10 @@ $conn->close();
 
   <body class="size-1280 primary-color-red">
     <!-- HEADER -->
-    <!-- <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
+    <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
     background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-    </div> -->
+    
+    </div>
     <header role="banner" class="position-absolute">
       <!-- Top Bar -->
       <div class="top-bar full-width hide-s hide-m">
@@ -193,26 +226,126 @@ $conn->close();
             <?php endif; ?>
             </div>
           </div>
+        </div>
+
+
+
+
+      <section class="section-top-bottom-padding">
+    <div class="line">
+        <h2 class="text-extra-strong text-size-80 text-m-size-40 margin-bottom-40">Upcoming Live Events</h2>
     </div>
+
+    <!-- Image / Text Carousel -->
+    <div class="carousel-center owl-carousel carousel-main carousel-hide-pagination nav-bottom text-center">
+
+        <?php
+        // Assuming $tournaments array is populated from the fetch code
+        if (!empty($tournaments)) {
+            foreach ($tournaments as $tournament) {
+                $tournamentName = htmlspecialchars($tournament['tname']);
+                $bannerImg = htmlspecialchars($tournament['bannerimg']);
+                $startDate = $tournament['sdate']; 
+                $startTime = $tournament['stime']; 
+                
+                $tournamentDateTime = $startDate . ' ' . $startTime;
+                
+                $tournamentTimestamp = strtotime($tournamentDateTime);
+                $currentTimestamp = time(); 
+   
+                if ($currentTimestamp >= $tournamentTimestamp) {
+
+                    ?>
+                   
+                    <?php
+                } else {
+
+                    ?>
+                    <div class="item">
+                        <div class="image-with-text-overlay">
+                            <div class="image-text-overlay">
+                                <div class="image-text-overlay-content padding-2x">
+                                    <!-- Text -->
+                                    <p class="text-orange text-size-30 margin-bottom-10"><?php echo $tournamentName; ?></p>
+                                    <h3 class="text-white text-size-30 text-strong">Starting Soon</h3>
+                                    <p class="text-white">The tournament will start on <?php echo date('F j, Y, g:i a', $tournamentTimestamp); ?>.</p> 
+                                </div> 
+                            </div>
+                            <!-- Photo -->
+                            <?php if (!empty($tournament['bannerimg'])): ?>
+                                <img src="data:image/jpeg;base64,<?php echo base64_encode($tournament['bannerimg']); ?>" alt="Tournament Banner" style="width: 100%; height: 450px; object-fit: cover;">
+                            <?php else: ?>
+                                <img src="./img/dash-logo.png" alt="Default Tournament Banner" style="width: 100%; height: 450px; object-fit: cover;">
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php
+                }
+            }
+        } else {
+            echo "No tournament data found.";
+        }
+        ?>
+
+    </div>
+</section>
 
 
         <!-- Section Videos Section --> 
-        <section class="section line-full-width">      
-          <div class="margin">
+        <section class="section line-full-width">
+        <div class="line">
+            <h2 class="text-extra-strong text-size-80 text-m-size-40 margin-bottom-40">Live Events</h2>
+        </div>
+
+          <div class="margin">      
+          <?php
+              // Assuming $tournaments array is populated from the fetch code
+              if (!empty($tournaments)) {
+                  foreach ($tournaments as $tournament) {
+                      $tournamentName = htmlspecialchars($tournament['tname']);
+                      $channelName = htmlspecialchars($tournament['channel_name']);
+                      $startDate = $tournament['sdate']; 
+                      $startTime = $tournament['stime']; 
+
+                      $tournamentDateTime = $startDate . ' ' . $startTime;
+                      
+
+                      $tournamentTimestamp = strtotime($tournamentDateTime);
+                      $currentTimestamp = time(); 
+
+                      if ($currentTimestamp >= $tournamentTimestamp) {
+
+                          ?>
+                          <div class="s-12 m-6">
+                              <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
+                        
+                                  <h1><?php echo $tournamentName; ?></h1>
+                                  <!-- Twitch Embed only  -->
+                                  <iframe 
+                                      src="https://player.twitch.tv/?channel=<?php echo urlencode($channelName); ?>&parent=localhost" 
+                                      frameborder="0" 
+                                      allowfullscreen="true" 
+                                      scrolling="no" 
+                                      height="365" 
+                                      width="700">
+                                  </iframe>
+                              </a>    
+                          </div>
+                          <?php
+                      } else {
+
+                      }
+                  }
+              } else {
+                  echo "No tournament data found.";
+              }
+          ?>
+
+
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-              <h1>Latest News</h1>
-                <iframe width="700" height="365" src="https://www.youtube.com/embed/ColfvV3PGvc?si=tDtjUanZC0PMu136" 
-                title="Dota 2 The International 2024" frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen></iframe>
-              </a>	
-            </div>       
-            <div class="s-12 m-6">
-              <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
-                <!-- YouTube Video Embed -->
-              <h1>Latest News</h1>
+              <h1>Games Highlights</h1>
                 <iframe width="700" height="365" src="https://www.youtube.com/embed/u1oqfdh4xBY?si=vhWBHZT9TCSuW0Mi" 
                 title="Pubg Tournaments" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -222,7 +355,7 @@ $conn->close();
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-              <h1>Latest News</h1>
+              <h1>Games Highlights</h1>
                 <iframe width="700" height="365" src="https://www.youtube.com/embed/oq2Rz2I11l0?si=SMtxcxt0eeu_LMoK" 
                 title="Free Fire Tournament" frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -232,7 +365,7 @@ $conn->close();
             <div class="s-12 m-6">
               <a class="image-with-hover-overlay image-hover-zoom margin-bottom">
                 <!-- YouTube Video Embed -->
-              <h1>Latest News</h1>
+              <h1>Games Highlights</h1>
                 <iframe width="700" height="365" src="https://www.youtube.com/embed/4N3xwEtLpu0?si=t__WCvNzt33pjJZi&amp;start=10" 
                 title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; 
                 gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>

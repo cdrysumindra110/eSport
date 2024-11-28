@@ -28,7 +28,7 @@ if ($stmt_uname) {
     if ($stmt_uname->fetch()) {
         $_SESSION['uname'] = $uname;
     } else {
-        $error_message = "Error: Username not found for the user ID.";
+        // $error_message = "Error: Username not found for the user ID.";
     }
     $stmt_uname->close();
 } else {
