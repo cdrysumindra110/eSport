@@ -578,7 +578,7 @@ if (!$isSignin) {
                   <div class="margin margin-bottom-30">
                     <div class="s-12 m-3 l-3">
                       <a class="image-hover-zoom margin-m-bottom-30" href="/">
-                        <img src="img/img-15.jpg" alt="">
+                        <img src="img/parallax-04.jpg" alt="">
                       </a>  
                     </div>
                     <div class="s-12 m-9 l-9">
