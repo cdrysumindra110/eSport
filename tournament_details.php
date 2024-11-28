@@ -158,7 +158,7 @@ $conn->close();
     display: flex;
     gap: 10px;
     margin-right: 20px;
-    position: relative; /* Needed for dropdown positioning */
+    position: relative; 
 }
 
 .operation-btn button {
@@ -170,7 +170,7 @@ $conn->close();
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
-    position: relative; /* Needed for dropdown positioning */
+    position: relative; 
 }
 
 .operation-btn button:hover {
@@ -182,7 +182,7 @@ $conn->close();
 }
 
 .operation-btn .options:hover {
-    color: black; /* Ensures consistency with hover color */
+    color: black; 
 }
 
 /* Dropdown menu styles */
@@ -199,7 +199,7 @@ $conn->close();
     margin: 0;
     width: 200px; /* Adjust as needed */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 10; /* Ensures dropdown appears above other content */
+    z-index: 10; 
 }
 
 .dropdown-menu li {
@@ -209,7 +209,7 @@ $conn->close();
 }
 
 .dropdown-menu li i {
-    margin-right: 8px; /* Space between icon and text */
+    margin-right: 8px; 
 }
 
 .dropdown-menu li:hover {
