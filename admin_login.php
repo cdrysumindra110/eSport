@@ -1,6 +1,6 @@
 <?php
-session_start(); // Start the session at the beginning
-include_once("config.php"); // Include your database connection file
+session_start(); 
+include_once("config.php"); 
 
 // Initialize messages
 $error_message = '';
@@ -8,39 +8,37 @@ $success_message = '';
 
 
 if (isset($_POST['email']) && isset($_POST['password'])) {
-    // Sanitize user inputs
+
     $email = htmlspecialchars(trim($_POST["email"]));
     $password = trim($_POST["password"]);
 
-    // Prepare the SQL statement using prepared statements
     $stmt = $conn->prepare("SELECT * FROM admin WHERE email = ? LIMIT 1");
-    $stmt->bind_param("s", $email); // 's' means string
+    $stmt->bind_param("s", $email); 
 
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Check if a user with that email exists
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        // Verify the password using password_verify (assuming passwords are hashed)
-        if (password_verify($password, $user['password'])) {
-            // Password is correct, start the session
-            $_SESSION['isLogin'] = true;
-            $_SESSION['user_id'] = $user['id']; // Optionally store user ID
-            $_SESSION['user_email'] = $user['email']; // Optionally store email
-            $_SESSION['message'] = 'Successfully logged in!'; // Store success message
 
-            // Redirect to the admin page
+        if (password_verify($password, $user['password'])) {
+
+            $_SESSION['isLogin'] = true;
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_email'] = $user['email']; 
+            $_SESSION['message'] = 'Successfully logged in!'; 
+
+
             header("Location: ./admin/admin.php");
-            exit();  // Stop further execution
+            exit();  
         } else {
-            // Invalid password
-            $_SESSION['message'] = "Invalid email or password!"; // Store error message
+          
+            $_SESSION['message'] = "Unauthorized Login!"; 
         }
     } else {
-        // No user found with the given email
-        $_SESSION['message'] = "Invalid email or password!"; // Store error message
+
+        $_SESSION['message'] = "Unauthorized Login!"; 
     }
 
     // Close the statement

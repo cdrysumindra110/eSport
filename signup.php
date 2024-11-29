@@ -262,12 +262,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       return;
     }
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      event.preventDefault();
-      showPopupMessage('Password must be at least 8 characters long, include one uppercase letter, one number, and one special character.', 'error');
-      return;
-    }
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./])[A-Za-z\d@$!%*?&./]{8,}$/;
+
+if (!passwordRegex.test(password)) {
+  event.preventDefault();
+  showPopupMessage('Password must be at least 8 characters long, and include one uppercase letter, one number, and one special character.', 'error');
+  return;
+}
+
+
   });
 </script>
 <script>
