@@ -2621,3 +2621,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
 // Close the database connection
 $conn->close();
 ?>
+
+
+
+
+                <!-- New Password -->
+                <div class="form-group hidden" id="passwordGroup">
+                  <label for="newPassword">New Password</label>
+                  <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group hidden" id="confirmPasswordGroup">
+                  <label for="confirmPassword">Confirm Password</label>
+                  <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+                  <div id="passwordError" class="error"></div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+                <?php
+session_start(); 
+include_once("config.php"); 
+
+// Initialize messages
+$error_message = '';
+$success_message = '';   
+
+
+if (isset($_POST['email']) && isset($_POST['password'])) {
+
+    $email = htmlspecialchars(trim($_POST["email"]));
+    $password = trim($_POST["password"]);
+
+    $stmt = $conn->prepare("SELECT * FROM admin WHERE email = ? LIMIT 1");
+    $stmt->bind_param("s", $email); 
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+
+        if (password_verify($password, $user['password'])) {
+
+            $_SESSION['isLogin'] = true;
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_email'] = $user['email']; 
+            $_SESSION['message'] = 'Successfully logged in!'; 
+
+
+            header("Location: ./admin/admin.php");
+            exit();  
+        } else {
+          
+            $_SESSION['message'] = "Unauthorized Login!"; 
+        }
+    } else {
+
+        $_SESSION['message'] = "Unauthorized Login!"; 
+    }
+
+    // Close the statement
+    $stmt->close();
+}
+?>

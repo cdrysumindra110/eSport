@@ -1,7 +1,7 @@
 <?php
 session_start(); 
 include_once("config.php"); 
-
+// admin1 is the password
 // Initialize messages
 $error_message = '';
 $success_message = '';   
@@ -45,6 +45,8 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
     $stmt->close();
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html>

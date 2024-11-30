@@ -8,16 +8,16 @@ $success_message = '';
 
 // Redirect if not logged in
 if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
-  header('Location: ../admin_login.php');
-  exit();
+    header('Location: ../admin_login.php');
+    exit();
 }
 
-$id = $_SESSION['admin_id']; // Fetch admin id from session (should be 1 for single admin)
+$id = $_SESSION['admin_id'] ?? 1;  // Or from the URL with $_GET['id']
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_email = $_POST['newEmail'] ?? null;
     $new_password = $_POST['newPassword'] ?? null;
-    $confirm_password = $_POST['confirmPassword'] ?? null;  // Confirm password for validation
+    $confirm_password = $_POST['confirmPassword'] ?? null;
     $errors = [];
 
     // Email validation and update
@@ -25,49 +25,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Invalid email format.";
         } else {
-            // Update email (no need to check for other admins since there is only one)
-            $stmt = $conn->prepare("UPDATE admin SET email = ? WHERE id = ?");
-            $stmt->bind_param("si", $new_email, $id);
-            if (!$stmt->execute()) {
-                $errors[] = "Failed to update email.";
+            // Check if email already exists
+            $stmt = $conn->prepare("SELECT id FROM admin WHERE email = ? AND id != ?");
+            $stmt->bind_param("si", $new_email, $id); // Exclude current admin
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                $errors[] = "This email is already in use.";
             }
             $stmt->close();
+
+            // Update email if no errors
+            if (empty($errors)) {
+                $stmt = $conn->prepare("UPDATE admin SET email = ? WHERE id = ?");
+                $stmt->bind_param("si", $new_email, $id);
+                if (!$stmt->execute()) {
+                    $errors[] = "Failed to update email.";
+                }
+                $stmt->close();
+            }
         }
     }
 
     // Password validation and update
     if ($new_password) {
-        if ($new_password !== $confirm_password) {
-            $errors[] = "Passwords do not match.";
-        } elseif (strlen($new_password) < 6) {
-            $errors[] = "Password must be at least 6 characters.";
-        } else {
-            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE admin SET password = ? WHERE id = ?");
-            $stmt->bind_param("si", $hashed_password, $id);
-            if (!$stmt->execute()) {
-                $errors[] = "Failed to update password.";
-            }
-            $stmt->close();
+        // Password update
+        if ($new_password) {
+          $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+          $stmt = $conn->prepare("UPDATE admin SET password = ? WHERE id = ?");
+          $stmt->bind_param("si", $hashed_password, $id);
+          
+          if (!$stmt->execute()) {
+              $errors[] = "Failed to update password.";
+          }
+          $stmt->close();
         }
     }
 
     // Provide success or error message
     if (empty($errors)) {
-      $success_message = "Admin details updated successfully!";
+        $success_message = "Admin details updated successfully!";
+        header('Location: ../admin_login.php');
+        exit();
     } else {
         $error_message = implode("<br>", $errors);
     }
 } else {
-    // Fetch existing details
-    $stmt = $conn->prepare("SELECT email FROM admin WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->bind_result($email);
-    $stmt->fetch();
-    $stmt->close();
+// Fetch existing email
+$email = ''; // Initialize the $email variable
+$stmt = $conn->prepare("SELECT email FROM admin WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$stmt->bind_result($email);
+$stmt->fetch();
+$stmt->close();
+
+// Check if the email is empty
+if (empty($email)) {
+    echo "No email found for this ID.";
+}
+
 }
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -79,19 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="./css/admin.css">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f9fa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-
   .form-container {
     max-width: 500px;
+    /* width: 70%; */
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -251,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <li>
               <a href="../admin/contents.php">
-                <svg class=""><use xlink:href="#icon-tour_reg"></use></svg>
+              <svg class="icon icon-bullhorn"><use xlink:href="#icon-bullhorn"></use></svg>
                 <span>Contents</span>
               </a>
             </li>
@@ -305,39 +316,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <!-- Setting Management Section -->
           <section id="Setting">
             <div class="main-content">
-              <h1>Admin Control pannel</h1>
-            </div>
-            <div class="form-container">
+                <h1>Admin Control pannel</h1>
+                <div class="form-container">
               <h2>Update Admin Details</h2>
               <div class="options">
                 <div class="option active" data-target="emailGroup">Update Email</div>
                 <div class="option" data-target="passwordGroup">Update Password</div>
               </div>
-              <form id="updateForm" method="POST" action="settings.php">
-                <!-- Email Update Group -->
-                <div class="form-group" id="emailGroup">
-                  <label for="currentEmail">Existing Email</label>
-                  <input type="text" id="currentEmail" name="currentEmail" value="<?php echo htmlspecialchars($email); ?>" placeholder="Enter your current email" readonly>
-                  <label for="newEmail">New Email</label>
-                  <input type="text" id="newEmail" name="newEmail" placeholder="Enter new email">
-                </div>
+              <form id="updateForm" method="POST" action="settings.php" onsubmit="return validatePassword()">
+                  <!-- Email Update Group -->
+                  <div class="form-group" id="emailGroup">
+                      <label for="currentEmail">Existing Email</label>
+                      <input type="text" id="currentEmail" name="currentEmail" value="<?php echo htmlspecialchars($email); ?>" readonly>
+                      <label for="newEmail">New Email</label>
+                      <input type="text" id="newEmail" name="newEmail" placeholder="Enter new email">
+                  </div>
 
-                <!-- Password Update Group -->
-                <div class="form-group hidden" id="passwordGroup">
-                  <label for="newPassword">New Password</label>
-                  <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
-                  <label for="confirmPassword">Confirm Password</label>
-                  <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
-                  <div id="passwordError" class="error hidden">Passwords do not match.</div>
-                </div>
+                  <!-- Password Update Group -->
+                  <div class="form-group hidden" id="passwordGroup">
+                      <label for="newPassword">New Password</label>
+                      <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
+                      <label for="confirmPassword">Confirm Password</label>
+                      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+                      <div id="passwordError" class="error hidden">Passwords do not match.</div>
+                  </div>
 
-                <!-- Single Submit Button -->
-                <button type="submit" class="btn">Update</button>
+                  <!-- Single Submit Button -->
+                  <button type="submit" class="btn">Update</button>
+                  <div id="errorMessages"></div>
+                  <!-- Error and Success Messages -->
+                  <?php if ($error_message): ?>
+                      <div class="error"><?php echo $error_message; ?></div>
+                  <?php endif; ?>
+                  <?php if ($success_message): ?>
+                      <div class="success"><?php echo $success_message; ?></div>
+                  <?php endif; ?>
               </form>
+            </div>
             </div>
           </section>
         </section>
-  
+
 
 
         <!-- <footer class="page-footer">
@@ -825,6 +844,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <path d="M30 19l-9 9-3-3-2 2 5 5 11-11z"></path>
         <path d="M14 24h10v-3.598c-2.101-1.225-4.885-2.066-8-2.321v-1.649c2.203-1.242 4-4.337 4-7.432 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h14v-2z"></path>
         </symbol>
+        <symbol id="icon-bullhorn" viewBox="0 0 32 32">
+        <path d="M32 13.414c0-6.279-1.837-11.373-4.109-11.413 0.009-0 0.018-0.001 0.027-0.001h-2.592c0 0-6.088 4.573-14.851 6.367-0.268 1.415-0.438 3.102-0.438 5.047s0.171 3.631 0.438 5.047c8.763 1.794 14.851 6.367 14.851 6.367h2.592c-0.009 0-0.018-0.001-0.027-0.001 2.272-0.040 4.109-5.134 4.109-11.413zM27.026 23.102c-0.293 0-0.61-0.304-0.773-0.486-0.395-0.439-0.775-1.124-1.1-1.979-0.727-1.913-1.127-4.478-1.127-7.223s0.4-5.309 1.127-7.223c0.325-0.855 0.705-1.54 1.1-1.979 0.163-0.182 0.48-0.486 0.773-0.486s0.61 0.304 0.773 0.486c0.395 0.439 0.775 1.124 1.1 1.979 0.727 1.913 1.127 4.479 1.127 7.223s-0.4 5.309-1.127 7.223c-0.325 0.855-0.705 1.54-1.1 1.979-0.163 0.181-0.48 0.486-0.773 0.486zM7.869 13.414c0-1.623 0.119-3.201 0.345-4.659-1.48 0.205-2.779 0.323-4.386 0.323-2.096 0-2.096 0-2.096 0l-1.733 2.959v2.755l1.733 2.959c0 0 0 0 2.096 0 1.606 0 2.905 0.118 4.386 0.323-0.226-1.458-0.345-3.036-0.345-4.659zM11.505 20.068l-4-0.766 2.558 10.048c0.132 0.52 0.648 0.782 1.146 0.583l3.705-1.483c0.498-0.199 0.698-0.749 0.444-1.221l-3.853-7.161zM27.026 17.148c-0.113 0-0.235-0.117-0.298-0.187-0.152-0.169-0.299-0.433-0.424-0.763-0.28-0.738-0.434-1.726-0.434-2.784s0.154-2.046 0.434-2.784c0.125-0.33 0.272-0.593 0.424-0.763 0.063-0.070 0.185-0.187 0.298-0.187s0.235 0.117 0.298 0.187c0.152 0.169 0.299 0.433 0.424 0.763 0.28 0.737 0.434 1.726 0.434 2.784s-0.154 2.046-0.434 2.784c-0.125 0.33-0.272 0.593-0.424 0.763-0.063 0.070-0.185 0.187-0.298 0.187z"></path>
+        </symbol>
     </svg>
 
     <script src="../admin/js/admin.js?ver=1.0"></script>
@@ -855,43 +877,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Toggle between email and password update
     options.forEach(option => {
-      option.addEventListener('click', () => {
-        // Switch the active option
-        document.querySelector('.option.active').classList.remove('active');
-        option.classList.add('active');
+        option.addEventListener('click', () => {
+            // Switch the active option
+            document.querySelector('.option.active').classList.remove('active');
+            option.classList.add('active');
 
-        // Show the correct form section
-        document.querySelectorAll('.form-group').forEach(group => {
-          group.classList.add('hidden');
+            // Show the correct form section
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.add('hidden');
+            });
+            const targetId = option.dataset.target;
+            document.getElementById(targetId).classList.remove('hidden');
         });
-        const targetId = option.dataset.target;
-        document.getElementById(targetId).classList.remove('hidden');
-      });
     });
 
     const form = document.getElementById('updateForm');
     form.addEventListener('submit', event => {
-      const newPassword = document.getElementById('newPassword');
-      const confirmPassword = document.getElementById('confirmPassword');
-      passwordError.classList.add('hidden');
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        passwordError.classList.add('hidden');
 
-      // Password validation: only if password section is visible
-      if (!newPassword.classList.contains('hidden') && newPassword.value !== confirmPassword.value) {
-        passwordError.classList.remove('hidden');
-        event.preventDefault();
-      }
-
-      // Optionally add email validation here if you need it
-      const newEmail = document.getElementById('newEmail');
-      if (!newEmail.classList.contains('hidden') && newEmail.value) {
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(newEmail.value)) {
-          alert("Please enter a valid email address.");
-          event.preventDefault();
+        // Password validation: only if password section is visible
+        if (!newPassword.classList.contains('hidden') && newPassword.value !== confirmPassword.value) {
+            passwordError.classList.remove('hidden');
+            event.preventDefault();
         }
-      }
+
+        // Optionally add email validation here if you need it
+        const newEmail = document.getElementById('newEmail');
+        if (!newEmail.classList.contains('hidden') && newEmail.value) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(newEmail.value)) {
+                alert("Please enter a valid email address.");
+                event.preventDefault();
+            }
+        }
     });
-  });
+});
+
+function validatePassword() {
+    // Get references to the password group and error messages container
+    const passwordGroup = document.getElementById("passwordGroup");
+    const errorMessages = document.getElementById("errorMessages");
+
+    // Clear previous error messages
+    errorMessages.innerHTML = "";
+
+    // If the password group is not visible, don't perform the validation
+    if (passwordGroup.classList.contains("hidden")) {
+        return true;  // Skip password validation
+    }
+
+    const newPassword = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    // Check if passwords match
+    if (newPassword !== confirmPassword) {
+        errorMessages.innerHTML = "Passwords do not match.";
+        return false;  // Prevent form submission
+    }
+
+    // Check password length
+    if (newPassword.length < 6) {
+        errorMessages.innerHTML = "Password must be at least 6 characters.";
+        return false;  // Prevent form submission
+    }
+
+    // If validation passes, allow the form to submit
+    return true;
+}
+
+
 </script>
 </body>
 </html>
