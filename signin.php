@@ -52,6 +52,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   $error_message = "Error: " . $conn->error;
               }
             }
+
+            if ($user['is_verified'] == 1) { // Check if the user's account is not verified
+              if ($stmt->affected_rows > 0) {
+                  $_SESSION['username'] = $uname;
+          
+                  $error_signin = "Your account is not verified. Please verify your email or contact support.";
+                  header("Location: signin.php?error_signin=" . urlencode($error_signin));
+                  exit();
+              } else {
+                  $error_message = "Error: " . $conn->error;
+              }
+          }
+          
           
             // If the account is not suspended, set session variables for the logged-in user
             $_SESSION['isSignin'] = true;

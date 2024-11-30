@@ -159,7 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="top-bar full-width hide-s hide-m">
         <div class="right">
             <a href="tel:080055544444444" class="text-white text-primary-hover">Phone : +977 8888888888 </a> 
-            <span class="sep text-white">|</span> <a href="mailto:info@InfiKnight.com" class="text-white text-primary-hover"><i ></i>Email : info@InfiKnight.com</a>
+            <span class="sep text-white">|</span> <a href="mailto:infiknightesports@gmail.com" class="text-white text-primary-hover"><i ></i>Email : infiknightesports@gmail.com</a>
         </div>  
       </div>    
       <!-- Top Navigation -->

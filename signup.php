@@ -57,13 +57,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $mail->isSMTP();
                         $mail->Host = 'smtp.gmail.com';  // Set the SMTP server to send through
                         $mail->SMTPAuth = true;
-                        $mail->Username = 'cdrysumindra2060@gmail.com';  // Your email address
-                        $mail->Password = 'rwiy dkal iizf ildc';  // Your email password (or app password)
+                        $mail->Username = 'infiknightesports@gmail.com';  // Your email address
+                        $mail->Password = 'mjbn ijjz ysel kkiz';  // Your email password (or app password) mjbn ijjz ysel kkiz
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
-
+                      //  cdrysumindra2060@gmail.com =  rwiy dkal iizf ildc   
                         // Recipients
-                        $mail->setFrom('cdrysumindra2060@gmail.com');
+                        $mail->setFrom('infiknightesports@gmail.com');
                         $mail->addAddress($email);
 
                         // Content
