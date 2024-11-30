@@ -149,12 +149,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
             </li>
             
             <!-- Registration Menu Section -->
-            <li>
+            <!-- <li>
               <a href="../admin/registrations.php">
                 <svg class="icon icon-tour_reg"><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Registration</span>
               </a>
-            </li>
+            </li> -->
 
             <li>
               <a href="../admin/disputes_message.php">
@@ -261,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
                             
                             <!-- The placeholder for the new image preview -->
                             <div id="new-image-preview" style="margin-top: 10px; display: none;">
-                                <img id="new-image" src="" alt="New Image" style="max-width: 100%; height: auto;">
+                                <img id="new-image" src="" alt="New Image" style="width: 100%; height: 300px; object-fit: cover; margin-top: 10px; display: none;">
                             </div>
                         </div>
                         <button type="submit" name="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Update News</button>

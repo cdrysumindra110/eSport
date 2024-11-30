@@ -11,6 +11,18 @@ $success_message = '';
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
+// Get the messages from the URL query string
+$success_message = isset($_GET['success_message']) ? $_GET['success_message'] : '';
+$error_message = isset($_GET['error_message']) ? $_GET['error_message'] : '';
+
+// Display success or error message
+if ($success_message) {
+    echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
+}
+
+if ($error_message) {
+    echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($error_message)."', 'error'); }</script>";
+}
 
 // Check if the user is logged in
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {

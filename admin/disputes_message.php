@@ -1,32 +1,69 @@
 <?php
-include('../config.php'); 
+include('../config.php');
 session_start();
 
 // Initialize messages
 $error_message = '';
 $success_message = '';
 
-// Redirect if not logged in
+// Ensure the user is authenticated
 if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
-  header('Location: ../admin_login.php');
-  exit;
+    header('Location: ../admin_login.php');
+    exit;
 }
 
-// Retrieve success/error messages from session
-if (isset($_SESSION['message'])) {
-    $success_message = $_SESSION['message'];
-    unset($_SESSION['message']);
-}
-
-if (isset($_SESSION['error_message'])) {
-    $error_message = $_SESSION['error_message'];
-    unset($_SESSION['error_message']);
-}
-
-// Fetch data from database
-$sql = "SELECT id, name, email, subject, message, submitted_at FROM contact";
+// Fetch messages from the database
+$sql = "SELECT * FROM contact ORDER BY submitted_at DESC"; // Add query to fetch messages
 $result = $conn->query($sql);
+
+if ($conn->error) {
+    $_SESSION['error_message'] = 'Database query error: ' . $conn->error;
+}
+
+// Check if the form was submitted correctly for deletion
+if (isset($_POST['delete'], $_POST['id']) && is_numeric($_POST['id'])) {
+    $id = intval($_POST['id']);
+
+    // Check the database connection
+    if (!$conn) {
+        $_SESSION['error_message'] = 'Database connection error.';
+        header('Location: disputes_message.php');
+        exit; // Ensure exit after redirection
+    }
+
+    // Prepare the SQL query
+    $sql = "DELETE FROM contact WHERE id = ?";
+
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param('i', $id); // 'i' indicates that the parameter is an integer
+
+        // Execute the statement
+        if ($stmt->execute()) {
+            $_SESSION['success_message'] = "Message deleted successfully."; // Use session for success messages
+        } else {
+            $_SESSION['error_message'] = "Error executing query: " . $stmt->error;
+        }
+
+        // Close the statement
+        $stmt->close();
+    } else {
+        $_SESSION['error_message'] = 'Database error: Could not prepare statement.';
+    }
+
+    // Close the connection
+    $conn->close();
+
+    // Redirect to the messages page with the appropriate message
+    header('Location: disputes_message.php');
+    exit; // Ensure no further code is executed after redirection
+}
 ?>
+
+<?php
+// Display success/error messages in a popup using JavaScript
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,12 +127,12 @@ $result = $conn->query($sql);
             </li>
             
             <!-- Registration Menu Section -->
-            <li>
+            <!-- <li>
               <a href="../admin/registrations.php">
                 <svg class="icon icon-tour_reg"><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Registration</span>
               </a>
-            </li>
+            </li> -->
 
             <li>
               <a href="../admin/disputes_message.php">
@@ -162,41 +199,54 @@ $result = $conn->query($sql);
             <div class="main-content">
               <h1>Dispute Management</h1>
             </div>
-            <div class="message <?= !empty($success_message) ? 'success' : (!empty($error_message) ? 'error' : '') ?>">
-        <?= !empty($success_message) ? $success_message : $error_message ?>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Subject</th>
-                <th>Message</th>
-                <th>Submitted At</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if ($result->num_rows > 0): ?>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['id']) ?></td>
-                        <td><?= htmlspecialchars($row['name']) ?></td>
-                        <td><?= htmlspecialchars($row['email']) ?></td>
-                        <td><?= htmlspecialchars($row['subject']) ?></td>
-                        <td><?= htmlspecialchars($row['message']) ?></td>
-                        <td><?= htmlspecialchars($row['submitted_at']) ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="6">No data available</td>
-                </tr>
-            <?php endif; ?>
-            <?php $conn->close(); ?>
-        </tbody>
-    </table>
-    </table>
+            <?php
+                // Display success/error messages
+                if (isset($_SESSION['success_message'])): ?>
+                    <div class="success-message"><?= $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['error_message'])): ?>
+                    <div class="error-message"><?= $_SESSION['error_message']; unset($_SESSION['error_message']); ?></div>
+                <?php endif; ?>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Submitted At</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($result->num_rows > 0): ?>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($row['id']) ?></td>
+                                    <td><?= htmlspecialchars($row['name']) ?></td>
+                                    <td><?= htmlspecialchars($row['email']) ?></td>
+                                    <td><?= htmlspecialchars($row['subject']) ?></td>
+                                    <td><?= htmlspecialchars($row['message']) ?></td>
+                                    <td><?= htmlspecialchars($row['submitted_at']) ?></td>
+                                    <td>
+                                        <form method="POST" action="disputes_message.php">
+                                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                            <button type="submit" name="delete" class="delete-btn">Delete</button>
+                                        </form>
+                                    </td> 
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7">No data available</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+
+                <?php $conn->close(); ?>
           </section>
         </section>
   
@@ -695,7 +745,13 @@ $result = $conn->query($sql);
         loader.style.display = "none";
     });
   </script>
-<script>
+    <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function() {
+                var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+                myModal.show();
+            }, 1000); // 1-second delay before modal appears
+        });
         // Display popup message when page loads
         document.addEventListener('DOMContentLoaded', function() {
             <?php if (isset($_SESSION['message'])): ?>
@@ -714,7 +770,7 @@ $result = $conn->query($sql);
                 popup.style.display = 'none';  // Hide the popup after 5 seconds
             }, 5000);
         }
-	</script>
+    </script>
 </body>
 </html>
 

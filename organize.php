@@ -113,7 +113,7 @@ if (!$isSignin) {
           <div class="line">
   
             <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-              Our Services
+              Games
             </h1>
           
           </div>

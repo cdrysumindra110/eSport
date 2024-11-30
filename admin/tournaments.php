@@ -156,12 +156,12 @@ $conn->close();
             </li>
             
             <!-- Registration Menu Section -->
-            <li>
+            <!-- <li>
               <a href="../admin/registrations.php">
                 <svg class="icon icon-tour_reg"><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Registration</span>
               </a>
-            </li>
+            </li> -->
 
             <li>
               <a href="../admin/disputes_message.php">

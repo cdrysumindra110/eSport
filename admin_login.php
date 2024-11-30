@@ -114,6 +114,11 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
         window.addEventListener("load", function () {
             loader.style.display = "none";
         })
+        window.history.forward();
+
+        setTimeout(() => {
+        window.history.forward();
+        }, 0);
     </script>
 </body>
 </html>

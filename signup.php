@@ -38,10 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $error_message = "Username already exists.";
                 }
             } else {
-                // Hash the password
+
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-                // Insert the new user
                 $stmt = $conn->prepare("INSERT INTO users (uname, email, password) VALUES (?, ?, ?)");
                 $stmt->bind_param("sss", $uname, $email, $hashed_password);
                 $stmt->execute();
@@ -57,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
 
-            // Close the statement and connection
+
             $stmt->close();
             $conn->close();
         }
@@ -118,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       cursor: pointer;
     }
     #toggle-icon {
-      font-size: 1rem;  /* Adjust the size as needed */
+      font-size: 1rem;  
     }
   </style>
 </head>
@@ -182,10 +181,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if (passwordField.type === "password") {
       passwordField.type = "text";
-      toggleButton.textContent = "🙈"; // Change to 'Hide' icon when visible
+      toggleButton.textContent = "🙈"; 
     } else {
       passwordField.type = "password";
-      toggleButton.textContent = "👁️"; // Change to 'Show' icon when hidden
+      toggleButton.textContent = "👁️"; 
     }
   }
 
@@ -264,13 +263,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./])[A-Za-z\d@$!%*?&./]{8,}$/;
 
-if (!passwordRegex.test(password)) {
-  event.preventDefault();
-  showPopupMessage('Password must be at least 8 characters long, and include one uppercase letter, one number, and one special character.', 'error');
-  return;
-}
-
-
+    if (!passwordRegex.test(password)) {
+      event.preventDefault();
+      showPopupMessage('Password must be at least 8 characters long, and include one uppercase letter, one number, and one special character.', 'error');
+      return;
+    }
   });
 </script>
 <script>
@@ -278,6 +275,11 @@ if (!passwordRegex.test(password)) {
     window.addEventListener("load", function () {
         loader.style.display = "none";
     });
+    // window.history.forward();
+
+    // setTimeout(() => {
+    // window.history.forward();
+    // }, 0);
   </script>
 </body>
 </html>

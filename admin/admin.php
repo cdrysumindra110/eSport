@@ -122,12 +122,12 @@ if (isset($_GET['delete_id'])) {
             </li>
             
             <!-- Registration Menu Section -->
-            <li>
+            <!-- <li>
               <a href="../admin/registrations.php">
                 <svg class="icon icon-tour_reg"><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Registration</span>
               </a>
-            </li>
+            </li> -->
 
             <li>
               <a href="../admin/disputes_message.php">
@@ -226,17 +226,22 @@ if (isset($_GET['delete_id'])) {
                                       )">
                                         <button class="view-btn">View</button>
                                   </a>
-
-
                                 <!-- Delete Button -->
                                 <a href="?delete_id=<?php echo $user['id']; ?>" onclick="return confirm('Are you sure you want to delete this user?')">
                                     <button class="delete-btn">Delete</button>
-                                </a>
+                                </a>&nbsp;&nbsp;
+                                <!-- Suspend/Unsuspend Button -->
+                                <button 
+                                    class="suspend-btn" 
+                                    id="status-btn-<?php echo $user['id']; ?>" 
+                                    onclick="toggleSuspend('<?php echo $user['id']; ?>', '<?php echo $user['is_suspended']; ?>')">
+                                    <?php echo $user['is_suspended'] ? 'Unsuspend' : 'Suspend'; ?>
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-            </table>
+              </table>
               <!-- Popup Container -->
               <div id="popup" class="popup-container" style="display: none;">
                 <div class="popup-content">
@@ -763,7 +768,29 @@ if (isset($_GET['delete_id'])) {
             }, 5000);
         }
 	</script>
-
+  <script>
+    function toggleSuspend(userId, isSuspended) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "toggle_suspend.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    const button = document.getElementById(`status-btn-${userId}`);
+                    const newStatus = response.is_suspended;
+                    button.textContent = newStatus ? "Unsuspend" : "Suspend";
+                    button.setAttribute("onclick", `toggleSuspend('${userId}', '${newStatus}')`);
+                } else {
+                    alert(response.message);
+                }
+            } else {
+                alert("Failed to update status. Please try again.");
+            }
+        };
+        xhr.send(`user_id=${userId}&is_suspended=${isSuspended}`);
+    }
+</script>
 </body>
 </html>
 

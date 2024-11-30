@@ -1,65 +1,87 @@
 <?php
-
 session_start();
-
-
 require_once 'config.php';
-
 
 $error_message = '';
 $success_message = '';
 
-
+// Check if the user is already logged in
 if (isset($_SESSION['username'])) {
     $uname = $_SESSION['username'];
 }
 
-
+// Show success message for signup
 if (isset($_GET['success_signup'])) {
     $success_message = htmlspecialchars($_GET['success_signup']);
     echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
 }
+if (isset($_GET['error_signin'])) {
+    $success_message = htmlspecialchars($_GET['error_signin']);
+    echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
+    // Escape input to prevent SQL injection
     $email = $conn->real_escape_string($email);
     $password = $conn->real_escape_string($password);
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    // Fetch user details from the database
+    $stmt = $conn->prepare("SELECT id, uname, password, is_suspended FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
- 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-  
+        // Verify the user's password first
         if (password_verify($password, $user['password'])) {
+            // Check if the account is suspended
+            if ($user['is_suspended'] == 1) {
+                if ($stmt->affected_rows > 0) {
+                  $_SESSION['username'] = $uname;
 
+                  $error_signin = "Your account has been suspended. Please contact support.";
+                  header("Location: signin.php?error_signin=" . urlencode($error_signin));
+                  exit();
+              } else {
+                  $error_message = "Error: " . $conn->error;
+              }
+            }
+          
+            // If the account is not suspended, set session variables for the logged-in user
             $_SESSION['isSignin'] = true;
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['uname'];
 
-            header("Location: dashboard.php?success_signin=" . urlencode("Successfully logged in!"));
-            exit();
+            if ($stmt->affected_rows > 0) {
+              $_SESSION['username'] = $uname;
+
+              $success_signin = "Successfully logged in!";
+              header("Location: dashboard.php?success_signin=" . urlencode($success_signin));
+              exit();
+          } else {
+              $error_message = "Error: " . $conn->error;
+          }
         } else {
-            
             $error_message = "Invalid email or password. Please try again.";
         }
     } else {
-        
-        $error_message = "User Not Registered, Please Signup.";
+        $error_message = "User not registered. Please sign up.";
     }
-
 
     $stmt->close();
 }
 
 $conn->close();
+
+// Handle error messages
+if (!empty($error_message)) {
+    echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($error_message)."', 'error'); }</script>";
+}
 ?>
 
 
@@ -222,6 +244,11 @@ document.getElementById('signUp').addEventListener('click', toggleContainerAndRe
     window.addEventListener("load", function () {
         loader.style.display = "none";
     });
+    window.history.forward();
+
+    setTimeout(() => {
+    window.history.forward();
+    }, 0);
   </script>
 </body>
 </html>

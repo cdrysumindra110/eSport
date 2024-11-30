@@ -152,12 +152,12 @@ if ($result->num_rows > 0) {
             </li>
             
             <!-- Registration Menu Section -->
-            <li>
+            <!-- <li>
               <a href="../admin/registrations.php">
                 <svg class="icon icon-tour_reg"><use xlink:href="#icon-tour_reg"></use></svg>
                 <span>Registration</span>
               </a>
-            </li>
+            </li> -->
 
             <li>
               <a href="../admin/disputes_message.php">
@@ -255,7 +255,7 @@ if ($result->num_rows > 0) {
                             <input type="file" name="image" id="image" class="form-control" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; transition: border-color 0.3s ease;" onchange="previewImage(event)">
                             <br>
                             <!-- Image preview section -->
-                            <img id="imagePreview" src="#" alt="Image Preview" style="max-width: 100%; margin-top: 10px; display: none;">
+                            <img id="imagePreview" src="#" alt="Image Preview" style="width: 100%; height: 300px; object-fit: cover; margin-top: 10px; display: none;">
                         </div>
                           <button type="submit" name="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Post News</button>
                       </form>
