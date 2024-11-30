@@ -1,9 +1,9 @@
 
 <?php 
-// Include the config file for database connection
+
 require_once 'config.php';
 
-// Start the session
+
 session_start();
 
 // Initialize messages
@@ -13,36 +13,33 @@ $success_message = '';
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
 
-// Check if a success signin message exists in the URL
 $success_message = '';
 if (isset($_GET['success_signin'])) {
     $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
 }
 
 
-// Check if a success message exists in the URL
 if (isset($_GET['success_message'])) {
     $success_message = htmlspecialchars(urldecode($_GET['success_message']));
 }
-//Error Message
+
 if (isset($_GET['error_message'])) {
   $error_message = htmlspecialchars(urldecode($_GET['error_message']));
 }
 
 
-// Check if the user is logged in
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     header('Location: signin.php');
     exit();
 }
 
-// Get the logged-in user ID
+
 if (!isset($_SESSION['user_id'])) {
     die("Error: User ID not set in session.");
 }
 
 $user_id = $_SESSION['user_id'];
-// Fetch current user data (cover photo and profile picture)
+
 $sql = "SELECT cover_photo, profile_pic FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('i', $user_id);

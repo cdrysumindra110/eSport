@@ -86,7 +86,7 @@ if (!$isSignin) {
                       <li><a href="signup.php">Signup</a></li>
                   <?php endif; ?>
               </ul>
-          </li>
+            </li>
           </li>
         </div>
       </nav>

@@ -1,48 +1,43 @@
-
 <?php 
-// Include the config file for database connection
+
 require_once 'config.php';
 
-// Start the session
 session_start();
 
-// Initialize messages
 $error_message = '';
 $success_message = '';
 
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
 
-// Check if a success signin message exists in the URL
 $success_message = '';
 if (isset($_GET['success_signin'])) {
     $success_message = htmlspecialchars(urldecode($_GET['success_signin']));
 }
 
 
-// Check if a success message exists in the URL
 if (isset($_GET['success_message'])) {
     $success_message = htmlspecialchars(urldecode($_GET['success_message']));
 }
-//Error Message
+
 if (isset($_GET['error_message'])) {
   $error_message = htmlspecialchars(urldecode($_GET['error_message']));
 }
 
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['isSignin']) || !$_SESSION['isSignin']) {
     header('Location: signin.php');
     exit();
 }
 
-// Get the logged-in user ID
+
 if (!isset($_SESSION['user_id'])) {
     die("Error: User ID not set in session.");
 }
 
 $user_id = $_SESSION['user_id'];
-// Fetch current user data (cover photo and profile picture)
+
 $sql = "SELECT cover_photo, profile_pic FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('i', $user_id);
@@ -55,7 +50,7 @@ if ($stmt->num_rows > 0) {
 } else {
     die("Error: User not found.");
 }
-// Fetch current email from the database
+
 $currentEmail = '';
 $stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
 if ($stmt === false) {
@@ -67,17 +62,17 @@ $stmt->bind_result($currentEmail);
 $stmt->fetch();
 $stmt->close();
 
-// Check if the form has been submitted
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
     $newEmail = filter_var($_POST['newEmail'], FILTER_SANITIZE_EMAIL);
 
-    // Validate the new email
+
     if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-        // Check if the new email is different from the current email
+
         if ($newEmail === $currentEmail) {
             $error_message = 'Cannot update same email address.';
         } else {
-            // Prepare and execute the update
+
             $stmt = $conn->prepare("UPDATE users SET email = ? WHERE id = ?");
             if ($stmt === false) {
                 die('Prepare failed: ' . $conn->error);
@@ -95,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
         $error_message = 'Invalid email format.';
     }
 
-    // Prepare query string for redirect
+
     $query_string = '';
     if (!empty($success_message)) {
         $query_string .= 'success_message=' . urlencode($success_message);
@@ -105,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
         $query_string .= 'error_message=' . urlencode($error_message);
     }
 
-    // Redirect the user back to the change email page with messages
+
     header('Location: change_email.php?' . $query_string);
     exit;
 }
@@ -148,9 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_email'])) {
       <div class="top-bar full-width hide-s hide-m">
         <div class="right">
             <a href="tel:080055544444444" class="text-white text-primary-hover">Phone : +977 8888888888 </a> 
-            <span class="sep text-white">|</span> <a href="mailto:
-infiknightesports@gmail.com" class="text-white text-primary-hover"><i ></i>Email : 
-infiknightesports@gmail.com</a>
+            <span class="sep text-white">|</span> <a href="mailto:infiknightesports@gmail.com" class="text-white text-primary-hover"><i ></i>Email : infiknightesports@gmail.com</a>
         </div>  
       </div>    
       <!-- Top Navigation -->
@@ -224,7 +217,7 @@ infiknightesports@gmail.com</a>
                         <input type="file" name="cover_photo" id="cover_photo" accept="image/*" onchange="loadCoverPhoto(event)" class="file-input" />
                         <label for="cover_photo" class="cover-photo-label">
                         </label>
-                        <!-- Display user's cover photo or default cover photo -->
+
                         <img id="coverPhoto" 
                             name="coverPhoto" 
                             src="<?php echo isset($cover_photo) && !empty($cover_photo) 
@@ -240,7 +233,7 @@ infiknightesports@gmail.com</a>
                     <label for="profile_pic" class="profile-pic-label">
                         <span class="icon-wrapper">
                     </label>
-                    <!-- Display user's profile picture or default profile picture -->
+
                     <img id="profilePic" 
                         name="profilePic" 
                         src="<?php echo isset($profile_pic) && !empty($profile_pic) 
@@ -373,18 +366,16 @@ infiknightesports@gmail.com</a>
   });
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Get all buttons in the button container
+
     const buttons = document.querySelectorAll('.btn-cnt');
   
     buttons.forEach(button => {
         button.addEventListener('click', function() {
-            // Remove 'active' class from all buttons
+
             buttons.forEach(btn => btn.classList.remove('active'));
-  
-            // Add 'active' class to the clicked button
+
             this.classList.add('active');
-  
-            // Determine the URL to redirect based on button ID
+
             let redirectUrl = '';
             switch (this.id) {
                 case 'walletBtn':
@@ -409,10 +400,9 @@ infiknightesports@gmail.com</a>
                     redirectUrl = 'logout.php';
                     break;
                 default:
-                    redirectUrl = 'dashboard.php'; // Default fallback URL
+                    redirectUrl = 'dashboard.php'; 
             }
   
-            // Redirect to the appropriate page
             window.location.href = redirectUrl;
         });
     });
@@ -439,9 +429,9 @@ function showPopupMessage(message, type) {
   } else if (type === 'error') {
     popup.classList.add('error');
   }
-  popup.style.display = 'block'; // Show the popup
+  popup.style.display = 'block'; 
   setTimeout(() => {
-    popup.style.display = 'none'; // Hide after 3 seconds
+    popup.style.display = 'none'; 
   }, 3000);
 }
 

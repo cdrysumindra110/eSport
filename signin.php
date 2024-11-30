@@ -2,7 +2,6 @@
 session_start();
 require_once 'config.php';
 
-
 $error_message = '';
 $success_message = '';
 
@@ -11,26 +10,23 @@ if (isset($_SESSION['username'])) {
     $uname = $_SESSION['username'];
 }
 
-// Show success message for signup
+// Display success/error messages
 if (isset($_GET['success_signup'])) {
     $success_message = htmlspecialchars($_GET['success_signup']);
     echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
 }
 if (isset($_GET['error_signin'])) {
-    $success_message = htmlspecialchars($_GET['error_signin']);
-    echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($success_message)."', 'success'); }</script>";
+    $error_message = htmlspecialchars($_GET['error_signin']);
+    echo "<script type='text/javascript'>window.onload = function() { showPopupMessage('".addslashes($error_message)."', 'error'); }</script>";
 }
 
+// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    // Escape input to prevent SQL injection
-    $email = $conn->real_escape_string($email);
-    $password = $conn->real_escape_string($password);
-
     // Fetch user details from the database
-    $stmt = $conn->prepare("SELECT id, uname, password, is_suspended FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, uname, password, is_suspended, is_verified FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -38,48 +34,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        // Verify the user's password first
+        // Verify the user's password
         if (password_verify($password, $user['password'])) {
             // Check if the account is suspended
             if ($user['is_suspended'] == 1) {
-                if ($stmt->affected_rows > 0) {
-                  $_SESSION['username'] = $uname;
+                $error_message = "Your account has been suspended. Please contact support.";
+            } elseif ($user['is_verified'] == 0) {
+                $error_message = "Your account is not verified. Please check your email.";
+            } else {
+                // Successful login
+                $_SESSION['isSignin'] = true;
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['uname'];
 
-                  $error_signin = "Your account has been suspended. Please contact support.";
-                  header("Location: signin.php?error_signin=" . urlencode($error_signin));
-                  exit();
-              } else {
-                  $error_message = "Error: " . $conn->error;
-              }
+                $success_message = "Successfully logged in!";
+                header("Location: dashboard.php?success_signin=" . urlencode($success_message));
+                exit();
             }
-
-            if ($user['is_verified'] == 1) { // Check if the user's account is not verified
-              if ($stmt->affected_rows > 0) {
-                  $_SESSION['username'] = $uname;
-          
-                  $error_signin = "Your account is not verified. Please verify your email or contact support.";
-                  header("Location: signin.php?error_signin=" . urlencode($error_signin));
-                  exit();
-              } else {
-                  $error_message = "Error: " . $conn->error;
-              }
-          }
-          
-          
-            // If the account is not suspended, set session variables for the logged-in user
-            $_SESSION['isSignin'] = true;
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['uname'];
-
-            if ($stmt->affected_rows > 0) {
-              $_SESSION['username'] = $uname;
-
-              $success_signin = "Successfully logged in!";
-              header("Location: dashboard.php?success_signin=" . urlencode($success_signin));
-              exit();
-          } else {
-              $error_message = "Error: " . $conn->error;
-          }
         } else {
             $error_message = "Invalid email or password. Please try again.";
         }
