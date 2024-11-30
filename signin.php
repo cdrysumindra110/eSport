@@ -2,6 +2,7 @@
 session_start();
 require_once 'config.php';
 
+
 $error_message = '';
 $success_message = '';
 
@@ -148,7 +149,7 @@ if (!empty($error_message)) {
       <form action="signin.php" method="post">
         <h1>Sign in</h1>
         <div class="social-container">
-          <a class="social-icon" id="google-signin" title="Sign with Google"><i class="fab fa-google"></i></a>
+          <a href="<?= $url ?>" class="social-icon" id="google-signin" title="Sign with Google"><i class="fab fa-google"></i></a>
           <a class="social-icon" id="facebook-signin" title="Sign with Facebook"><i class="fab fa-facebook-f"></i></a>
           <a class="social-icon" id="twitch-signin" title="Sign with Twitch"><i class="fab fa-twitch"></i></a>
           <a class="social-icon" id="discord-signin" title="Sign with Discord"><i class="fab fa-discord"></i></a>

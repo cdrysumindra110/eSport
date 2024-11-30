@@ -1,14 +1,15 @@
 <?php
-
 session_start();
-
 include_once('config.php');
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
 
 $error_message = '';
 $success_signup = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
     $uname = $_POST['uname'];
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -38,24 +39,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $error_message = "Username already exists.";
                 }
             } else {
-
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-                $stmt = $conn->prepare("INSERT INTO users (uname, email, password) VALUES (?, ?, ?)");
-                $stmt->bind_param("sss", $uname, $email, $hashed_password);
+                // Generate a verification token
+                $verify_token = md5(rand() . time());
+
+                $stmt = $conn->prepare("INSERT INTO users (uname, email, password, verify_token) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("ssss", $uname, $email, $hashed_password, $verify_token);
                 $stmt->execute();
 
                 if ($stmt->affected_rows > 0) {
-                    $_SESSION['username'] = $uname;
+                    // Send the verification email using PHPMailer
+                    $mail = new PHPMailer(true);
 
-                    $success_signup = "Account created successfully!";
-                    header("Location: signin.php?success_signup=" . urlencode($success_signup));
-                    exit();
+                    try {
+                        // Server settings
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';  // Set the SMTP server to send through
+                        $mail->SMTPAuth = true;
+                        $mail->Username = 'cdrysumindra2060@gmail.com';  // Your email address
+                        $mail->Password = 'rwiy dkal iizf ildc';  // Your email password (or app password)
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port = 587;
+
+                        // Recipients
+                        $mail->setFrom('cdrysumindra2060@gmail.com');
+                        $mail->addAddress($email);
+
+                        // Content
+                        $mail->isHTML(true);
+                        $mail->Subject = 'Email Verification';
+                        $mail->Body    = 'Please click the following link to verify your email address: 
+                        <a href="http://localhost/esport/verify.php?token=' . $verify_token . '">Verify Email</a>';
+
+                        // Send the email
+                        $mail->send();
+                        $success_signup = "Account created successfully! Please check your email for verification.";
+                        header("Location: signin.php?success_signup=" . urlencode($success_signup));
+                        exit();
+                    } catch (Exception $e) {
+                        $error_message = "Error sending verification email: " . $mail->ErrorInfo;
+                    }
                 } else {
                     $error_message = "Error: " . $conn->error;
                 }
             }
-
 
             $stmt->close();
             $conn->close();
@@ -63,7 +91,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 
 
 <!DOCTYPE html>
