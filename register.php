@@ -106,6 +106,17 @@ function checkSlotsFull($tournament_id, $match_type) {
     return $current_count >= $max_slots;
 }
 
+// Function to handle file upload
+function uploadFile($input_name) {
+    if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] == 0) {
+        $target_dir = "uploads/";
+        $file_path = $target_dir . basename($_FILES[$input_name]["name"]);
+        if (move_uploaded_file($_FILES[$input_name]["tmp_name"], $file_path)) {
+            return $file_path;
+        }
+    }
+    return null;
+}
 
 // Handle form data when the form is submitted via POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
