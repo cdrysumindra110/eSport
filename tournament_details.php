@@ -11,71 +11,7 @@ if (!isset($_GET['tournament_id'])) {
     die("Error: Tournament ID not provided.");
 }
 
-$tournament_id = intval($_GET['tournament_id']); 
-$tournament = []; 
-$error_message = '';
 
-// Fetch tournament details
-$sql = "SELECT 
-            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
-            b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
-            b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
-            s.provider, s.channel_name, s.social_media, s.social_media_input
-        FROM tournaments t
-        LEFT JOIN brackets b ON t.id = b.tournament_id
-        LEFT JOIN streams s ON t.id = s.tournament_id
-        WHERE t.id = ?"; // Filter by tournament ID
-
-$stmt = $conn->prepare($sql);
-if ($stmt) {
-    $stmt->bind_param("i", $tournament_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $tournament = $result->fetch_assoc(); // Fetch the specific tournament details
-
-        // Assign variables from the $tournament array
-        $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
-        $sdate = $tournament['sdate'] ?? '';
-        $stime = $tournament['stime'] ?? '';
-        $bracket_type = $tournament['bracket_type'] ?? '';
-        $match_type = $tournament['match_type'] ?? '';
-        $about = $tournament['about'] ?? '';
-        $rules = $tournament['rules'] ?? '';
-        $prizes = $tournament['prizes'] ?? '';
-        $social_media_input = $tournament['social_media_input'] ?? '';
-        $bannerimg = $tournament['bannerimg'] ?? '';
-    } else {
-        $error_message = "No tournament found with that ID.";
-    }
-    $stmt->close();
-} else {
-    $error_message = "Error preparing the tournament detail statement: " . $conn->error;
-}
-
-// Handle tournament deletion
-if (isset($_POST['delete_tournament']) && $_POST['delete_tournament'] == 'yes') {
-    // Delete the tournament (and related data if needed)
-    $delete_sql = "DELETE FROM tournaments WHERE id = ?";
-    $stmt = $conn->prepare($delete_sql);
-    if ($stmt) {
-        $stmt->bind_param("i", $tournament_id);
-        $stmt->execute();
-        
-        if ($stmt->affected_rows > 0) {
-            $success_message = "Tournament deleted successfully.";
-            // Redirect to a confirmation page or back to the tournament list
-            header("Location: mytournaments.php?message=" . urlencode($success_message));
-            exit();
-        } else {
-            $error_message = "Error deleting tournament.";
-        }
-        $stmt->close();
-    } else {
-        $error_message = "Error preparing the delete statement: " . $conn->error;
-    }
-}
 
 // Handle participant/team removal
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove']) && $_POST['remove'] === 'yes') {
@@ -123,55 +59,148 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove']) && $_POST['
   }
 }
 
+$tournament_id = intval($_GET['tournament_id']);
+$tournament = [];
+$error_message = '';
+$slots_full_message = ''; // Variable to hold the slots full message
 
-// Fetch participants based on match type
-$participants = []; // Initialize array to hold participants
-if ($match_type == 'solo') {
-    $sql_participants = "SELECT player_name AS team_name, NULL AS logo_path, player_name AS players 
-                         FROM solo_registration 
-                         WHERE tournament_id = ?";
-} elseif ($match_type == 'duo') {
-    $sql_participants = "SELECT dr.team_name, dr.logo_path, GROUP_CONCAT(dp.ign) AS players 
-                         FROM duo_registration dr
-                         LEFT JOIN duo_players dp ON dr.duo_id = dp.duo_id
-                         WHERE dr.tournament_id = ? 
-                         GROUP BY dr.team_name, dr.logo_path";
-} elseif ($match_type == 'squad') {
-    $sql_participants = "SELECT sr.team_name, sr.logo_path, GROUP_CONCAT(sp.ign) AS players 
-                         FROM squad_registration sr
-                         LEFT JOIN squad_players sp ON sr.squad_id = sp.squad_id
-                         WHERE sr.tournament_id = ?
-                         GROUP BY sr.team_name, sr.logo_path";
-}
+// Fetch tournament details including creator name
+$sql = "SELECT 
+            t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
+            b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
+            b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
+            s.provider, s.channel_name, s.social_media, s.social_media_input,
+            u.uname AS creator_name  -- Use 'uname' for the creator's name
+        FROM tournaments t
+        LEFT JOIN brackets b ON t.id = b.tournament_id
+        LEFT JOIN streams s ON t.id = s.tournament_id
+        LEFT JOIN users u ON t.user_id = u.id  
+        WHERE t.id = ?";
 
-if (isset($sql_participants)) {
-    $stmt_participants = $conn->prepare($sql_participants);
-    if ($stmt_participants) {
-        $stmt_participants->bind_param("i", $tournament_id);
-        $stmt_participants->execute();
-        $result_participants = $stmt_participants->get_result();
-        while ($row = $result_participants->fetch_assoc()) {
-            // Explode the players if it's a CSV
-            if (!empty($row['players'])) {
-                $row['players'] = explode(',', $row['players']);
+$stmt = $conn->prepare($sql);
+if ($stmt) {
+    $stmt->bind_param("i", $tournament_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $tournament = $result->fetch_assoc(); // Fetch tournament details
+
+        // Assign variables from the $tournament array
+        $selected_game = $tournament['selected_game'] ?? 'Unknown Game';
+        $tname = $tournament['tname'] ?? 'Unknown Game';
+        $sdate = $tournament['sdate'] ?? '';
+        $stime = $tournament['stime'] ?? '';
+        $bracket_type = $tournament['bracket_type'] ?? '';
+        $match_type = $tournament['match_type'] ?? '';
+        $about = $tournament['about'] ?? '';
+        $rules = $tournament['rules'] ?? '';
+        $prizes = $tournament['prizes'] ?? '';
+        $social_media_input = $tournament['social_media_input'] ?? '';
+        $bannerimg = $tournament['bannerimg'] ?? '';
+        $creator_name = $tournament['creator_name'] ?? 'Unknown Creator'; // Get creator's name
+
+        // Initialize registered count variable
+        $registered_count = 0;
+
+        // Calculate registered teams/players based on match type
+        if ($match_type == 'solo') {
+            $sql_solo = "SELECT COUNT(*) AS registered FROM solo_registration WHERE tournament_id = ?";
+            $stmt_solo = $conn->prepare($sql_solo);
+            if ($stmt_solo) {
+                $stmt_solo->bind_param("i", $tournament_id);
+                $stmt_solo->execute();
+                $result_solo = $stmt_solo->get_result();
+                $row_solo = $result_solo->fetch_assoc();
+                $registered_count = $row_solo['registered'];
+                $total_teams = $tournament['solo_players'];
+                $registration_message = "Players Registered";
+                $stmt_solo->close(); // Close the statement here
             }
-            $participants[] = $row;
+        } elseif ($match_type == 'duo') {
+            $sql_duo = "SELECT COUNT(*) AS registered FROM duo_registration WHERE tournament_id = ?";
+            $stmt_duo = $conn->prepare($sql_duo);
+            if ($stmt_duo) {
+                $stmt_duo->bind_param("i", $tournament_id);
+                $stmt_duo->execute();
+                $result_duo = $stmt_duo->get_result();
+                $row_duo = $result_duo->fetch_assoc();
+                $registered_count = $row_duo['registered'];
+                $total_teams = $tournament['duo_teams'];
+                $registration_message = "Teams Registered";
+                $stmt_duo->close(); // Close the statement here
+            }
+        } elseif ($match_type == 'squad') {
+            $sql_squad = "SELECT COUNT(*) AS registered FROM squad_registration WHERE tournament_id = ?";
+            $stmt_squad = $conn->prepare($sql_squad);
+            if ($stmt_squad) {
+                $stmt_squad->bind_param("i", $tournament_id);
+                $stmt_squad->execute();
+                $result_squad = $stmt_squad->get_result();
+                $row_squad = $result_squad->fetch_assoc();
+                $registered_count = $row_squad['registered'];
+                $total_teams = $tournament['squad_teams'];
+                $registration_message = "Teams Registered";
+                $stmt_squad->close(); // Close the statement here
+            }
+        } else {
+            $registered_count = 0; // Default to 0 if the match type is invalid
+            $total_teams = 0; // Default total to 0
+            $registration_message = "Unknown Registration Type"; // Default message
         }
-        $stmt_participants->close();
+
+        // Check if the slots are full
+        if ($registered_count >= $total_teams) {
+            $slots_full_message = "Slots Full"; // Show this message if slots are full
+        }
+
+        // Display the teams/players-registered message
+        $teams_registered_message = "$registered_count / $total_teams $registration_message";
+
+        // Fetch registered participants
+        $participants = []; // Initialize an array to hold participants' details
+        if ($match_type == 'solo') {
+            $sql_participants = "SELECT player_name AS team_name, NULL AS logo_path 
+                                 FROM solo_registration 
+                                 WHERE tournament_id = ?";
+        } elseif ($match_type == 'duo') {
+            $sql_participants = "SELECT team_name, logo_path 
+                                 FROM duo_registration 
+                                 WHERE tournament_id = ?";
+        } elseif ($match_type == 'squad') {
+            $sql_participants = "SELECT team_name, logo_path 
+                                 FROM squad_registration 
+                                 WHERE tournament_id = ?";
+        }
+
+        if (isset($sql_participants)) {
+            $stmt_participants = $conn->prepare($sql_participants);
+            if ($stmt_participants) {
+                $stmt_participants->bind_param("i", $tournament_id);
+                $stmt_participants->execute();
+                $result_participants = $stmt_participants->get_result();
+                while ($row = $result_participants->fetch_assoc()) {
+                    $participants[] = $row;
+                }
+                $stmt_participants->close(); // Close this statement
+            } else {
+                $error_message = "Error preparing the participants query: " . $conn->error;
+            }
+        }
+
+        
+
     } else {
-        $error_message = "Error preparing the participants query: " . $conn->error;
+        $error_message = "No tournament found with that ID.";
     }
+    $stmt->close(); // Close the tournament detail statement
+} else {
+    $error_message = "Error preparing the tournament detail statement: " . $conn->error;
 }
 
 $conn->close();
 
-// Display error message if any
-if (!empty($error_message)) {
-    echo htmlspecialchars($error_message);
-}
 ?>
-
-
 
 
 
@@ -408,6 +437,31 @@ if (!empty($error_message)) {
   padding:10px 5px;
   border-bottom: 0.5px solid grey;
 }
+
+
+.gameuser {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; 
+    padding: 10px 0; 
+    font-size: 21px;
+}
+
+.gameuser .titlename {
+    color: aquamarine; 
+    margin: 0 5px; 
+    font-size: 24px;
+}
+
+
+.teams-registered {
+    font-size: 20px; 
+    color: #fff; 
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center; 
+}
     </style>
   </head>
 
@@ -520,9 +574,11 @@ if (!empty($error_message)) {
 
         <div class="gameuser">
             <p class="titlename"><?php echo htmlspecialchars($selected_game); ?></p>
-            Tournament By: 
-            <p class="titlename"><?php echo htmlspecialchars($_SESSION['uname']); ?></p>
+            Tournament By:
+            <p class="titlename"><?php echo htmlspecialchars($creator_name); ?></p>
         </div>
+        
+        <p class="teams-registered"><?php echo $teams_registered_message; ?></p>
     </div>
 
     <div class="tournament-details" id="tournament-details">
@@ -601,7 +657,7 @@ if (!empty($participants)) {
                 <span style="flex: 1; margin-left: 10px; font-weight: bold;"><?php echo $counter . ". " . htmlspecialchars($participant['team_name']); ?></span>
                 <!-- Remove Team Button -->
                 <button onclick="confirmRemove(<?php echo urlencode($tournament_id); ?>, '<?php echo $match_type; ?>', '<?php echo htmlspecialchars($participant['team_name']); ?>')">
-                    <i class='fa fa-play'></i> Remove Team
+                      <i class="fa fa-trash"></i> Remove Team
                 </button>
             </div>
 
