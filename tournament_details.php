@@ -77,8 +77,102 @@ if (isset($_POST['delete_tournament']) && $_POST['delete_tournament'] == 'yes') 
     }
 }
 
+// Handle participant/team removal
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove']) && $_POST['remove'] === 'yes') {
+  $tournament_id = $_POST['tournament_id']; // Tournament ID from the form
+  $team_name = $_POST['team_name']; // Team name from the form
+  $match_type = $_POST['match_type']; // Match type from the form
+
+  $sql_remove = '';
+  if ($match_type === 'solo') {
+      // Remove a solo player
+      $sql_remove = "DELETE FROM solo_registration WHERE tournament_id = ? AND player_name = ?";
+  } elseif ($match_type === 'duo') {
+      // Remove a duo team and its players
+      $sql_remove = "DELETE dr, dp 
+                     FROM duo_registration dr
+                     LEFT JOIN duo_players dp ON dr.duo_id = dp.duo_id
+                     WHERE dr.tournament_id = ? AND dr.team_name = ?";
+  } elseif ($match_type === 'squad') {
+      // Remove a squad team and its players
+      $sql_remove = "DELETE sr, sp 
+                     FROM squad_registration sr
+                     LEFT JOIN squad_players sp ON sr.squad_id = sp.squad_id
+                     WHERE sr.tournament_id = ? AND sr.team_name = ?";
+  }
+
+  if ($sql_remove) {
+      $stmt_remove = $conn->prepare($sql_remove);
+      if ($stmt_remove) {
+          // Bind parameters for tournament ID and team name
+          $stmt_remove->bind_param("is", $tournament_id, $team_name);
+          if ($stmt_remove->execute()) {
+              // $success_message = "Team successfully removed from the tournament.";
+              header("Location: mytournaments.php?success_message=Team removed successfully");
+              exit();
+
+          } else {
+              $error_message = "Error executing the removal query: " . $stmt_remove->error;
+              echo $error_message;
+          }
+          $stmt_remove->close();
+      } else {
+          $error_message = "Error preparing the removal query: " . $conn->error;
+          echo $error_message;
+      }
+  }
+}
+
+
+// Fetch participants based on match type
+$participants = []; // Initialize array to hold participants
+if ($match_type == 'solo') {
+    $sql_participants = "SELECT player_name AS team_name, NULL AS logo_path, player_name AS players 
+                         FROM solo_registration 
+                         WHERE tournament_id = ?";
+} elseif ($match_type == 'duo') {
+    $sql_participants = "SELECT dr.team_name, dr.logo_path, GROUP_CONCAT(dp.ign) AS players 
+                         FROM duo_registration dr
+                         LEFT JOIN duo_players dp ON dr.duo_id = dp.duo_id
+                         WHERE dr.tournament_id = ? 
+                         GROUP BY dr.team_name, dr.logo_path";
+} elseif ($match_type == 'squad') {
+    $sql_participants = "SELECT sr.team_name, sr.logo_path, GROUP_CONCAT(sp.ign) AS players 
+                         FROM squad_registration sr
+                         LEFT JOIN squad_players sp ON sr.squad_id = sp.squad_id
+                         WHERE sr.tournament_id = ?
+                         GROUP BY sr.team_name, sr.logo_path";
+}
+
+if (isset($sql_participants)) {
+    $stmt_participants = $conn->prepare($sql_participants);
+    if ($stmt_participants) {
+        $stmt_participants->bind_param("i", $tournament_id);
+        $stmt_participants->execute();
+        $result_participants = $stmt_participants->get_result();
+        while ($row = $result_participants->fetch_assoc()) {
+            // Explode the players if it's a CSV
+            if (!empty($row['players'])) {
+                $row['players'] = explode(',', $row['players']);
+            }
+            $participants[] = $row;
+        }
+        $stmt_participants->close();
+    } else {
+        $error_message = "Error preparing the participants query: " . $conn->error;
+    }
+}
+
 $conn->close();
+
+// Display error message if any
+if (!empty($error_message)) {
+    echo htmlspecialchars($error_message);
+}
 ?>
+
+
+
 
 
 <!DOCTYPE html>
@@ -445,7 +539,7 @@ $conn->close();
         </div>
 
         <div id="schedule" class="schedule" onclick="showContent('schedule')">
-            <span class="tour-title">Schedule</span>
+            <span class="tour-title">Participants</span>
         </div>
 
         <div id="contact" class="contact" onclick="showContent('contact')">
@@ -485,8 +579,50 @@ $conn->close();
         </div>
 
         <div class="content-container schedule-container" id="schedule-container">
-            <p class="content-title">Match Schedule</p>
+            <p class="content-title">Registered Teams</p>
             <p class="cont-title"> </p>
+            <?php
+if (!empty($participants)) {
+    $counter = 1; // Initialize the counter
+    foreach ($participants as $participant) {
+        ?>
+        <div style="margin-bottom: 20px; padding: 10px; border-bottom: 1px solid #ddd; border-radius: 5px; background: #282828;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <!-- Team Logo -->
+                <div class="small-banner" style="width: 40px; height: 40px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.2);">
+                    <?php
+                    $logo_path = !empty($participant['logo_path']) && file_exists('uploads/' . htmlspecialchars($participant['logo_path']))
+                                ? 'uploads/' . htmlspecialchars($participant['logo_path'])
+                                : 'uploads/dash-logo.png';
+                    echo '<img src="' . $logo_path . '" alt="Team Logo" style="width: 100%; height: 100%; object-fit: cover;">';
+                    ?>
+                </div>
+                <!-- Team Name -->
+                <span style="flex: 1; margin-left: 10px; font-weight: bold;"><?php echo $counter . ". " . htmlspecialchars($participant['team_name']); ?></span>
+                <!-- Remove Team Button -->
+                <button onclick="confirmRemove(<?php echo urlencode($tournament_id); ?>, '<?php echo $match_type; ?>', '<?php echo htmlspecialchars($participant['team_name']); ?>')">
+                    <i class='fa fa-play'></i> Remove Team
+                </button>
+            </div>
+
+            <!-- Players Row -->
+            <?php if (!empty($participant['players'])): ?>
+                <div style="display: flex; align-items: center; margin-left: 50px; gap: 10px; flex-wrap: wrap;">
+                    <?php foreach ($participant['players'] as $player): ?>
+                        <span style="background: #e0e0e0; padding: 5px 10px; border-radius: 20px; font-size: 14px;"><?php echo htmlspecialchars($player); ?></span>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+        $counter++; // Increment the counter
+    }
+} else {
+    echo "<p>No participants registered yet.</p>";
+}
+?>
+
+
         </div>
 
         <div class="content-container contact-container" id="contact-container">
@@ -678,6 +814,46 @@ function confirmDelete() {
         form.submit();
     }
 }
+</script>
+<script type="text/javascript">
+   function confirmRemove(tournamentId, matchType, teamName) {
+    if (confirm("Are you sure you want to remove the team from this tournament?")) {
+        // Create a form dynamically
+        var form = document.createElement("form");
+        form.method = "POST";
+        form.action = ""; // Submit to the same page
+
+        // Hidden input fields for tournament data
+        var inputTournamentId = document.createElement("input");
+        inputTournamentId.type = "hidden";
+        inputTournamentId.name = "tournament_id";
+        inputTournamentId.value = tournamentId;
+        form.appendChild(inputTournamentId);
+
+        var inputRemove = document.createElement("input");
+        inputRemove.type = "hidden";
+        inputRemove.name = "remove";
+        inputRemove.value = "yes"; // Custom field to indicate removal action
+        form.appendChild(inputRemove);
+
+        var inputMatchType = document.createElement("input");
+        inputMatchType.type = "hidden";
+        inputMatchType.name = "match_type";
+        inputMatchType.value = matchType;
+        form.appendChild(inputMatchType);
+
+        var inputTeamName = document.createElement("input");
+        inputTeamName.type = "hidden";
+        inputTeamName.name = "team_name";
+        inputTeamName.value = teamName;
+        form.appendChild(inputTeamName);
+
+        // Append form and submit
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
 </script>
 </body>
 </html>

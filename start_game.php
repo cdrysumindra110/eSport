@@ -136,7 +136,7 @@ $conn->close();
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            width: 100%;
+            width: 80%;
             max-width: 100%;
             margin: 0 auto;
             background-color: #f9f9f9;
@@ -294,8 +294,8 @@ $conn->close();
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
-            width: 48%;
-            margin-top: 10px;
+            width: 20%;
+            margin-top: 20px;
         }
 
         .start-btn {
@@ -388,21 +388,21 @@ $conn->close();
         </div>
       </nav>
     </header>
-    
+    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
+    background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
+    </div>
    <!-- MAIN -->
     <main role="main"> 
         <!-- Header -->
         <header class="section-head background-image" style="background-image:url(img/full_bg.jpg)">
             <div class="line">
               <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
-                Register Tournament
+                Start Tournament
               </h1>
             </div>
         </header>
     </main>
-    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
-    background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-    </div>
+
         <!-- Popup Message -->
         <div class="popup-message" id="popup-message"></div>
 <!-- ++++++++++++++++++++++++++++++++++++++++++++++Form containrerer+++++++++++++++++++++++++++++++++++ -->
@@ -425,7 +425,7 @@ $conn->close();
                 <input type="datetime-local" id="expire_time" name="expire_time" required>
             </div>
             <div class="form-group">
-                <button type="button" class="cancel-btn" onclick="window.history.back();">Cancel</button>
+                <button type="button" class="cancel-btn" onclick="window.history.back();">Cancel</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <button type="submit" value="submit" class="start-btn">Start Tournament</button>
             </div>
         </form>

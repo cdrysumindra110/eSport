@@ -140,6 +140,8 @@ if ($stmt) {
             }
         }
 
+        
+
     } else {
         $error_message = "No tournament found with that ID.";
     }

@@ -63,6 +63,7 @@ if ($stmt) {
     $error_message = "Error preparing the tournament statement: " . $conn->error;
 }
 
+
 $conn->close();
 ?>
 
@@ -227,7 +228,7 @@ $conn->close();
                                 <?php foreach ($tournaments as $tournament): ?>
                                     <div class="ut-container">
                                         <table class="ut-table">
-                                            <tr class="ut-row" onclick="window.location.href='tournament_details.php?tournament_id=<?php echo $tournament['id']; ?>'" style="cursor: pointer;">
+                                            <tr class="ut-row" data-id="<?php echo $tournament['id']; ?>" data-match-type="<?php echo htmlspecialchars($tournament['match_type']); ?>" onclick="redirectToDetails(this)" style="cursor: pointer;">
                                                 <td class="ut-table__cell ut-table__cell--first">
                                                     <div class="ut-image">
                                                         <?php if (!empty($tournament['bannerimg'])): ?>
@@ -458,7 +459,8 @@ function loadProfilePic(event) {
 <script>
 function redirectToDetails(row) {
     var tournamentId = row.getAttribute('data-id');
-    window.location.href = 'tournament_details.php?tournament_id=' + tournamentId;
+    var matchType = row.getAttribute('data-match-type');
+    window.location.href = 'tournament_details.php?tournament_id=' + tournamentId + '&match_type=' + matchType;
 }
 </script>
 <script>

@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     try {
                         // Server settings
                         $mail->isSMTP();
-                        $mail->Host = 'smtp.gmail.com';  // Set the SMTP server to send through
+                        $mail->Host = 'smtp.gmail.com';  
                         $mail->SMTPAuth = true;
                         $mail->Username = 'infiknightesports@gmail.com';  // Your email address
                         $mail->Password = 'mjbn ijjz ysel kkiz';  // Your email password (or app password) mjbn ijjz ysel kkiz

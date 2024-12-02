@@ -208,12 +208,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
       </nav>
     </header>
-    
+    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
+    background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
+    </div>
    <!-- MAIN -->
     <main role="main"> 
-        
         <!-- Header -->
-        <header class="section-head background-image" style="background-image:url(img/full_bg.jpg)">
+        <header class="section-head background-image" style="width: 100%; height: 100%; object-fit: cover;background-image:url(img/battleground.gif)">
             <div class="line">
               <h1 class="text-white text-s-size-30 text-m-size-40 text-l-size-50 text-size-70 headline">
                 Organize Tournament
@@ -222,9 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </header>
     </main>
 
-    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
-    background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-    </div>
+
     
         <!-- Popup Message -->
         <div class="popup-message" id="popup-message"></div>
