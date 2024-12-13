@@ -675,6 +675,12 @@ document.addEventListener('DOMContentLoaded', function() {
         loader.style.display = "none";
     });
   </script>
+  <script>
+    // Get today's date in the format YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
+
+    document.getElementById('sdate').setAttribute('min', today);
+</script>
 <!-- Accordian jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>

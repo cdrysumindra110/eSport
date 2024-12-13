@@ -675,6 +675,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 </script>
 <script>
+    // Get today's date in the format YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
+
+    document.getElementById('sdate').setAttribute('min', today);
+</script>
+<script>
     var loader = document.getElementById("preloader");
     window.addEventListener("load", function () {
         loader.style.display = "none";
