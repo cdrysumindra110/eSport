@@ -2,67 +2,58 @@
 include('../config.php');
 session_start();
 
-// Initialize messages
 $error_message = '';
 $success_message = '';
 
-// Ensure the user is authenticated
+
 if (!isset($_SESSION['isLogin']) || $_SESSION['isLogin'] !== true) {
     header('Location: ../admin_login.php');
     exit;
 }
 
-// Fetch messages from the database
-$sql = "SELECT * FROM contact ORDER BY submitted_at DESC"; // Add query to fetch messages
+$sql = "SELECT * FROM contact ORDER BY submitted_at DESC"; 
 $result = $conn->query($sql);
 
 if ($conn->error) {
     $_SESSION['error_message'] = 'Database query error: ' . $conn->error;
 }
 
-// Check if the form was submitted correctly for deletion
+
 if (isset($_POST['delete'], $_POST['id']) && is_numeric($_POST['id'])) {
     $id = intval($_POST['id']);
 
-    // Check the database connection
     if (!$conn) {
         $_SESSION['error_message'] = 'Database connection error.';
         header('Location: disputes_message.php');
-        exit; // Ensure exit after redirection
+        exit; 
     }
 
-    // Prepare the SQL query
+
     $sql = "DELETE FROM contact WHERE id = ?";
 
     if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param('i', $id); // 'i' indicates that the parameter is an integer
+        $stmt->bind_param('i', $id); 
 
-        // Execute the statement
+   
         if ($stmt->execute()) {
-            $_SESSION['success_message'] = "Message deleted successfully."; // Use session for success messages
+            $_SESSION['success_message'] = "Message deleted successfully."; 
         } else {
             $_SESSION['error_message'] = "Error executing query: " . $stmt->error;
         }
 
-        // Close the statement
         $stmt->close();
     } else {
         $_SESSION['error_message'] = 'Database error: Could not prepare statement.';
     }
 
-    // Close the connection
     $conn->close();
-
-    // Redirect to the messages page with the appropriate message
     header('Location: disputes_message.php');
-    exit; // Ensure no further code is executed after redirection
 }
 ?>
 
-<?php
-// Display success/error messages in a popup using JavaScript
-?>
+<?php 
 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -126,13 +117,6 @@ if (isset($_POST['delete'], $_POST['id']) && is_numeric($_POST['id'])) {
               </a>
             </li>
             
-            <!-- Registration Menu Section -->
-            <!-- <li>
-              <a href="../admin/registrations.php">
-                <svg class="icon icon-tour_reg"><use xlink:href="#icon-tour_reg"></use></svg>
-                <span>Registration</span>
-              </a>
-            </li> -->
 
             <li>
               <a href="../admin/disputes_message.php">
@@ -198,7 +182,6 @@ if (isset($_POST['delete'], $_POST['id']) && is_numeric($_POST['id'])) {
           <section id="disputes_message">
             <div class="main-content">
               <h1>Dispute Management</h1>
-            </div>
             <?php
                 // Display success/error messages
                 if (isset($_SESSION['success_message'])): ?>
@@ -211,20 +194,18 @@ if (isset($_POST['delete'], $_POST['id']) && is_numeric($_POST['id'])) {
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Subject</th>
-                            <th>Message</th>
-                            <th>Submitted At</th>
-                            <th>Options</th>
+                            <th>Dispute Message</th>
+                            <th>Submission Date & Time</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ($result->num_rows > 0): ?>
                             <?php while ($row = $result->fetch_assoc()): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($row['id']) ?></td>
                                     <td><?= htmlspecialchars($row['name']) ?></td>
                                     <td><?= htmlspecialchars($row['email']) ?></td>
                                     <td><?= htmlspecialchars($row['subject']) ?></td>
@@ -233,7 +214,7 @@ if (isset($_POST['delete'], $_POST['id']) && is_numeric($_POST['id'])) {
                                     <td>
                                         <form method="POST" action="disputes_message.php">
                                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                                            <button type="submit" name="delete" class="delete-btn">Delete</button>
+                                            <button type="submit" name="delete" class="view-btn">Resolve</button>
                                         </form>
                                     </td> 
                                 </tr>
@@ -247,6 +228,7 @@ if (isset($_POST['delete'], $_POST['id']) && is_numeric($_POST['id'])) {
                 </table>
 
                 <?php $conn->close(); ?>
+            </div>
           </section>
         </section>
   

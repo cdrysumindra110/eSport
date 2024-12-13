@@ -106,14 +106,14 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <!-- <link rel="stylesheet" href="./css/admin.css">   -->
+    <link rel="stylesheet" href="./css/admin.css?ver=1.0">  
     <link rel="stylesheet" href="./css/leaderboard.css?ver=1.0">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 <div id="preloader" style="background: #000 url(../img/loader.gif) no-repeat center center; 
-        background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-        </div>
+    background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
+</div>
 <div class="popup-message" id="popup-message"></div>
       <header class="page-header">
         <nav>
