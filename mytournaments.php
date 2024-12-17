@@ -33,36 +33,82 @@ if ($stmt_uname) {
 }
 
 // Fetch tournament data
+// Check for filtering criteria in GET parameters
+$selected_game = isset($_GET['selected_game']) ? $_GET['selected_game'] : '';
+$match_type = isset($_GET['match_type']) ? $_GET['match_type'] : '';
+$sdate = isset($_GET['sdate']) ? $_GET['sdate'] : '';
+
+// Base SQL query
 $sql = "SELECT 
             t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
             b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
             b.squad_teams, b.squad_players_per_team, b.rounds, b.placement, b.rules, b.prizes,
-            s.provider, s.channel_name, s.social_media, s.social_media_input
+            s.provider, s.channel_name, s.social_media, s.social_media_input,
+            u.uname AS host_username 
         FROM tournaments t
         LEFT JOIN brackets b ON t.id = b.tournament_id
         LEFT JOIN streams s ON t.id = s.tournament_id
-        WHERE t.user_id = ? 
-        ORDER BY t.id";
+        LEFT JOIN users u ON t.user_id = u.id
+        WHERE 1=1";
 
+// Apply filters to the query
+if (!empty($selected_game)) {
+    $sql .= " AND t.selected_game = ?";
+}
+
+if (!empty($match_type)) {
+    $sql .= " AND b.match_type = ?";
+}
+
+if (!empty($sdate)) {
+    $sql .= " AND t.sdate = ?";
+}
+
+// Add sorting order
+$sql .= " ORDER BY t.id";
+
+// Prepare the statement with possible filtering criteria
 $stmt = $conn->prepare($sql);
+
+// Bind parameters dynamically based on the filters
+$params = [];
+$types = ''; // Dynamic parameter types for bind_param
+
+if (!empty($selected_game)) {
+    $params[] = $selected_game;
+    $types .= 's'; // 's' for string
+}
+
+if (!empty($match_type)) {
+    $params[] = $match_type;
+    $types .= 's'; // 's' for string
+}
+
+if (!empty($sdate)) {
+    $params[] = $sdate;
+    $types .= 's'; // 's' for string
+}
+
+// Bind parameters to the prepared statement
+if (!empty($types)) {
+    $stmt->bind_param($types, ...$params);
+}
+
 if ($stmt) {
-    $stmt->bind_param("i", $user_id);
     $stmt->execute();
-    $result = $stmt->get_result();  // Use get_result for multiple rows
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Fetch all tournaments into an array
         while ($row = $result->fetch_assoc()) {
             $tournaments[] = $row;
         }
     } else {
-        $error_message = "No tournament data found.";
+        $error_message = "No tournaments found.";
     }
     $stmt->close();
 } else {
     $error_message = "Error preparing the tournament statement: " . $conn->error;
 }
-
 
 $conn->close();
 ?>
@@ -94,7 +140,94 @@ $conn->close();
 
 
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+    <style>
+          /* General Form Styling */
+          .filter-form {
+              font-family: Arial, sans-serif;
+              display: flex;
+              gap: 20px;
+              flex-wrap: wrap;
+          }
 
+          .filter-form div {
+              display: flex;
+              flex-direction: column;
+              position: relative;
+              margin-right: 10px;
+          }
+
+          .filter-form label {
+              font-size: 14px;
+              font-weight: bold;
+              color: white;
+              margin-bottom: 5px;
+              margin-right: 10px;
+          }
+
+          /* Input and Select Styles */
+          .filter-form select,
+          .filter-form input[type="date"] {
+              padding: 10px;
+              font-size: 14px;
+              border: 1px solid #ccc;
+              border-radius: 5px;
+              outline: none;
+              transition: all 0.3s ease;
+          }
+
+          .filter-form select:focus,
+          .filter-form input[type="date"]:focus {
+              border-color: #007BFF;
+              box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+          }
+
+          /* Button Styling */
+          .filter-form button {
+              padding: 10px 20px;
+              font-size: 14px;
+              color: #fff;
+              background-color: #007BFF;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              align-self: center;
+          }
+
+          .filter-form button:hover {
+              background-color: #0056b3;
+              transform: scale(1.05);
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+          }
+
+          /* Animations */
+          select, input {
+              animation: fadeInUp 0.6s ease;
+          }
+
+          @keyframes fadeInUp {
+              0% {
+                  opacity: 0;
+                  transform: translateY(10px);
+              }
+              100% {
+                  opacity: 1;
+                  transform: translateY(0);
+              }
+          }
+
+          /* Responsive Adjustments */
+          @media (max-width: 768px) {
+              .filter-form {
+                  flex-direction: column;
+                  gap: 15px;
+              }
+
+              .filter-form div {
+                  margin-right: 0;
+              }
+          }
+    </style>
   </head>
 
   <body class="size-1280 primary-color-red">
@@ -120,19 +253,7 @@ $conn->close();
         <div class="top-nav s-12 l-10">
           <ul class="right chevron">
             <li><a href="index.php">Home</a></li>
-           <li><a href="tournaments.php">Tournaments</a>
-              <ul>
-                <li><a href="#">Upcoming Tournaments</a>
-                  <ul class="game_container">
-                    <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
-                    <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
-                    <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
-                    <a href="tournaments.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
-                  </ul>
-              </li>
-                <li><a>Ongoing Tournaments</a></li>
-                </ul>
-            </li>
+            <li><a href="tournaments.php">Tournaments</a></li>
             <li><a href="news.php">News</a></li>
             <li><a href="our-services.php">Our Services</a></li>
              
@@ -203,7 +324,34 @@ $conn->close();
                 <h2 class="unique-header">Organized Tournaments</h2> 
                 <div class="ut-container">
                     <div class="ut-header">
-                        <a href="organize.php" class="ut-header__button"><i class="fas fa-plus" style="color: white;"></i> CREATE TOURNAMENTS</a>
+                      <form method="GET" action="" class="filter-form">
+                          <div style="display: inline-block; margin-right: 15px;">
+                              <label for="selected_game">Game:</label>
+                              <select name="selected_game" id="selected_game">
+                                  <option value="">All</option>
+                                  <option value="PUBG" <?php echo isset($_GET['selected_game']) && $_GET['selected_game'] == 'PUBG' ? 'selected' : ''; ?>>PUBG</option>
+                                  <option value="Call of Duty: Mobile" <?php echo isset($_GET['selected_game']) && $_GET['selected_game'] == 'Call of Duty: Mobile' ? 'selected' : ''; ?>>Call of Duty: Mobile</option>
+                                  <option value="Free Fire" <?php echo isset($_GET['selected_game']) && $_GET['selected_game'] == 'Free Fire' ? 'selected' : ''; ?>>Free Fire</option>
+                              </select>
+                          </div>
+                          <div style="display: inline-block; margin-right: 15px;">
+                              <label for="match_type">Match Type:</label>
+                              <select name="match_type" id="match_type">
+                                  <option value="">All</option>
+                                  <option value="solo" <?php echo isset($_GET['match_type']) && $_GET['match_type'] == 'solo' ? 'selected' : ''; ?>>Solo</option>
+                                  <option value="duo" <?php echo isset($_GET['match_type']) && $_GET['match_type'] == 'duo' ? 'selected' : ''; ?>>Duo</option>
+                                  <option value="squad" <?php echo isset($_GET['match_type']) && $_GET['match_type'] == 'squad' ? 'selected' : ''; ?>>Squad</option>
+                              </select>
+                          </div>
+                          <div style="display: inline-block; margin-right: 15px;">
+                              <label for="sdate">Date:</label>
+                              <input type="date" name="sdate" id="sdate" value="<?php echo isset($_GET['sdate']) ? htmlspecialchars($_GET['sdate']) : ''; ?>">
+                          </div>
+                          <div style="display: inline-block;">
+                              <button type="submit">FILTER</button>
+                          </div>
+                      </form>
+                      <a href="organize.php" class="ut-header__button"><i class="fas fa-plus" style="color: white;"></i> CREATE TOURNAMENTS</a>
                     </div>
                     <table class="ut-table">
                         <thead>

@@ -137,19 +137,7 @@ $conn->close();
         <div class="top-nav s-12 l-10">
           <ul class="right chevron">
             <li><a href="index.php">Home</a></li>
-           <li><a href="tournaments.php">Tournaments</a>
-              <ul>
-                <li><a href="#">Upcoming Tournaments</a>
-                  <ul class="game_container">
-                    <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
-                    <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
-                    <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
-                    <a href="tournaments.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
-                  </ul>
-              </li>
-                <li><a>Ongoing Tournaments</a></li>
-                </ul>
-            </li>
+            <li><a href="tournaments.php">Tournaments</a></li>
             <li><a href="news.php">News</a></li>
             <li><a href="our-services.php">Our Services</a></li>
              

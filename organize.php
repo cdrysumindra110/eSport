@@ -9,12 +9,11 @@ session_start();
 $isSignin = isset($_SESSION['isSignin']) ? $_SESSION['isSignin'] : false;
 
 if (!$isSignin) {
-  // Set an error message in the session
-  $_SESSION['error_message'] = 'Please login to access this page.';
-  // Redirect to the index page
-  header('Location: index.php');
+  $error_message = "Please Login to Access This Page!";
+  header("Location: index.php?error_signin=" . urlencode($error_message));
   exit();
 }
+
 ?>
 
 
