@@ -3667,3 +3667,64 @@ h1 {
   position: fixed;
   z-index: 100;
 }
+
+/* ----------------------------------------------------------Accordian CSS +++++++++++++++++++++++++++++++++++++ */
+
+        /* Accordion CSS */
+        .accordion {
+          max-width: 100%;
+          margin: 0 auto;
+      }
+      .accordion dd {
+          display: none;
+          padding: 30px;
+          border: 1px solid goldenrod;
+      }
+      .accordion dd:first-of-type {
+          display: block;
+      }
+      .accordion dt {
+          position: relative;
+          background-color: aliceblue;
+          box-shadow: 0 1px 4px 0 gray;
+          margin-top: 10px;
+          padding: 4px 10px;
+          cursor: pointer;
+          font-size: 18px;
+      }
+      .accordion dt:hover,
+      .accordion dt.expand {
+          background-color: darkcyan;
+          color: #fff;
+      }
+      .accordion dt span {
+          position: absolute;
+          left: 10px;
+      }
+      .accordion dt::before,
+      .accordion dt::after {
+          content: "";
+          display: inline-block;
+          width: 16px;
+          height: 3px;
+          background-color: #000;
+          position: absolute;
+          top: 50%;
+          right: 10px;
+          transform: translate(0, -50%);
+          transition: 0.3s;
+      }
+      .accordion dt::after {
+          width: 4px;
+          height: 16px;
+          right: 16px;
+      }
+      .accordion dt.expand::after {
+          right: 10px;
+          width: 16px;
+          height: 3px;
+      }
+      .accordion dt.expand::before,
+      .accordion dt.expand::after {
+          background-color: white;
+      }

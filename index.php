@@ -451,7 +451,7 @@ if (!$isSignin) {
               <h4 class="text-strong margin-bottom-10">Mohan Khatri</h4>                        
               <p class="margin-bottom-10 text-primary text-uppercase">CEO</p>                                                                                                                                          
               <div class="line">
-                <a href="/"><i class="icon-linked_in_circle text-primary-hover text-size-25"></i></a> <a href="/"><i class="icon-google_plus_circle text-primary-hover text-size-25"></i></a> <a href="/"><i class="icon-twitter_circle text-primary-hover text-size-25"></i></a>
+                <a href="#"><i class="icon-linked_in_circle text-primary-hover text-size-25"></i></a> <a href="#"><i class="icon-google_plus_circle text-primary-hover text-size-25"></i></a> <a href="#"><i class="icon-twitter_circle text-primary-hover text-size-25"></i></a>
               </div>                                                                                                                                                                                                                                          
             </div>                                                                                                                                                            
           </div> 
@@ -473,7 +473,7 @@ if (!$isSignin) {
               <h4 class="text-strong margin-bottom-10">Sumindra Chaudhary</h4>                        
               <p class="margin-bottom-10 text-primary text-uppercase">BOD</p>                                                                                                                                          
               <div class="line">
-                <a href="/"><i class="icon-linked_in_circle text-primary-hover text-size-25"></i></a> <a href="/"><i class="icon-google_plus_circle text-primary-hover text-size-25"></i></a> <a href="/"><i class="icon-twitter_circle text-primary-hover text-size-25"></i></a>
+                <a href="#"><i class="icon-linked_in_circle text-primary-hover text-size-25"></i></a> <a href="#"><i class="icon-google_plus_circle text-primary-hover text-size-25"></i></a> <a href="#"><i class="icon-twitter_circle text-primary-hover text-size-25"></i></a>
               </div>                                                                                                                                                                                                                                          
             </div>                                                                                                                                                                                                                                                                                                                                                                                    
           </div> 
@@ -624,11 +624,11 @@ if (!$isSignin) {
     <footer>
       <!-- Social -->
       <div class="background-primary padding text-center">
-        <a href="/"><i class="icon-facebook_circle text-size-30 text-white"></i></a> 
-        <a href="/"><i class="icon-twitter_circle text-size-30 text-white"></i></a>
-        <a href="/"><i class="icon-google_plus_circle text-size-30 text-white"></i></a>
-        <a href="/"><i class="icon-instagram_circle text-size-30 text-white"></i></a> 
-        <a href="/"><i class="icon-linked_in_circle text-size-30 text-white"></i></a>                                                                       
+        <a href="#"><i class="icon-facebook_circle text-size-30 text-white"></i></a> 
+        <a href="#"><i class="icon-twitter_circle text-size-30 text-white"></i></a>
+        <a href="#"><i class="icon-google_plus_circle text-size-30 text-white"></i></a>
+        <a href="#"><i class="icon-instagram_circle text-size-30 text-white"></i></a> 
+        <a href="#"><i class="icon-linked_in_circle text-size-30 text-white"></i></a>                                                                       
       </div>
       <!-- Animated Logos -->
       <div class="container-animated sticky" id="logo-container">

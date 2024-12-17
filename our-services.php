@@ -151,19 +151,18 @@ $conn->close();
               <i class="icon-sli-location-pin text-primary text-size-30 center"></i>
               <h2 class="text-size-20 margin-bottom-0 text-strong">Company Address</h2>                
               <p>
-                 Pradarshani Marga,<br>
+                 Exhibition Road,<br>
                  Kathmandu, Nepal
               </p> 
               
               <i class="icon-sli-envelope text-primary text-size-30 center margin-top-20"></i>
               <h2 class="text-size-20 margin-bottom-0 text-strong">E-mail</h2>                
-              <a class="text-primary-hover" href="mailto:contact@infiknight.com">contact@infiknight.com</a><section>
-              <a class="text-primary-hover" href="mailto:office@infiknight.com">office@infiknight.com</a>
+              <a class="text-primary-hover" href="mailto:infiknightesports@gmail.com">infiknightesports@gmail.com</a><section>
+              <a class="text-primary-hover" href="mailto:contact@infiknightesports.com">contact@infiknightesports.com</a>
               
               <i class="icon-sli-earphones-alt text-primary text-size-30 center margin-top-20"></i>
               <h2 class="text-size-20 margin-bottom-0 text-strong">Phone Numbers</h2>                
               <p>
-                +977 66666666<br>
                 +977 77777777<br>
                 +977 88888888
               </p> 
@@ -178,7 +177,7 @@ $conn->close();
         <!-- Section 3 -->
         <section class="section background-image" style="background-image:url(img/contact_bg.jpg)">
           <div class="s-12 m-12 l-4 center">
-            <h3 class="text-white text-size-30 margin-bottom-40 text-center">Contact Form</h3>
+            <h3 class="text-white text-size-60 margin-bottom-20 text-center">Contact Form</h3>
 
             <form id="contactForm" name="contactForm" class="customform text-white" method="post" enctype="multipart/form-data" action="our-services.php">
               <div class="line">
@@ -321,86 +320,86 @@ $conn->close();
       <img class="arrow-object" src="img/object-red.svg" alt="">
     </section>
    <!-- FOOTER -->
-   <footer>
-      <!-- Social -->
-      <div class="background-primary padding text-center">
-        <a href="/"><i class="icon-facebook_circle text-size-30 text-white"></i></a> 
-        <a href="/"><i class="icon-twitter_circle text-size-30 text-white"></i></a>
-        <a href="/"><i class="icon-google_plus_circle text-size-30 text-white"></i></a>
-        <a href="/"><i class="icon-instagram_circle text-size-30 text-white"></i></a> 
-        <a href="/"><i class="icon-linked_in_circle text-size-30 text-white"></i></a>                                                                       
-      </div>
-      <!-- Animated Logos -->
-      <div class="container-animated sticky" id="logo-container">
-        <div class="scrollable-container">
-          <button class="animated-btn left-button">&nbsp;&nbsp;&nbsp;&nbsp;We are Trusted By:&nbsp;&nbsp;&nbsp;&nbsp;</button>
-          <div class="logos">
-            <img src="img/logo/ESports.jpg" alt="Esports" class="image">
-            <img src="img/logo/amd.jpg" alt="AMD" class="image">
-            <img src="img/logo/redbull.jpg" alt="Red Bull" class="image">
-            <img src="img/logo/unicef.jpg" alt="UNICEF" class="image">
-            <img src="img/logo/tencent.jpg" alt="Tencent" class="image">
-            <img src="img/logo/KoHire.png" alt="KoHire" class="image">
-            <img src="img/logo/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
-            <img src="img/logo/Empyre.png" alt="Empyre" class="image">
-          </div>
-            <button onclick="window.location.href='our-services.php'" class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
+  <footer>
+    <!-- Social -->
+    <div class="background-primary padding text-center">
+      <a href="#"><i class="icon-facebook_circle text-size-30 text-white"></i></a> 
+      <a href="#"><i class="icon-twitter_circle text-size-30 text-white"></i></a>
+      <a href="#"><i class="icon-google_plus_circle text-size-30 text-white"></i></a>
+      <a href="#"><i class="icon-instagram_circle text-size-30 text-white"></i></a> 
+      <a href="#"><i class="icon-linked_in_circle text-size-30 text-white"></i></a>                                                                       
+    </div>
+    <!-- Animated Logos -->
+    <div class="container-animated sticky" id="logo-container">
+      <div class="scrollable-container">
+        <button class="animated-btn left-button">&nbsp;&nbsp;&nbsp;&nbsp;We are Trusted By:&nbsp;&nbsp;&nbsp;&nbsp;</button>
+        <div class="logos">
+          <img src="img/logo/ESports.jpg" alt="Esports" class="image">
+          <img src="img/logo/amd.jpg" alt="AMD" class="image">
+          <img src="img/logo/redbull.jpg" alt="Red Bull" class="image">
+          <img src="img/logo/unicef.jpg" alt="UNICEF" class="image">
+          <img src="img/logo/tencent.jpg" alt="Tencent" class="image">
+          <img src="img/logo/KoHire.png" alt="KoHire" class="image">
+          <img src="img/logo/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
+          <img src="img/logo/Empyre.png" alt="Empyre" class="image">
         </div>
+          <button onclick="window.location.href='our-services.php'" class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
       </div>
-      <section class="section background-dark">
-        <!-- Main Footer -->
-        <div class="line"> 
-          <div class="margin2x">
-            <div class="hide-s hide-m hide-l xl-2">
-              <img src="img/logo.png" alt="">
-            </div>
-            <div class="s-12 m-6 l-3 xl-3">
-               <h4 class="text-white text-strong">Our Mission</h4>
-               <p style="text-align: justify;">
-                To create a thriving esports ecosystem where players can showcase their skills, 
-                teams can compete at the highest level, and fans can experience the excitement 
-                of world-class gaming events.
-               </p>
-            </div>
-            <div class="s-12 m-6 l-3 xl-2">
-               <h4 class="text-white text-strong margin-m-top-30">Useful Links</h4> 
-               <a class="text-primary-hover" href="index.php">Home</a><br>
-               <a class="text-primary-hover" href="news.php">News</a><br>     
-               <a class="text-primary-hover" href="our-services.php">Contact Us</a><br>
-               <a class="text-primary-hover" href="about-us.php">About Us</a><br>
-            </div>
-            <div class="s-12 m-6 l-3 xl-2">
-               <h4 class="text-white text-strong margin-m-top-30">Term of Use</h4>
-               <a class="text-primary-hover" href="faq.php">FAQ</a><br>
-               <a class="text-primary-hover" href="privacy-policy.php">Privacy Policy</a><br>
-               <a class="text-primary-hover" href="disclaimer.php">Disclaimer</a>
-            </div>
-            <div class="s-12 m-6 l-3 xl-3">
-               <h4 class="text-white text-strong margin-m-top-30">Contact Us</h4>
-                <a class="text-primary-hover" href="tel:+977 8888888888"><i class="icon-sli-screen-smartphone text-primary"></i> +977 8888888888</a><br>
-                <a class="text-primary-hover" href="mailto:contact@InfiKnight.com"><i class="fa-solid fa-envelope text-primary"></i> contact@InfiKnight.com</a><br>
-                <a class="text-primary-hover" href="https://maps.app.goo.gl/QGesNa3t51KtP1Vt7"><i class="fa-solid fa-map-marker-alt text-primary"></i> Pradarshani Marg, Kathmandu 44600</a>
-            </div>
-          </div>  
-        </div>    
-      </section>
-      <div class="background-dark">
-        <hr class="break margin-top-bottom-0" style="border-color: #777;">
-      </div>
-      <!-- Bottom Footer -->
-      <section class="padding-2x background-dark full-width">
-        <div class="full-width">
-          <div class="s-12 l-6">
-            <p class="text-size-16 margin-bottom-0">Copyright 2024 &Sigma;Indra65 , MK38 - BCA 2K22</p>
-            <p class="text-size-12">Copyright 2024 InfiKnight Esports. All Rights Reserved.</p>
+    </div>
+    <section class="section background-dark">
+      <!-- Main Footer -->
+      <div class="line"> 
+        <div class="margin2x">
+          <div class="hide-s hide-m hide-l xl-2">
+            <img src="img/logo.png" alt="">
           </div>
-          <div class="s-12 l-6">
-            <a class="right text-size-12 text-primary-hover" href="#" title="Team InfiKnight">Developed by Team <span style="font-size: 25px;">&infin;</span>
-            </a>
+          <div class="s-12 m-6 l-3 xl-3">
+              <h4 class="text-white text-strong">Our Mission</h4>
+              <p style="text-align: justify;">
+              To create a thriving esports ecosystem where players can showcase their skills, 
+              teams can compete at the highest level, and fans can experience the excitement 
+              of world-class gaming events.
+              </p>
+          </div>
+          <div class="s-12 m-6 l-3 xl-2">
+              <h4 class="text-white text-strong margin-m-top-30">Useful Links</h4> 
+              <a class="text-primary-hover" href="index.php">Home</a><br>
+              <a class="text-primary-hover" href="news.php">News</a><br>     
+              <a class="text-primary-hover" href="our-services.php">Contact Us</a><br>
+              <a class="text-primary-hover" href="about-us.php">About Us</a><br>
+          </div>
+          <div class="s-12 m-6 l-3 xl-2">
+              <h4 class="text-white text-strong margin-m-top-30">Term of Use</h4>
+              <a class="text-primary-hover" href="faq.php">FAQ</a><br>
+              <a class="text-primary-hover" href="privacy-policy.php">Privacy Policy</a><br>
+              <a class="text-primary-hover" href="disclaimer.php">Disclaimer</a>
+          </div>
+          <div class="s-12 m-6 l-3 xl-3">
+              <h4 class="text-white text-strong margin-m-top-30">Contact Us</h4>
+              <a class="text-primary-hover" href="tel:+977 8888888888"><i class="icon-sli-screen-smartphone text-primary"></i> +977 8888888888</a><br>
+              <a class="text-primary-hover" href="mailto:contact@InfiKnight.com"><i class="fa-solid fa-envelope text-primary"></i> contact@InfiKnight.com</a><br>
+              <a class="text-primary-hover" href="https://maps.app.goo.gl/QGesNa3t51KtP1Vt7"><i class="fa-solid fa-map-marker-alt text-primary"></i> Pradarshani Marg, Kathmandu 44600</a>
           </div>
         </div>  
-      </section>
-    </footer>
+      </div>    
+    </section>
+    <div class="background-dark">
+      <hr class="break margin-top-bottom-0" style="border-color: #777;">
+    </div>
+    <!-- Bottom Footer -->
+    <section class="padding-2x background-dark full-width">
+      <div class="full-width">
+        <div class="s-12 l-6">
+          <p class="text-size-16 margin-bottom-0">Copyright 2024 &Sigma;Indra65 , MK38 - BCA 2K22</p>
+          <p class="text-size-12">Copyright 2024 InfiKnight Esports. All Rights Reserved.</p>
+        </div>
+        <div class="s-12 l-6">
+          <a class="right text-size-12 text-primary-hover" href="#" title="Team InfiKnight">Developed by Team <span style="font-size: 25px;">&infin;</span>
+          </a>
+        </div>
+      </div>  
+    </section>
+  </footer>
   <script type="text/javascript" src="js/responsee.js"></script>
   <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
   <script type="text/javascript" src="js/template-scripts.js"></script> 
