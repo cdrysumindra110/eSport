@@ -143,7 +143,6 @@ if (isset($_GET['error_signin'])) {
         
         <div class="item">
           <div class="s-12 center">
-            <!-- For ZOOM effect add classes "background-image-zoom-out" or "background-image-zoom-in" -->
             <div class="section background-image-zoom-out">
               <!-- ZOOMED Carousel Image -->
               <div class="background-image background-image-object" style="background-image:url(img/carousel-03.jpg)"></div>
