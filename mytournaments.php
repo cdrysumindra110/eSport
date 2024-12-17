@@ -32,7 +32,6 @@ if ($stmt_uname) {
     $error_message = "Error preparing the statement: " . $conn->error;
 }
 
-
 $selected_game = isset($_GET['selected_game']) ? $_GET['selected_game'] : '';
 $match_type = isset($_GET['match_type']) ? $_GET['match_type'] : '';
 $sdate = isset($_GET['sdate']) ? $_GET['sdate'] : '';
@@ -47,7 +46,7 @@ $sql = "SELECT
         LEFT JOIN brackets b ON t.id = b.tournament_id
         LEFT JOIN streams s ON t.id = s.tournament_id
         LEFT JOIN users u ON t.user_id = u.id
-        WHERE 1=1";
+        WHERE t.user_id = ?";  
 
 if (!empty($selected_game)) {
     $sql .= " AND t.selected_game = ?";
@@ -66,7 +65,9 @@ $sql .= " ORDER BY t.id";
 $stmt = $conn->prepare($sql);
 
 $params = [];
-$types = ''; 
+$types = 'i'; 
+
+$params[] = $user_id;  
 
 if (!empty($selected_game)) {
     $params[] = $selected_game;
@@ -105,6 +106,7 @@ if ($stmt) {
 
 $conn->close();
 ?>
+
 
 
 
