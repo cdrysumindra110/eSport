@@ -239,6 +239,15 @@ if (!$isSignin) {
 
     <!-- FOOTER -->
     <footer>
+      <!-- Social -->
+      <div class="background-primary padding text-center">
+        <a href="/"><i class="icon-facebook_circle text-size-30 text-white"></i></a> 
+        <a href="/"><i class="icon-twitter_circle text-size-30 text-white"></i></a>
+        <a href="/"><i class="icon-google_plus_circle text-size-30 text-white"></i></a>
+        <a href="/"><i class="icon-instagram_circle text-size-30 text-white"></i></a> 
+        <a href="/"><i class="icon-linked_in_circle text-size-30 text-white"></i></a>                                                                       
+      </div>
+      <!-- Animated Logos -->
       <div class="container-animated sticky" id="logo-container">
         <div class="scrollable-container">
           <button class="animated-btn left-button">&nbsp;&nbsp;&nbsp;&nbsp;We are Trusted By:&nbsp;&nbsp;&nbsp;&nbsp;</button>
@@ -252,35 +261,36 @@ if (!$isSignin) {
             <img src="img/logo/masterportfolio-banner-dark.png" alt="masterportfolio-banner-dark" class="image">
             <img src="img/logo/Empyre.png" alt="Empyre" class="image">
           </div>
-            <button class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
+            <button onclick="window.location.href='our-services.php'" class="animated-btn right-button">&nbsp;&nbsp;Become our Client&nbsp;&nbsp;</button>
         </div>
-    </div>
+      </div>
       <section class="section background-dark">
-      <!-- Main Footer -->
+        <!-- Main Footer -->
         <div class="line"> 
           <div class="margin2x">
             <div class="hide-s hide-m hide-l xl-2">
-               <img src="img/logo.png" alt="">
+              <img src="img/logo.png" alt="">
             </div>
             <div class="s-12 m-6 l-3 xl-3">
                <h4 class="text-white text-strong">Our Mission</h4>
-               <p>
+               <p style="text-align: justify;">
                 To create a thriving esports ecosystem where players can showcase their skills, 
                 teams can compete at the highest level, and fans can experience the excitement 
                 of world-class gaming events.
                </p>
             </div>
             <div class="s-12 m-6 l-3 xl-2">
-               <h4 class="text-white text-strong margin-m-top-30">Useful Links</h4>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">FAQ</a><br>      
-               <a class="text-primary-hover" href="contact-1.html">Contact Us</a><br>
-               <a class="text-primary-hover" href="blog.html">Blog</a>
+               <h4 class="text-white text-strong margin-m-top-30">Useful Links</h4> 
+               <a class="text-primary-hover" href="index.php">Home</a><br>
+               <a class="text-primary-hover" href="news.php">News</a><br>     
+               <a class="text-primary-hover" href="our-services.php">Contact Us</a><br>
+               <a class="text-primary-hover" href="about-us.php">About Us</a><br>
             </div>
             <div class="s-12 m-6 l-3 xl-2">
                <h4 class="text-white text-strong margin-m-top-30">Term of Use</h4>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Terms and Conditions</a><br>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Refund Policy</a><br>
-               <a class="text-primary-hover" href="sample-post-without-sidebar.html">Disclaimer</a>
+               <a class="text-primary-hover" href="faq.php">FAQ</a><br>
+               <a class="text-primary-hover" href="privacy-policy.php">Privacy Policy</a><br>
+               <a class="text-primary-hover" href="disclaimer.php">Disclaimer</a>
             </div>
             <div class="s-12 m-6 l-3 xl-3">
                <h4 class="text-white text-strong margin-m-top-30">Contact Us</h4>
@@ -298,12 +308,11 @@ if (!$isSignin) {
       <section class="padding-2x background-dark full-width">
         <div class="full-width">
           <div class="s-12 l-6">
-            <p class="text-size-12 margin-bottom-0">Copyright 2024, &Sigma;Indra65 - BCA 2k22</p>
-            <p class="text-size-12 margin-bottom-0">Copyright 2024, MK38 - BCA 2k22</p>
-            <p class="text-size-12">© 2024 InfiKnight Esports. All Rights Reserved.</p>
+            <p class="text-size-16 margin-bottom-0">Copyright 2024 &Sigma;Indra65 , MK38 - BCA 2K22</p>
+            <p class="text-size-12">Copyright 2024 InfiKnight Esports. All Rights Reserved.</p>
           </div>
           <div class="s-12 l-6">
-            <a class="right text-size-12 text-primary-hover" href="#" title="Esports Website">Developed by Team <span style="font-size: 25px;">&infin;</span>
+            <a class="right text-size-12 text-primary-hover" href="#" title="Team InfiKnight">Developed by Team <span style="font-size: 25px;">&infin;</span>
             </a>
           </div>
         </div>  
