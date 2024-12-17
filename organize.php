@@ -125,12 +125,12 @@ if (!$isSignin) {
 
 
 
-            <!-- Popup Message -->
-            <div class="popup-message" id="popup-message"></div>
+  <!-- Popup Message -->
+  <div class="popup-message" id="popup-message"></div>
 
   <div class="game-tournament">
-      <h2 class="section-heading">Select a Game</h2>
-      <div id="search">
+      <h2 class="section-heading" style="float: left;padding-left : 100px">Select a Game</h2>
+      <div id="search" style="float: right;">
         <svg viewBox="0 0 420 60" xmlns="http://www.w3.org/2000/svg">
           <rect class="bar"/>
           
@@ -170,7 +170,7 @@ if (!$isSignin) {
             <path class="particle plus"/>
           </g>
         </svg>
-        <input type=search name=q aria-label="Search for inspiration"/>
+        <input type="search" name="q" id="searchInput" aria-label="Search for inspiration" placeholder="Search games..."/>
       </div>
       
       <div id="results">
@@ -355,6 +355,21 @@ document.addEventListener('DOMContentLoaded', function() {
     showPopupMessage("<?php echo $error_message; ?>", 'error');
   <?php endif; ?>
 });
+
+document.getElementById('searchInput').addEventListener('input', function() {
+    var searchTerm = this.value.toLowerCase();
+    var gameCards = document.querySelectorAll('.game-card');
+
+    gameCards.forEach(function(card) {
+        var gameName = card.querySelector('h3').textContent.toLowerCase();
+        if (gameName.includes(searchTerm)) {
+            card.style.display = ''; // Show the card if it matches the search
+        } else {
+            card.style.display = 'none'; // Hide the card if it doesn't match
+        }
+    });
+});
+
 </script>
 <!-- Accordian jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
