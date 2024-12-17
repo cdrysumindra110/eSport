@@ -36,12 +36,12 @@ if ($stmt_uname) {
     $error_message = "Error preparing the statement: " . $conn->error;
 }
 
-// Check for filtering criteria in GET parameters
+
 $selected_game = isset($_GET['selected_game']) ? $_GET['selected_game'] : '';
 $match_type = isset($_GET['match_type']) ? $_GET['match_type'] : '';
 $sdate = isset($_GET['sdate']) ? $_GET['sdate'] : '';
 
-// Base SQL query
+
 $sql = "SELECT 
             t.id, t.selected_game, t.tname, t.sdate, t.stime, t.about, t.bannerimg, 
             b.bracket_type, b.match_type, b.solo_players, b.duo_teams, b.duo_players_per_team, 
@@ -54,7 +54,7 @@ $sql = "SELECT
         LEFT JOIN users u ON t.user_id = u.id
         WHERE 1=1";
 
-// Apply filters to the query
+
 if (!empty($selected_game)) {
     $sql .= " AND t.selected_game = ?";
 }
@@ -67,32 +67,29 @@ if (!empty($sdate)) {
     $sql .= " AND t.sdate = ?";
 }
 
-// Add sorting order
 $sql .= " ORDER BY t.id";
 
-// Prepare the statement with possible filtering criteria
 $stmt = $conn->prepare($sql);
 
-// Bind parameters dynamically based on the filters
 $params = [];
-$types = ''; // Dynamic parameter types for bind_param
+$types = ''; 
 
 if (!empty($selected_game)) {
     $params[] = $selected_game;
-    $types .= 's'; // 's' for string
+    $types .= 's'; 
 }
 
 if (!empty($match_type)) {
     $params[] = $match_type;
-    $types .= 's'; // 's' for string
+    $types .= 's'; 
 }
 
 if (!empty($sdate)) {
     $params[] = $sdate;
-    $types .= 's'; // 's' for string
+    $types .= 's'; 
 }
 
-// Bind parameters to the prepared statement
+
 if (!empty($types)) {
     $stmt->bind_param($types, ...$params);
 }
