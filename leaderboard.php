@@ -67,10 +67,10 @@ $conn->close();
   </head>
 
   <body class="size-1280 primary-color-red">
-    <!-- HEADER -->
-    <!-- <div id="preloader" style="background: #000 url(./img/loading100.gif) no-repeat center center; 
-    background-size: 45%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-    </div> -->
+    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
+      background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
+    </div>
+    
     <header role="banner" class="position-absolute">
       <!-- Top Bar -->
       <div class="top-bar full-width hide-s hide-m">
@@ -92,19 +92,7 @@ $conn->close();
         <div class="top-nav s-12 l-10">
           <ul class="right chevron">
             <li><a href="index.php">Home</a></li>
-           <li><a href="tournaments.php">Tournaments</a>
-              <ul>
-                <li><a href="#">Upcoming Tournaments</a>
-                  <ul class="game_container">
-                    <a href="#"><li class="ga_me"> <img src="img/logo/pubg_logo.png" alt="Pubg Logo" class="ga_me-icon">Pubg Mobile</li></a>
-                    <a href="#"><li class="ga_me"> <img src="img/logo/ff_logo.png" alt="FF Logo" class="ga_me-icon">Free Fire</li></a>
-                    <a href="#"><li class="ga_me"> <img src="img/logo/cs_logo.png" alt="COD Logo" class="ga_me-icon">COD Mobile</li></a>
-                    <a href="tournaments.php" class="all-games"><li class="all-games-text">All Tournaments<i class="fas fa-arrow-right"></i></li></a>
-                  </ul>
-              </li>
-                <li><a>Ongoing Tournaments</a></li>
-                </ul>
-            </li>
+            <li><a href="tournaments.php">Tournaments</a></li>
             <li><a href="news.php">News</a></li>
             <li><a href="our-services.php">Our Services</a></li>
              
@@ -126,9 +114,6 @@ $conn->close();
       </nav>
     </header>
 
-    <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
-    background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-    </div>
     <!-- MAIN -->
     <main role="main">    
       <article>

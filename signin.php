@@ -122,9 +122,9 @@ if (!empty($error_message)) {
 </head>
 <body>
 
-<div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
+  <div id="preloader" style="background: #000 url(./img/loader.gif) no-repeat center center; 
     background-size: 4.5%;height: 100vh;width: 100%;position: fixed;z-index: 999;">
-    </div>
+  </div>
 
   <div class="popup-message" id="popup-message"></div>
   

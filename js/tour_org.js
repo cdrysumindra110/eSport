@@ -145,6 +145,7 @@ function copyContentToInput() {
         const editorContent = document.getElementById('editor').innerHTML;
         document.getElementById('hiddenInput').value = editorContent;
     }
+    
 // Accordian js
 let accordDT = jQuery(".accordion dt");
 accordDT.on("click", function () {
